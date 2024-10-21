@@ -6,7 +6,7 @@ export default function About() {
       <div className='container mx-auto flex flex-col items-center px-4'>
         
         {/* Título Principal */}
-        <h1 className='text-4xl font-bold p-4 text-center'>Gestión de proyectos simplificada</h1>
+        <h1 className='text-4xl font-bold p-4 text-center'>Gestión de proyectos y tareas de forma simplificada</h1>
         
         {/* Imagen principal */}
         <img src="/main.png" alt="Logo" className='w-full h-96 mb-6  bg-black' />

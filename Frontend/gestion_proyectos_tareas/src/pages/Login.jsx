@@ -74,7 +74,7 @@ function Login() {
 
       {/* Imagen de fondo */}
       <div className="hidden md:block w-full h-full ">
-        <img src="../public/login.png" alt="Login" className="w-full h-full  bg-blue-950" />
+        <img src="../public/login.png" alt="Login" className="w-full h-full" />
       </div>
 
     </div>

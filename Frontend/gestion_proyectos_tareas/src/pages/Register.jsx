@@ -28,8 +28,8 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 justify-center items-center bg-gray-100 px-4 md:px-0">
+      <div className="w-full max-w-md mx-auto md:ml-32">
         <form onSubmit={handleRegister} className="bg-white shadow-md rounded px-8 py-6">
           <h2 className="text-2xl font-bold text-center mb-6">Registrate</h2>
           <div className="mb-4">
@@ -45,7 +45,7 @@ function Register() {
               required
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
               Correo
             </label>
@@ -81,7 +81,11 @@ function Register() {
           </div>
         </form>
       </div>
+      <div className="hidden md:block w-full h-full ">
+    <img src="../public/login.png" alt="Login" className="w-full h-full" />
+     </div>
     </div>
+
   );
 }
 
