@@ -1,13 +1,20 @@
 import { useState } from "react";
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import { useNavigate, Link } from "react-router-dom";
 
+
+
+
 function Login() {
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
     const response = await fetch('http://localhost:5000/api/auth/login', {
       method: 'POST',
       headers: {
@@ -15,17 +22,24 @@ function Login() {
       },
       body: JSON.stringify({ email, password }),
     });
-
+  
     const data = await response.json();
+  
     if (response.ok) {
       localStorage.setItem('token', data.token);
-      navigate('/dashboard');
+      toast.success('Iniciaste sesión de forma correcta')
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     } else {
-      alert(data.message);
+      toast.error(data.message);
     }
-  };
+  }
+  
 
   return (
+
+    <>
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 justify-center items-center bg-gray-100 px-4 md:px-0">
       
       {/* Formulario de login */}
@@ -78,6 +92,9 @@ function Login() {
       </div>
 
     </div>
+    
+
+    </>
   );
 }
 

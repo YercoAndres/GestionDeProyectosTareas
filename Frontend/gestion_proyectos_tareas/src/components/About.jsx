@@ -6,10 +6,10 @@ export default function About() {
       <div className='container mx-auto flex flex-col items-center px-4'>
         
         {/* Título Principal */}
-        <h1 className='text-4xl font-bold p-4 text-center'>Gestión de proyectos y tareas de forma simplificada</h1>
+        <h1 className='text-4xl font-bold p-8 text-center'>Gestión de proyectos y tareas de forma simplificada</h1>
         
         {/* Imagen principal */}
-        <img src="/main.png" alt="Logo" className='w-full h-96 mb-6  bg-black' />
+        <img src="/main.png" alt="Logo" className='w-full h-96 mb-6 ' />
 
         <div className='flex flex-col items-center'>
           
@@ -25,13 +25,13 @@ export default function About() {
             {/* Imágenes de servicios */}
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6'>
               <div className='flex justify-center'>
-                <img src="../public/1.png" alt="Servicio 1" className='w-16 h-16 m-2' />
+                <img src="../public/1.png" alt="Servicio 1" className='w-16 h-16 m-2 animate-pulse' />
               </div>
               <div className='flex justify-center'>
-                <img src="../public/2.png" alt="Servicio 2" className='w-16 h-16 m-2' />
+                <img src="../public/2.png" alt="Servicio 2" className='w-16 h-16 m-2 animate-pulse' />
               </div>
               <div className='flex justify-center'>
-                <img src="../public/3.png" alt="Servicio 3" className='w-16 h-16 m-2' />
+                <img src="../public/3.png" alt="Servicio 3" className='w-16 h-16 m-2 animate-pulse' />
               </div>
             </div>
 
@@ -45,6 +45,8 @@ export default function About() {
           
         </div>
       </div>
+    
     </section>
+    
   );
 }

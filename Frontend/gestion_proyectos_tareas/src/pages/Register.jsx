@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Register() {
   const [name, setName] = useState('');
@@ -20,14 +21,20 @@ function Register() {
 
     const data = await response.json();
     if (response.ok) {
-      alert('Registered successfully');
+      toast.success('Usuario registrado de forma correcta'),{
+        autoClose: 5000
+      }
       navigate('/login');
     } else {
-      alert(data.message);
+      toast.error(data.message),{
+        autoClose: 5000
+      };
     }
   };
 
   return (
+    
+    
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 justify-center items-center bg-gray-100 px-4 md:px-0">
       <div className="w-full max-w-md mx-auto md:ml-32">
         <form onSubmit={handleRegister} className="bg-white shadow-md rounded px-8 py-6">
@@ -79,7 +86,15 @@ function Register() {
               Registrar
             </button>
           </div>
-        </form>
+        </form> 
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">
+            ¿Ya tienes una cuenta?{' '}
+            <Link to="/login" className="text-blue-500 hover:text-blue-700">
+              Ingresa aquí
+            </Link>
+          </p>
+        </div>
       </div>
       <div className="hidden md:block w-full h-full ">
     <img src="../public/login.png" alt="Login" className="w-full h-full" />
