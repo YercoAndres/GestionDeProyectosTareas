@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { ToastContainer, Zoom, toast } from 'react-toastify'; // Importa el ToastContainer
+import { ToastContainer, Zoom, toast } from 'react-toastify'; 
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MainPage from './pages/MainPage';
-import Dashboard from './pages/Dashboard'; // Asegúrate de que la ruta sea correcta
+import Dashboard from './pages/Dashboard';
 
 
 

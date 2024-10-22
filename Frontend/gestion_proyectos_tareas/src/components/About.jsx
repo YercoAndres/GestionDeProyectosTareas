@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 export default function About() {
   return (
     <section id='about' className='py-20 bg-white text-black'>
@@ -9,7 +10,8 @@ export default function About() {
         <h1 className='text-4xl font-bold p-8 text-center'>Gestión de proyectos y tareas de forma simplificada</h1>
         
         {/* Imagen principal */}
-        <img src="/main.png" alt="Logo" className='w-full h-96 mb-6 ' />
+      
+        <img src="/main.png" alt="Logo" className='w-full h-96 mb-6' />
 
         <div className='flex flex-col items-center'>
           

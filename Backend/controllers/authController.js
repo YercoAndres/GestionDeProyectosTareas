@@ -1,0 +1,43 @@
+const user = require ('../models/User');
+const jwt = require ('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
+const register = (req, res) => {
+    const { name, email, password } = req.body; // extraiga los datos del cuerpo de la solicitud 
+    // verificamos si el correo existe
+    user.findByEmail(email, (err, results)=>{
+        if (results.length > 0) {
+            return res.status(400).json({message: 'Usuario ya existe'})
+        } else {
+            user.create({ name, email, password}, (err, results)=>{
+                if(err) throw err;
+                return res.status(201).json ({message: 'Usuario registrado de forma exitosa'})
+            });
+        }
+    });
+};
+const login = (req, res) => {
+    const { email, password } = req.body; // Extrae los datos del cuerpo
+
+    user.findByEmail(email, (err, results) => {
+        if (results.length === 0) {
+            return res.status(400).json({ message: 'Usuario no encontrado' });
+        }
+        const user = results[0];
+
+        const isMatch = bcrypt.compareSync(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Credenciales inválidas' });
+        } 
+
+        const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, {
+            expiresIn: '1h'
+        });
+        
+        // Asegúrate de enviar el token y el mensaje aquí
+        return res.status(200).json({ token, message: 'Iniciaste sesión de forma correcta' });
+    });
+};
+
+
+module.exports = {register, login};
