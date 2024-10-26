@@ -11,7 +11,7 @@ const register = (req, res) => {
         } else {
             user.create({ name, email, password}, (err, results)=>{
                 if(err) throw err;
-                return res.status(201).json ({message: 'Usuario registrado de forma exitosa'})
+                return res.status(201).json ({message: 'Usuario registrado de forma exitosa'})               
             });
         }
     });
@@ -33,9 +33,7 @@ const login = (req, res) => {
         const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, {
             expiresIn: '1h'
         });
-        
-        // Asegúrate de enviar el token y el mensaje aquí
-        return res.status(200).json({ token, message: 'Iniciaste sesión de forma correcta' });
+        return res.status(200).json({ token});
     });
 };
 

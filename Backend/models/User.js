@@ -10,7 +10,11 @@ const User = {
   findByEmail: (email, callback) => {
     const query = 'SELECT * FROM users WHERE email = ?';
     db.query(query, [email], callback);
-  }
+  }//,
+  // deleteUser: (email, callback) => {
+  //   const query = 'DELETE FROM users WHERE email =?';
+  //   db.query(query, [email], callback)
+  // }
 };
 
 module.exports = User;
