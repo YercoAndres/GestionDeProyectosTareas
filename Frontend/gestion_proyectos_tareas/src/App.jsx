@@ -5,6 +5,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MainPage from './pages/MainPage';
 import Dashboard from './pages/Dashboard';
+import Projects from './pages/Projects';
+import Tasks from './pages/Tasks';
+import Settings from './pages/Settings';
 
 
 
@@ -17,6 +20,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} /> {/* Ruta para Dashboard */}
+        <Route path="/dashboard/projects" element={<Projects/>} />
+        <Route path="/dashboard/tasks" element={<Tasks/>} />
+        <Route path='/dashboard/settings' element={<Settings/>}/>
         </Routes>
       </Router>
       <ToastContainer

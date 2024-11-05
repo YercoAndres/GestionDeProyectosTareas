@@ -1,21 +1,16 @@
+// src/pages/Dashboard.js
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // Eliminar el token del localStorage
-    localStorage.removeItem('token');
-    // Redirigir al usuario a la página de inicio de sesión
-    navigate('/');
-  };
-
   return (
-    <div>
-      <h1>Dashboard</h1>
-      {/* Botón de cerrar sesión */}
-      <button onClick={handleLogout}>Cerrar sesión</button>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1 p-10 bg-gray-100">
+        <h1 className="text-3xl font-semibold mb-6">Dashboard</h1>
+        <p>Contenido del Dashboard.</p>
+        {/* Aquí puedes añadir el contenido del dashboard */}
+      </div>
     </div>
   );
 };
