@@ -27,7 +27,7 @@ function Login() {
   
     if (response.ok) {
       localStorage.setItem('token', data.token);
-      toast.success('Iniciaste sesión de forma correcta')
+      toast.success('Inicio de sesión exitoso')
       setTimeout(() => {
         navigate('/dashboard');
       }, 1000);
