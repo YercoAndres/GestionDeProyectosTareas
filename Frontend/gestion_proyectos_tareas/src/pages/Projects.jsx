@@ -1,220 +1,167 @@
-// src/pages/Projects.js
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
-import ConfirmDialog from '../components/ConfirmDialog';
+import Modal from '../components/Modal';
+import ProjectCard from '../components/ProyectCard';
+import { FaPlus } from 'react-icons/fa';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [newProject, setNewProject] = useState({ name: '', description: '' });
-  const [newTask, setNewTask] = useState('');
-  const [editingProject, setEditingProject] = useState(null);
-  const [projectToDelete, setProjectToDelete] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [newProject, setNewProject] = useState({
+    name: '',
+    description: '',
+    startDate: '',
+    endDate: '',
+    members: []
+  });
+  const [newMember, setNewMember] = useState('');
   const [error, setError] = useState(null);
+
+  const toggleModal = () => setShowModal(!showModal);
 
   useEffect(() => {
     fetch('http://localhost:5000/projects')
-      .then(response => response.json())
-      .then(data => setProjects(data))
-      .catch(error => setError('Error fetching projects'));
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al obtener los proyectos');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data); // Agrega esta línea para ver la respuesta del servidor
+        setProjects(data); // Asegúrate de que 'data' tenga la estructura correcta
+      })
+      .catch(error => console.error('Error fetching projects:', error));
   }, []);
 
   const handleAddProject = (e) => {
     e.preventDefault();
+    if (!newProject.name || !newProject.startDate || !newProject.endDate) {
+      setError('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+  
+    const projectToAdd = {
+      ...newProject,
+      members: newProject.members || [] // Asegúrate de que los miembros se envíen correctamente
+    };
+  
     fetch('http://localhost:5000/projects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProject),
+      body: JSON.stringify(projectToAdd),
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la creación del proyecto');
+        }
+        return response.json();
+      })
       .then(data => {
         setProjects([...projects, data]);
-        setNewProject({ name: '', description: '' });
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [] });
+        setNewMember(''); // Limpiar el campo de nuevo miembro
+        setShowModal(false);
+        setError(null);
       })
-      .catch(() => setError('Error adding project'));
+      .catch(err => {
+        setError(err.message);
+        console.error('Error al agregar el proyecto:', err);
+      });
   };
 
-  const handleEditProject = (project) => setEditingProject(project);
 
-  const handleUpdateProject = (e) => {
-    e.preventDefault();
-    fetch(`http://localhost:5000/projects/${editingProject.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editingProject),
-    })
-      .then(response => response.json())
-      .then(data => {
-        setProjects(projects.map(project => (project.id === data.id ? data : project)));
-        setEditingProject(null);
-      })
-      .catch(() => setError('Error updating project'));
-  };
 
-  const handleDeleteProject = () => {
-    fetch(`http://localhost:5000/projects/${projectToDelete}`, { method: 'DELETE' })
-      .then(() => {
-        setProjects(projects.filter(project => project.id !== projectToDelete));
-        setShowConfirmDialog(false);
-        setProjectToDelete(null);
-      })
-      .catch(() => setError('Error deleting project'));
-  };
 
-  const confirmDeleteProject = (id) => {
-    setProjectToDelete(id);
-    setShowConfirmDialog(true);
-  };
-
-  const handleAddTask = (projectId) => {
-    fetch(`http://localhost:5000/projects/${projectId}/tasks`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task: newTask }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        setProjects(projects.map(project =>
-          project.id === projectId ? { ...project, tasks: [...project.tasks, data] } : project
-        ));
-        setNewTask('');
-      })
-      .catch(() => setError('Error adding task'));
+  const handleAddMember = () => {
+    if (newMember) {
+      setNewProject(prev => ({ ...prev, members: [...prev.members, newMember] }));
+      setNewMember('');
+    }
   };
 
   return (
     <Sidebar>
       <div className="flex-1 p-10 bg-gray-100">
-        <h1 className="text-3xl font-semibold mb-6">Proyectos</h1>
-        <p>Bienvenido a la sección de proyectos. Aquí puedes ver y gestionar todos tus proyectos.</p>
-        
-        {error && <p className="text-red-500">{error}</p>}
-        
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4">Crear Nuevo Proyecto</h2>
-          <form onSubmit={handleAddProject}>
-            <div className="mb-4">
-              <label className="block text-gray-700">Nombre del Proyecto</label>
-              <input
-                type="text"
-                value={newProject.name}
-                onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded"
-                placeholder="Introduce el nombre del proyecto"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Descripción</label>
-              <textarea
-                value={newProject.description}
-                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded"
-                placeholder="Introduce una descripción del proyecto"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Crear Proyecto
-            </button>
-          </form>
-        </div>
+        <h1 className="text-3xl font-semibold mb-6">Dashboard</h1>
+        <button 
+          onClick={toggleModal} 
+          className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
+        >
+          <FaPlus className="mr-2" /> Crear Nuevo Proyecto
+        </button>
+      </div>
 
+      {showModal && (
+        <Modal onClose={toggleModal}>
+          <h2 className="text-lg font-bold text-blue-600">Crear Nuevo Proyecto</h2>
+          {error && <p className="text-red-500">{error}</p>}
+          <form onSubmit={handleAddProject} className="space-y-4">
+  <input 
+    type="text" 
+    placeholder="Nombre del proyecto" 
+    value={newProject.name} 
+    onChange={(e) => setNewProject({ ...newProject, name: e.target.value })} 
+    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
+    required 
+  />
+  <textarea 
+    placeholder="Descripción" 
+    value={newProject.description} 
+    onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} 
+    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
+  />
+  <input 
+    type="date" 
+    placeholder="Fecha de Inicio" 
+    value={newProject.startDate} 
+    onChange={(e) => setNewProject({ ...newProject, startDate: e.target.value })} 
+    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
+    required 
+  />
+  <input 
+    type="date" 
+    placeholder="Fecha de Fin" 
+    value={newProject.endDate} 
+    onChange={(e) => setNewProject({ ...newProject, endDate: e.target.value })} 
+    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
+    required 
+  />
+  <div className="flex items-center">
+    <input 
+      type="text" 
+      placeholder="Agregar miembro" 
+      value={newMember} 
+      onChange={(e) => setNewMember(e.target.value)} 
+      className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
+    />
+    <button 
+      type="button" 
+      onClick={handleAddMember} 
+      className="ml-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
+    >
+      Agregar
+    </button>
+  </div>
+  <ul className="list-disc pl-5">
+    {newProject.members.map((member, index) => (
+      <li key={index} className="text-gray-700">{member}</li>
+    ))}
+  </ul>
+  <button 
+    type="submit" 
+    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+  >
+    Crear Proyecto
+  </button>
+</form>
+        </Modal>
+      )}
 
-
-
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4">Lista de Proyectos</h2>
-          <ul className="space-y-4">
-            {projects.length > 0 ? (
-              projects.map(project => (
-                <li key={project.id} className="p-4 bg-white rounded shadow">
-                  {editingProject && editingProject.id === project.id ? (
-                    <form onSubmit={handleUpdateProject}>
-                      <input
-                        type="text"
-                        value={editingProject.name}
-                        onChange={(e) => setEditingProject({ ...editingProject, name: e.target.value })}
-                        className="w-full p-2 mb-2 border border-gray-300 rounded"
-                      />
-                      <textarea
-                        value={editingProject.description}
-                        onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
-                        className="w-full p-2 mb-2 border border-gray-300 rounded"
-                      ></textarea>
-                      <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                        Guardar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditingProject(null)}
-                        className="px-4 py-2 ml-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                      >
-                        Cancelar
-                      </button>
-                    </form>
-                  ) : (
-                    <>
-                      <h3 className="text-xl font-bold">{project.name}</h3>
-                      <p>{project.description}</p>
-                      <button
-                        onClick={() => handleEditProject(project)}
-                        className="px-4 py-2 mt-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => confirmDeleteProject(project.id)}
-                        className="px-4 py-2 mt-2 ml-2 bg-red-600 text-white rounded hover:bg-red-700"
-                      >
-                        Eliminar
-                      </button>
-                    </>
-                  )}
-                  <div className="mt-4">
-                    <h4 className="text-lg font-semibold">Tareas</h4>
-                    <ul className="list-disc list-inside">
-                      {project.tasks && project.tasks.length > 0 ? (
-                        project.tasks.map((task, index) => (
-                          <li key={index}>{task.task}</li>
-                        ))
-                      ) : (
-                        <li>No hay tareas</li>
-                      )}
-                    </ul>
-                    <input
-                      type="text"
-                      value={newTask}
-                      onChange={(e) => setNewTask(e.target.value)}
-                      className="w-full p-2 mt-2 border border-gray-300 rounded"
-                      placeholder="Nueva tarea"
-                    />
-                    <button
-                      onClick={() => handleAddTask(project.id)}
-                      className="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Agregar Tarea
-                    </button>
-                  </div>
-                </li>
-              ))
-            ) : (
-              <li>No hay proyectos disponibles</li>
-            )}
-          </ul>
-        </div>
-        
-
-        
-        {showConfirmDialog && (
-          <ConfirmDialog
-            isOpen={showConfirmDialog}
-            onConfirm={handleDeleteProject}
-            onCancel={() => setShowConfirmDialog(false)}
-            message="¿Estás seguro de que deseas eliminar este proyecto?"
-          />
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        {projects.map((project, index) => (
+          <ProjectCard key={index} project={project} />
+        ))}
       </div>
     </Sidebar>
   );

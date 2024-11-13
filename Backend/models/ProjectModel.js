@@ -1,13 +1,19 @@
-
 const connection = require('../config/db');
+
+
+
 
 const getAllProjects = (callback) => {
   connection.query('SELECT * FROM projects', callback);
 };
 
 const createProject = (project, callback) => {
-  const { name, description } = project;
-  connection.query('INSERT INTO projects (name, description) VALUES (?, ?)', [name, description], callback);
+  const { name, description, startDate, endDate, members } = project;
+  const query = 'INSERT INTO projects (name, description, start_date, end_date, members) VALUES (?, ?, ?, ?, ?)';
+  connection.query(query, [name, description, startDate, endDate, members], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results.insertId);
+  });
 };
 
 const updateProject = (id, project, callback) => {
