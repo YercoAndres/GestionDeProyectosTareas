@@ -3,80 +3,159 @@ import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
 import ProjectCard from '../components/ProyectCard';
 import { FaPlus } from 'react-icons/fa';
+import ConfirmDialog from '../components/ConfirmDialog'; // Asegúrate de que la ruta sea correcta
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
     startDate: '',
     endDate: '',
-    members: []
+    members: [],
+    id: null // Asegúrate de que el id esté inicializado como null
   });
-  const [newMember, setNewMember] = useState('');
+  const [users, setUsers] = useState([]); // Lista de usuarios
   const [error, setError] = useState(null);
 
-  const toggleModal = () => setShowModal(!showModal);
+  const toggleModal = () => {
+    setShowModal(!showModal);
+    // Restablece el estado de newProject cuando se cierra el modal
+    if (!showModal) {
+      setNewProject({
+        name: '',
+        description: '',
+        startDate: '',
+        endDate: '',
+        members: [],
+        id: null // Asegúrate de que el id esté inicializado como null
+      });
+      setError(null); // Restablece el error
+    }
+  };
 
   useEffect(() => {
     fetch('http://localhost:5000/projects')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los proyectos');
-        }
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
-        console.log(data); // Agrega esta línea para ver la respuesta del servidor
-        setProjects(data); // Asegúrate de que 'data' tenga la estructura correcta
+        setProjects(data);
       })
       .catch(error => console.error('Error fetching projects:', error));
+
+    // Obtener la lista de usuarios
+    fetch('http://localhost:5000/api/users') // Asegúrate de que esta ruta sea correcta
+      .then(response => response.json())
+      .then(data => {
+        setUsers(data);
+      })
+      .catch(error => console.error('Error fetching users:', error));
   }, []);
 
   const handleAddProject = (e) => {
     e.preventDefault();
+  
     if (!newProject.name || !newProject.startDate || !newProject.endDate) {
       setError('Por favor, completa todos los campos obligatorios.');
       return;
     }
-  
     const projectToAdd = {
       ...newProject,
-      members: newProject.members || [] // Asegúrate de que los miembros se envíen correctamente
+      members: newProject.members // Solo asigna los miembros seleccionados
     };
   
-    fetch('http://localhost:5000/projects', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(projectToAdd),
-    })
+    if (newProject.id) {
+      // Edición de proyecto existente
+      fetch(`http://localhost:5000/projects/${newProject.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectToAdd),
+      })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Error en la creación del proyecto');
+          throw new Error('Error al editar el proyecto');
         }
         return response.json();
       })
       .then(data => {
-        setProjects([...projects, data]);
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [] });
-        setNewMember(''); // Limpiar el campo de nuevo miembro
+        setProjects(projects.map(project => project.id === newProject.id ? { ...projectToAdd, id: newProject.id } : project));
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null }); // Restablecer el estado
+        setError('');
         setShowModal(false);
-        setError(null);
       })
       .catch(err => {
-        setError(err.message);
-        console.error('Error al agregar el proyecto:', err);
+        console.error(err);
+        setError('Error al editar el proyecto. Inténtalo de nuevo.');
       });
+    } else {
+      // Creación de nuevo proyecto
+      fetch('http://localhost:5000/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectToAdd),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al crear el proyecto');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setProjects([...projects, { ...projectToAdd, id: data.projectId }]);
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null }); // Restablecer el estado
+        setError('');
+        setShowModal(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setError('Error al crear el proyecto. Inténtalo de nuevo.');
+      });
+    }
   };
 
+  // Función para manejar la selección de miembros
+  const handleMemberChange = (memberId) => {
+    setNewProject(prev => {
+      const members = prev.members.includes(memberId)
+        ? prev.members.filter(id => id !== memberId) // Si ya está seleccionado, quitarlo
+        : [...prev.members, memberId]; // Si no está, agregarlo
+      return { ...prev, members }; // Actualiza el estado con los miembros
+    });
+  };
 
+  // Funciones para editar y eliminar proyectos
+  const handleEditProject = (project) => {
+    setNewProject(project);
+    setShowModal(true);
+  };
+  const handleDeleteProject = (projectId) => {
+    setProjectToDelete(projectId);
+    setConfirmDialogVisible(true);
+  };
 
-
-  const handleAddMember = () => {
-    if (newMember) {
-      setNewProject(prev => ({ ...prev, members: [...prev.members, newMember] }));
-      setNewMember('');
+  const handleConfirmDelete = () => {
+    if (projectToDelete) {
+      fetch(`http://localhost:5000/projects/${projectToDelete}`, {
+        method: 'DELETE',
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error al eliminar el proyecto');
+          }
+          setProjects(projects.filter(project => project.id !== projectToDelete));
+          setProjectToDelete(null); // Limpiar el ID del proyecto a eliminar
+          setConfirmDialogVisible(false); // Ocultar el diálogo de confirmación
+        })
+        .catch(err => {
+          console.error('Error al eliminar el proyecto:', err);
+          setError('Error al eliminar el proyecto. Inténtalo de nuevo.'); // Manejo de error
+        });
     }
   };
 
@@ -86,82 +165,82 @@ const Projects = () => {
         <h1 className="text-3xl font-semibold mb-6">Dashboard</h1>
         <button 
           onClick={toggleModal} 
-          className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 transition duration-300"
-        >
-          <FaPlus className="mr-2" /> Crear Nuevo Proyecto
+          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center">
+          <FaPlus className="mr-2" /> Agregar Proyecto
         </button>
-      </div>
-
-      {showModal && (
-        <Modal onClose={toggleModal}>
-          <h2 className="text-lg font-bold text-blue-600">Crear Nuevo Proyecto</h2>
-          {error && <p className="text-red-500">{error}</p>}
-          <form onSubmit={handleAddProject} className="space-y-4">
-  <input 
-    type="text" 
-    placeholder="Nombre del proyecto" 
-    value={newProject.name} 
-    onChange={(e) => setNewProject({ ...newProject, name: e.target.value })} 
-    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
-    required 
-  />
-  <textarea 
-    placeholder="Descripción" 
-    value={newProject.description} 
-    onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} 
-    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
-  />
-  <input 
-    type="date" 
-    placeholder="Fecha de Inicio" 
-    value={newProject.startDate} 
-    onChange={(e) => setNewProject({ ...newProject, startDate: e.target.value })} 
-    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
-    required 
-  />
-  <input 
-    type="date" 
-    placeholder="Fecha de Fin" 
-    value={newProject.endDate} 
-    onChange={(e) => setNewProject({ ...newProject, endDate: e.target.value })} 
-    className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
-    required 
-  />
-  <div className="flex items-center">
-    <input 
-      type="text" 
-      placeholder="Agregar miembro" 
-      value={newMember} 
-      onChange={(e) => setNewMember(e.target.value)} 
-      className="border-2 border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:border-blue-500 transition duration-300" 
-    />
-    <button 
-      type="button" 
-      onClick={handleAddMember} 
-      className="ml-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
-    >
-      Agregar
-    </button>
-  </div>
-  <ul className="list-disc pl-5">
-    {newProject.members.map((member, index) => (
-      <li key={index} className="text-gray-700">{member}</li>
-    ))}
-  </ul>
-  <button 
-    type="submit" 
-    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-  >
-    Crear Proyecto
-  </button>
-</form>
-        </Modal>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-        {projects.map((project, index) => (
-          <ProjectCard key={index} project={project} />
-        ))}
+        {error && <p className="text-red-500">{error}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+          {projects.map(project => (
+            <ProjectCard 
+              key={project.id} 
+              project={project} 
+              onEdit={() => handleEditProject(project)} 
+              onDelete={() => handleDeleteProject(project.id)} 
+            />
+          ))}
+        </div>
+        {showModal && (
+          <Modal 
+            onClose={toggleModal}
+            title={newProject.id ? "Editar Proyecto" : "Agregar Proyecto"} // Cambia el título
+            buttonText={newProject.id ? "Guardar Cambios" : "Crear Proyecto"} // Cambia el texto del botón
+            onSubmit={handleAddProject} // Asegúrate de que esta función maneje el envío
+          >
+            <form onSubmit={handleAddProject}>
+              <input 
+                type="text" 
+                placeholder="Nombre del Proyecto" 
+                value={newProject.name} 
+                onChange={(e) => setNewProject({ ...newProject, name: e.target.value })} 
+                required className="border p-2 mb-4 w-full"
+              />
+              <textarea 
+                placeholder="Descripción" 
+                value={newProject.description} 
+                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} 
+                className="border p-2 mb-4 w-full"
+              />
+              <input 
+                type="date" 
+                value={newProject.startDate} 
+                onChange={(e) => setNewProject({ ...newProject, startDate: e.target.value })} 
+                required 
+                className="border p-2 mb-4 w-full"
+              />
+              <input 
+                type="date" 
+                value={newProject.endDate} 
+                onChange={(e) => setNewProject({ ...newProject, endDate: e.target.value })} 
+                required 
+                className="border p-2 mb-4 w-full"
+              />
+              <h3 className="text-lg font-semibold mb-2">Seleccionar Miembros</h3>
+              <div className="mb-4">
+                {users.map(user => (
+                  <div key={user.id} className="flex items-center mb-2">
+                    <input 
+                      type="checkbox" 
+                      id={`user-${user.id}`} 
+                      checked={newProject.members.includes(user.id)} 
+                      onChange={() => handleMemberChange(user.id)} 
+                    />
+                    <label htmlFor={`user-${user.id}`} className="ml-2">{user.name}</label>
+                  </div>
+                ))}
+              </div>
+              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
+                {newProject.id ? "Guardar Cambios" : "Crear Proyecto"} {/* Cambia el texto del botón */}
+              </button>
+            </form>
+          </Modal>
+        )}
+        {confirmDialogVisible && (
+          <ConfirmDialog
+            message="¿Estás seguro de que deseas eliminar este proyecto?"
+            onConfirm={handleConfirmDelete}
+            onCancel={() => setConfirmDialogVisible(false)}
+          />
+        )}
       </div>
     </Sidebar>
   );

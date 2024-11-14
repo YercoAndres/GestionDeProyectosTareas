@@ -1,30 +1,27 @@
-// src/components/ProjectCard.jsx
 import React from 'react';
 
-const ProjectCard = ({ project }) => {
-  // Función para formatear la fecha
+const ProjectCard = ({ project, onEdit, onDelete }) => { // Acepta onEdit y onDelete como props
   const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) { // Cambia isNaN por isNaN(date.getTime())
+      return 'Fecha inválida'; // Manejo de error
+    }
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('es-ES', options);
+    return date.toLocaleDateString('es-ES', options);
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 m-4">
-      <h3 className="text-xl font-bold">{project.name}</h3>
-      <p className="text-gray-600">{project.description || 'Sin descripción'}</p>
-      <p className="text-gray-500">Fecha de Inicio: {formatDate(project.start_date)}</p>
-      <p className="text-gray-500">Fecha de Fin: {formatDate(project.end_date)}</p>
-      <div className="mt-2">
-        <h4 className="font-semibold">Miembros:</h4>
-        {project.members && project.members.length > 0 ? (
-          <ul className="list-disc pl-5">
-            {project.members.map((member, index) => (
-              <li key={index} className="text-gray-600">{member}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-600">No hay miembros asignados</p>
-        )}
+    <div className="border p-4 rounded shadow-md">
+      <h2 className="text-xl font-semibold">{project.name}</h2>
+      <p>{project.description}</p>
+      <p>Fechas: {formatDate(project.start_date)} - {formatDate(project.end_date)}</p>
+      <p>Miembros: {project.members.length > 0 ? project.members.length : 'No hay miembros'}</p>      <div className="mt-4">
+        <button onClick={onEdit} className="bg-blue-500 text-white px-2 py-1 rounded mr-2">
+          Editar
+        </button>
+        <button onClick={onDelete} className="bg-red-500 text-white px-2 py-1 rounded">
+          Eliminar
+        </button>
       </div>
     </div>
   );

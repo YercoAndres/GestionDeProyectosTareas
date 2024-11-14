@@ -6,6 +6,7 @@ const colors = require('colors');
 const projectRoutes = require('./routes/projectRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const errorHandler = require('./middlewares/errorHandler');
+const userRoutes = require('./routes/userRoutes'); // Asegúrate de que la ruta sea correcta
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/projects', projectRoutes);
 app.use('/', taskRoutes); // Cambiado de `/projects` a `/`
-
+app.use('/api/users', userRoutes); // Usa la ruta de usuarios
 
 app.use(errorHandler);
 

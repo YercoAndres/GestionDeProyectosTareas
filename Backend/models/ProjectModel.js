@@ -8,9 +8,9 @@ const getAllProjects = (callback) => {
 };
 
 const createProject = (project, callback) => {
-  const { name, description, startDate, endDate, members } = project;
+  const { name, description, start_Date, end_Date, members } = project;
   const query = 'INSERT INTO projects (name, description, start_date, end_date, members) VALUES (?, ?, ?, ?, ?)';
-  connection.query(query, [name, description, startDate, endDate, members], (err, results) => {
+  connection.query(query, [name, description, start_Date, end_Date, members], (err, results) => {
     if (err) return callback(err);
     callback(null, results.insertId);
   });
@@ -22,16 +22,16 @@ const updateProject = (id, project, callback) => {
 };
 
 const deleteProject = (id, callback) => {
-    // Primero eliminamos las tareas asociadas con el proyecto
-    connection.query('DELETE FROM tasks WHERE project_id = ?', [id], (error) => {
-      if (error) {
-        return callback(error);
-      }
-  
-      // Después eliminamos el proyecto
-      connection.query('DELETE FROM projects WHERE id = ?', [id], callback);
-    });
-  };
+  // Primero eliminamos los miembros asociados con el proyecto
+  connection.query('DELETE FROM project_members WHERE project_id = ?', [id], (error) => {
+    if (error) {
+      return callback(error);
+    }
+
+    // Después eliminamos el proyecto
+    connection.query('DELETE FROM projects WHERE id = ?', [id], callback);
+  });
+};
   
 
 module.exports = {
