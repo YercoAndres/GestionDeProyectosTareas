@@ -27,4 +27,7 @@ const ProjectCard = ({ project, onEdit, onDelete }) => { // Acepta onEdit y onDe
   );
 };
 
+
+
+
 export default ProjectCard;

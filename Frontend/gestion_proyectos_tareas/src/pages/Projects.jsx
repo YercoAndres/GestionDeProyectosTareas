@@ -162,7 +162,7 @@ const Projects = () => {
   return (
     <Sidebar>
       <div className="flex-1 p-10 bg-gray-100">
-        <h1 className="text-3xl font-semibold mb-6">Dashboard</h1>
+        <h1 className="text-3xl font-semibold mb-6">Proyectos</h1>
         <button 
           onClick={toggleModal} 
           className="bg-blue-500 text-white px-4 py-2 rounded flex items-center">
@@ -200,6 +200,7 @@ const Projects = () => {
                 onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} 
                 className="border p-2 mb-4 w-full"
               />
+              <h2>Fecha de Inicio</h2>
               <input 
                 type="date" 
                 value={newProject.startDate} 
@@ -207,6 +208,7 @@ const Projects = () => {
                 required 
                 className="border p-2 mb-4 w-full"
               />
+              <h2>Fecha de Fin</h2>
               <input 
                 type="date" 
                 value={newProject.endDate} 
@@ -227,10 +229,11 @@ const Projects = () => {
                     <label htmlFor={`user-${user.id}`} className="ml-2">{user.name}</label>
                   </div>
                 ))}
-              </div>
+              </div>{/*
               <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-                {newProject.id ? "Guardar Cambios" : "Crear Proyecto"} {/* Cambia el texto del botón */}
+                {newProject.id ? "Guardar Cambios" : "Crear Proyecto"}  Cambia el texto del botón 
               </button>
+              */}
             </form>
           </Modal>
         )}
