@@ -79,7 +79,7 @@ const Sidebar = ({ children }) => {
             ProjectTask
           </h2>
           <Link to="/dashboard" className="block p-2 rounded hover:bg-gray-700">
-            Inicio
+            Dashboard
           </Link>
           <Link
             to="/dashboard/projects"

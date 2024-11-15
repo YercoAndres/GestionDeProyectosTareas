@@ -17,7 +17,7 @@ const register = (req, res) => {
     });
 };
 const login = (req, res) => {
-    const { email, password } = req.body; // Extrae los datos del cuerpo
+    const { email, password } = req.body;
 
     user.findByEmail(email, (err, results) => {
         if (results.length === 0) {
@@ -28,12 +28,12 @@ const login = (req, res) => {
         const isMatch = bcrypt.compareSync(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Credenciales inválidas' });
-        } 
+        }
 
         const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, {
             expiresIn: '1h'
         });
-        return res.status(200).json({ token});
+        return res.status(200).json({ token });
     });
 };
 
