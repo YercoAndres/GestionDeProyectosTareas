@@ -1,5 +1,7 @@
+// FILE: Settings.jsx
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
+import EditProfileModal from '../components/EditProfileModal';
 
 export default function Settings() {
   const [user, setUser] = useState({
@@ -43,10 +45,25 @@ export default function Settings() {
     setIsEditing(!isEditing);
   };
 
-  const handleSubmit = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    console.log('Datos actualizados:', user);
-    setIsEditing(false);
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
+      if (!response.ok) {
+        throw new Error('Error al actualizar los datos del usuario');
+      }
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -54,7 +71,7 @@ export default function Settings() {
       <Sidebar />
       <div className="flex-1 p-10 bg-gray-100">
         <h1 className="text-3xl font-semibold mb-6">Configuración de Perfil</h1>
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
+        <div className="bg-white p-6 rounded shadow-md">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
               Nombre
@@ -64,8 +81,7 @@ export default function Settings() {
               id="name"
               name="name"
               value={user.name}
-              onChange={handleInputChange}
-              disabled={!isEditing}
+              disabled
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
@@ -91,8 +107,7 @@ export default function Settings() {
               id="password"
               name="password"
               value={user.password}
-              onChange={handleInputChange}
-              disabled={!isEditing}
+              disabled
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
@@ -100,36 +115,32 @@ export default function Settings() {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
               Rol
             </label>
-            <select
+            <input
+              type="text"
               id="role"
               name="role"
               value={user.role}
-              onChange={handleInputChange}
-              disabled={!isEditing}
+              disabled
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="user">Usuario</option>
-              <option value="admin">Administrador</option>
-            </select>
+            />
           </div>
-          {isEditing ? (
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Guardar
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleEditToggle}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Editar
-            </button>
-          )}
-        </form>
+          <button
+            type="button"
+            onClick={handleEditToggle}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Editar
+          </button>
+        </div>
       </div>
+      {isEditing && (
+        <EditProfileModal
+          user={user}
+          onClose={handleEditToggle}
+          onSave={handleSave}
+          onChange={handleInputChange}
+        />
+      )}
     </div>
   );
 }
