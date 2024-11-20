@@ -6,17 +6,23 @@ function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+  if(!role){
+    toast.error('Por Favor selecciona un rol')
+    return;
+  }
 
     const response = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role }),
     });
 
     const data = await response.json();
@@ -67,7 +73,7 @@ function Register() {
           </div>
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Password
+              Contraseña
             </label>
             <input
               type="password"
@@ -78,6 +84,20 @@ function Register() {
               required
             />
           </div>
+          <div className="mb-6">
+            <label htmlFor="rol" className='block text-gray-700 text-sm font-bold mb-2'>
+              Rol
+            </label>
+            <select 
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            id="role"
+            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"'>
+              <option value="">Selecciona un rol</option>
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+            </select>
+            </div>
           <div className="flex items-center justify-center">
             <button
               type="submit"

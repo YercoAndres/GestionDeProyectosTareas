@@ -1,3 +1,4 @@
+// FILE: Projects.jsx
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
@@ -21,7 +22,7 @@ const Projects = () => {
   });
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
-  const [userRole, setUserRole] = useState(''); // Estado para almacenar el rol del usuario
+  const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || ''); // Estado para almacenar el rol del usuario
 
   useEffect(() => {
     // Decodificar el token y establecer el rol del usuario
@@ -143,7 +144,6 @@ const Projects = () => {
             >
               <FaPlus className="mr-2" /> Agregar Proyecto
             </button>
-            {error && <p className="text-red-500">{error}</p>}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
               {projects.map(project => (
                 <ProjectCard 
@@ -165,62 +165,16 @@ const Projects = () => {
         {showModal && (
           <Modal 
             onClose={toggleModal}
-            title={newProject.id ? "Editar Proyecto" : "Agregar Proyecto"}
-            buttonText={newProject.id ? "Guardar Cambios" : "Crear Proyecto"}
-            onSubmit={handleAddProject}
-          >
-            <form onSubmit={handleAddProject}>
-              <input 
-                type="text" 
-                placeholder="Nombre del Proyecto" 
-                value={newProject.name} 
-                onChange={(e) => setNewProject({ ...newProject, name: e.target.value })} 
-                required className="border p-2 mb-4 w-full"
-              />
-              <textarea 
-                placeholder="Descripción" 
-                value={newProject.description} 
-                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} 
-                className="border p-2 mb-4 w-full"
-              />
-              <h2>Fecha de Inicio</h2>
-              <input 
-                type="date" 
-                value={newProject.startDate} 
-                onChange={(e) => setNewProject({ ...newProject, startDate: e.target.value })} 
-                required 
-                className="border p-2 mb-4 w-full"
-              />
-              <h2>Fecha de Fin</h2>
-              <input 
-                type="date" 
-                value={newProject.endDate} 
-                onChange={(e) => setNewProject({ ...newProject, endDate: e.target.value })} 
-                required 
-                className="border p-2 mb-4 w-full"
-              />
-              <h3 className="text-lg font-semibold mb-2">Seleccionar Miembros</h3>
-              <div className="mb-4">
-                {users.map(user => (
-                  <div key={user.id} className="flex items-center mb-2">
-                    <input 
-                      type="checkbox" 
-                      id={`user-${user.id}`} 
-                      checked={newProject.members.includes(user.id)} 
-                      onChange={() => handleMemberChange(user.id)} 
-                    />
-                    <label htmlFor={`user-${user.id}`} className="ml-2">{user.name}</label>
-                  </div>
-                ))}
-              </div>
-            </form>
-          </Modal>
+            onSave={handleAddProject}
+            project={newProject}
+            users={users}
+            onMemberChange={handleMemberChange}
+          />
         )}
 
-        {/* Diálogo de confirmación para eliminar un proyecto */}
+        {/* Confirmación de eliminación */}
         {confirmDialogVisible && (
-          <ConfirmDialog
-            message="¿Estás seguro de que deseas eliminar este proyecto?"
+          <ConfirmDialog 
             onConfirm={handleConfirmDelete}
             onCancel={() => setConfirmDialogVisible(false)}
           />

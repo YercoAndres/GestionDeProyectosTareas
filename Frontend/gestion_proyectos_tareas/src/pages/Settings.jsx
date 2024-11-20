@@ -28,7 +28,6 @@ export default function Settings() {
           console.error('Error:', error);
         }
       };
-
       fetchUserData();
     }
   }, []);
@@ -45,27 +44,6 @@ export default function Settings() {
     setIsEditing(!isEditing);
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-      });
-      if (!response.ok) {
-        throw new Error('Error al actualizar los datos del usuario');
-      }
-      const updatedUser = await response.json();
-      setUser(updatedUser);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
   return (
     <div className="flex">
       <Sidebar />
@@ -78,37 +56,24 @@ export default function Settings() {
             </label>
             <input
               type="text"
-              id="name"
               name="name"
               value={user.name}
-              disabled
+              onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              disabled={!isEditing}
             />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              Correo Electrónico
+              Email
             </label>
             <input
               type="email"
-              id="email"
               name="email"
               value={user.email}
-              disabled
+              onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={user.password}
-              disabled
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              disabled={!isEditing}
             />
           </div>
           <div className="mb-4">
@@ -117,28 +82,26 @@ export default function Settings() {
             </label>
             <input
               type="text"
-              id="role"
               name="role"
               value={user.role}
-              disabled
+              onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              disabled
             />
           </div>
           <button
-            type="button"
             onClick={handleEditToggle}
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            Editar
+            {isEditing ? 'Guardar' : 'Editar'}
           </button>
         </div>
       </div>
-      {isEditing && (
+      {isEditing && user && (
         <EditProfileModal
           user={user}
+          setUser={setUser}
           onClose={handleEditToggle}
-          onSave={handleSave}
-          onChange={handleInputChange}
         />
       )}
     </div>

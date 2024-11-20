@@ -1,8 +1,5 @@
 const connection = require('../config/db');
 
-
-
-
 const getAllProjects = (callback) => {
   connection.query('SELECT * FROM projects', callback);
 };
@@ -22,21 +19,22 @@ const updateProject = (id, project, callback) => {
 };
 
 const deleteProject = (id, callback) => {
-  // Primero eliminamos los miembros asociados con el proyecto
-  connection.query('DELETE FROM project_members WHERE project_id = ?', [id], (error) => {
-    if (error) {
-      return callback(error);
-    }
-
-    // Después eliminamos el proyecto
-    connection.query('DELETE FROM projects WHERE id = ?', [id], callback);
-  });
+  connection.query('DELETE FROM projects WHERE id = ?', [id], callback);
 };
-  
+
+const getProjectsByUserId = (userId, callback) => {
+  const query = `
+    SELECT p.* FROM projects p
+    JOIN project_members pm ON p.id = pm.project_id
+    WHERE pm.user_id = ?
+  `;
+  connection.query(query, [userId], callback);
+};
 
 module.exports = {
   getAllProjects,
   createProject,
   updateProject,
   deleteProject,
+  getProjectsByUserId,
 };
