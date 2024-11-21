@@ -72,6 +72,7 @@ const Projects = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Incluye el token en los encabezados
         },
         body: JSON.stringify(projectToAdd),
       })
@@ -97,6 +98,7 @@ const Projects = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Incluye el token en los encabezados
         },
         body: JSON.stringify(projectToAdd),
       })
@@ -138,11 +140,14 @@ const Projects = () => {
     setProjectToDelete(projectId);
     setConfirmDialogVisible(true);
   };
-
+  
   const handleConfirmDelete = () => {
     if (projectToDelete) {
       fetch(`http://localhost:5000/projects/${projectToDelete}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Incluye el token en los encabezados
+        },
       })
         .then(response => {
           if (!response.ok) {
@@ -158,7 +163,6 @@ const Projects = () => {
         });
     }
   };
-
   return (
     <Sidebar>
       <div className="flex-1 p-10 bg-gray-100">

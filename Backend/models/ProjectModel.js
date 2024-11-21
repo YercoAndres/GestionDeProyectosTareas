@@ -19,7 +19,36 @@ const updateProject = (id, project, callback) => {
 };
 
 const deleteProject = (id, callback) => {
-  connection.query('DELETE FROM projects WHERE id = ?', [id], callback);
+  connection.beginTransaction(err => {
+    if (err) return callback(err);
+
+    // Elimina las filas relacionadas en project_members
+    connection.query('DELETE FROM project_members WHERE project_id = ?', [id], (err, result) => {
+      if (err) {
+        return connection.rollback(() => {
+          callback(err);
+        });
+      }
+
+      // Elimina el proyecto
+      connection.query('DELETE FROM projects WHERE id = ?', [id], (err, result) => {
+        if (err) {
+          return connection.rollback(() => {
+            callback(err);
+          });
+        }
+
+        connection.commit(err => {
+          if (err) {
+            return connection.rollback(() => {
+              callback(err);
+            });
+          }
+          callback(null, result);
+        });
+      });
+    });
+  });
 };
 
 const getProjectsByUserId = (userId, callback) => {
