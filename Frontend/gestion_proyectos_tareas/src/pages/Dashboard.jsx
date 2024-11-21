@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
-import TaskCalendar from '../components/TaskCalendar';
+
 
 export default function Dashboard() {
   const [projects, setProjects] = useState([]);
@@ -69,7 +69,7 @@ export default function Dashboard() {
                 <p><strong>Tareas asociadas:</strong> {tasks.filter(task => task.projectId === project.id).length}</p>
               </div>
             ))}
-            <TaskCalendar/>
+   
           </div>
         </div>
       </div>
