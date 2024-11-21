@@ -11,7 +11,7 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
+
     if(!role){
       toast.error('Por Favor selecciona un rol')
       return;
@@ -22,7 +22,7 @@ function Register() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role }),
     });
 
     const data = await response.json();
