@@ -18,24 +18,23 @@ const register = (req, res) => {
 };
 const login = (req, res) => {
     const { email, password } = req.body;
-
+  
     user.findByEmail(email, (err, results) => {
-        if (results.length === 0) {
-            return res.status(400).json({ message: 'Usuario no encontrado' });
-        }
-        const user = results[0];
-
-        const isMatch = bcrypt.compareSync(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Credenciales inválidas' });
-        }
-
-        const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, {
-            expiresIn: '1h'
-        });
-        return res.status(200).json({ token });
+      if (results.length === 0) {
+        return res.status(400).json({ message: 'Usuario no encontrado' });
+      }
+      const user = results[0];
+      const isMatch = bcrypt.compareSync(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Credenciales inválidas' });
+      }
+  
+      const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, {
+        expiresIn: '1h'
+      });
+      return res.status(200).json({ token, user }); // Asegúrate de devolver el objeto user
     });
-};
+  };
 
 
 module.exports = {register, login};

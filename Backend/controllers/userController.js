@@ -24,7 +24,36 @@ const getUserById = (req, res) => {
   });
 };
 
+const updateUser = (req, res) => {
+  const userId = req.params.id;
+  const { name, email, password, role } = req.body;
+
+  const updateData = { name, email, role };
+  if (password) {
+    updateData.password = password;
+  }
+
+  User.updateUser(userId, updateData, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error updating user' });
+    }
+    res.json({ message: 'User updated successfully' });
+  });
+};
+
+const getUserProjects = (req, res) => {
+  const userId = req.params.id;
+  Project.getProjectsByUserId(userId, (err, projects) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error fetching projects' });
+    }
+    res.json(projects);
+  });
+};
+
 module.exports = {
   getAllUsers,
   getUserById, // Asegúrate de exportar esta función
+  updateUser,
+  getUserProjects,
 };

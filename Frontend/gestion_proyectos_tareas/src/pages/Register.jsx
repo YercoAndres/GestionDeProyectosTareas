@@ -12,10 +12,17 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+<<<<<<< HEAD
     if(!role){
       toast.error('Por Favor selecciona un rol')
       return;
     }
+=======
+  if(!role){
+    toast.error('Por Favor selecciona un rol')
+    return;
+  }
+>>>>>>> f11d3d2e631c799c8a74ac9c0ff767b537185260
 
     const response = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
@@ -73,7 +80,7 @@ function Register() {
           </div>
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Password
+              Contraseña
             </label>
             <input
               type="password"
@@ -85,6 +92,7 @@ function Register() {
             />
           </div>
           <div className="mb-6">
+<<<<<<< HEAD
              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="rol">
               Rol
             </label>
@@ -99,6 +107,21 @@ function Register() {
              <option value="manager">Manager</option>
             </select>
           </div>
+=======
+            <label htmlFor="rol" className='block text-gray-700 text-sm font-bold mb-2'>
+              Rol
+            </label>
+            <select 
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            id="role"
+            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"'>
+              <option value="">Selecciona un rol</option>
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+            </select>
+            </div>
+>>>>>>> f11d3d2e631c799c8a74ac9c0ff767b537185260
           <div className="flex items-center justify-center">
             <button
               type="submit"
