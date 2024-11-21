@@ -5,7 +5,7 @@ const User = {
   create: (userData, callback) => {
     const hashedPassword = bcrypt.hashSync(userData.password, 10);
     const query = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
-    db.query(query, [userData.name, userData.email, hashedPassword, 'user'], callback);
+    db.query(query, [userData.name, userData.email, hashedPassword, userData.role], callback);
   },
   
   findByEmail: (email, callback) => {
