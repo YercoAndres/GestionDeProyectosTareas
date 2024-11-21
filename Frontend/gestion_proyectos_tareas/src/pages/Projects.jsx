@@ -4,12 +4,14 @@ import Modal from '../components/Modal';
 import ProjectCard from '../components/ProyectCard';
 import { FaPlus } from 'react-icons/fa';
 import ConfirmDialog from '../components/ConfirmDialog'; // Asegúrate de que la ruta sea correcta
+import jwt_decode from 'jwt-decode'; // Asegúrate de tener esta dependencia instalada
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
+  const [userRole, setUserRole] = useState('');
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -38,6 +40,13 @@ const Projects = () => {
   };
 
   useEffect(() => {
+    // Obtener el rol del usuario desde el token almacenado en localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwt_decode(token);
+      setUserRole(decodedToken.role);
+    }
+
     fetch('http://localhost:5000/projects')
       .then(response => response.json())
       .then(data => {
@@ -169,7 +178,9 @@ const Projects = () => {
         <h1 className="text-3xl font-semibold mb-6">Proyectos</h1>
         <button 
           onClick={toggleModal} 
-          className="bg-blue-500 text-white px-4 py-2 rounded flex items-center">
+          disabled={userRole === 'user'}
+          className={`bg-blue-500 text-white px-4 py-2 rounded flex items-center ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
           <FaPlus className="mr-2" /> Agregar Proyecto
         </button>
         {error && <p className="text-red-500">{error}</p>}
@@ -233,11 +244,7 @@ const Projects = () => {
                     <label htmlFor={`user-${user.id}`} className="ml-2">{user.name}</label>
                   </div>
                 ))}
-              </div>{/*
-              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-                {newProject.id ? "Guardar Cambios" : "Crear Proyecto"}  Cambia el texto del botón 
-              </button>
-              */}
+              </div>
             </form>
           </Modal>
         )}
