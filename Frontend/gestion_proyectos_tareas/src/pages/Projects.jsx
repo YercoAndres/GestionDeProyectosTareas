@@ -3,8 +3,8 @@ import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
 import ProjectCard from '../components/ProyectCard';
 import { FaPlus } from 'react-icons/fa';
-import ConfirmDialog from '../components/ConfirmDialog'; // Asegúrate de que la ruta sea correcta
-import jwt_decode from 'jwt-decode'; // Asegúrate de tener esta dependencia instalada
+import ConfirmDialog from '../components/ConfirmDialog';
+import jwt_decode from 'jwt-decode';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -12,20 +12,20 @@ const Projects = () => {
   const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [userRole, setUserRole] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
     startDate: '',
     endDate: '',
     members: [],
-    id: null // Asegúrate de que el id esté inicializado como null
+    id: null
   });
-  const [users, setUsers] = useState([]); // Lista de usuarios
+  const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 
   const toggleModal = () => {
     setShowModal(!showModal);
-    // Restablece el estado de newProject cuando se cierra el modal
     if (!showModal) {
       setNewProject({
         name: '',
@@ -33,14 +33,13 @@ const Projects = () => {
         startDate: '',
         endDate: '',
         members: [],
-        id: null // Asegúrate de que el id esté inicializado como null
+        id: null
       });
-      setError(null); // Restablece el error
+      setError(null);
     }
   };
 
   useEffect(() => {
-    // Obtener el rol del usuario desde el token almacenado en localStorage
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwt_decode(token);
@@ -54,14 +53,22 @@ const Projects = () => {
       })
       .catch(error => console.error('Error fetching projects:', error));
 
-    // Obtener la lista de usuarios
-    fetch('http://localhost:5000/api/users') // Asegúrate de que esta ruta sea correcta
+    fetch('http://localhost:5000/api/users')
       .then(response => response.json())
       .then(data => {
         setUsers(data);
       })
       .catch(error => console.error('Error fetching users:', error));
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleAddProject = (e) => {
     e.preventDefault();
@@ -72,16 +79,15 @@ const Projects = () => {
     }
     const projectToAdd = {
       ...newProject,
-      members: newProject.members // Solo asigna los miembros seleccionados
+      members: newProject.members
     };
   
     if (newProject.id) {
-      // Edición de proyecto existente
       fetch(`http://localhost:5000/projects/${newProject.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Incluye el token en los encabezados
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(projectToAdd),
       })
@@ -93,7 +99,7 @@ const Projects = () => {
       })
       .then(data => {
         setProjects(projects.map(project => project.id === newProject.id ? { ...projectToAdd, id: newProject.id } : project));
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null }); // Restablecer el estado
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null });
         setError('');
         setShowModal(false);
       })
@@ -102,12 +108,11 @@ const Projects = () => {
         setError('Error al editar el proyecto. Inténtalo de nuevo.');
       });
     } else {
-      // Creación de nuevo proyecto
       fetch('http://localhost:5000/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Incluye el token en los encabezados
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(projectToAdd),
       })
@@ -119,7 +124,7 @@ const Projects = () => {
       })
       .then(data => {
         setProjects([...projects, { ...projectToAdd, id: data.projectId }]);
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null }); // Restablecer el estado
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null });
         setError('');
         setShowModal(false);
       })
@@ -130,21 +135,20 @@ const Projects = () => {
     }
   };
 
-  // Función para manejar la selección de miembros
   const handleMemberChange = (memberId) => {
     setNewProject(prev => {
       const members = prev.members.includes(memberId)
-        ? prev.members.filter(id => id !== memberId) // Si ya está seleccionado, quitarlo
-        : [...prev.members, memberId]; // Si no está, agregarlo
-      return { ...prev, members }; // Actualiza el estado con los miembros
+        ? prev.members.filter(id => id !== memberId)
+        : [...prev.members, memberId];
+      return { ...prev, members };
     });
   };
 
-  // Funciones para editar y eliminar proyectos
   const handleEditProject = (project) => {
     setNewProject(project);
     setShowModal(true);
   };
+
   const handleDeleteProject = (projectId) => {
     setProjectToDelete(projectId);
     setConfirmDialogVisible(true);
@@ -155,7 +159,7 @@ const Projects = () => {
       fetch(`http://localhost:5000/projects/${projectToDelete}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Incluye el token en los encabezados
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       })
         .then(response => {
@@ -163,15 +167,17 @@ const Projects = () => {
             throw new Error('Error al eliminar el proyecto');
           }
           setProjects(projects.filter(project => project.id !== projectToDelete));
-          setProjectToDelete(null); // Limpiar el ID del proyecto a eliminar
-          setConfirmDialogVisible(false); // Ocultar el diálogo de confirmación
+          setProjectToDelete(null);
+          setConfirmDialogVisible(false);
         })
         .catch(err => {
           console.error('Error al eliminar el proyecto:', err);
-          setError('Error al eliminar el proyecto. Inténtalo de nuevo.'); // Manejo de error
+          setError('Error al eliminar el proyecto. Inténtalo de nuevo.');
         });
     }
   };
+
+  const filteredUsers = users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
   return (
     <Sidebar>
       <div className="flex-1 p-10 bg-gray-100">
@@ -183,7 +189,7 @@ const Projects = () => {
         >
           <FaPlus className="mr-2" /> Agregar Proyecto
         </button>
-        {error && <p className="text-red-500">{error}</p>}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {projects.map(project => (
             <ProjectCard 
@@ -197,9 +203,9 @@ const Projects = () => {
         {showModal && (
           <Modal 
             onClose={toggleModal}
-            title={newProject.id ? "Editar Proyecto" : "Agregar Proyecto"} // Cambia el título
-            buttonText={newProject.id ? "Guardar Cambios" : "Crear Proyecto"} // Cambia el texto del botón
-            onSubmit={handleAddProject} // Asegúrate de que esta función maneje el envío
+            title={newProject.id ? "Editar Proyecto" : "Agregar Proyecto"}
+            buttonText={newProject.id ? "Guardar Cambios" : "Crear Proyecto"}
+            onSubmit={handleAddProject}
           >
             <form onSubmit={handleAddProject}>
               <input 
@@ -232,19 +238,27 @@ const Projects = () => {
                 className="border p-2 mb-4 w-full"
               />
               <h3 className="text-lg font-semibold mb-2">Seleccionar Miembros</h3>
-              <div className="mb-4">
-                {users.map(user => (
-                  <div key={user.id} className="flex items-center mb-2">
-                    <input 
-                      type="checkbox" 
-                      id={`user-${user.id}`} 
-                      checked={newProject.members.includes(user.id)} 
-                      onChange={() => handleMemberChange(user.id)} 
-                    />
-                    <label htmlFor={`user-${user.id}`} className="ml-2">{user.name}</label>
-                  </div>
-                ))}
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="mb-4 p-2 border border-gray-300 rounded"
+                />
+                <div className="mb-4 max-h-64 overflow-y-auto">
+                  {filteredUsers.map(user => (
+                    <div key={user.id} className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id={`user-${user.id}`}
+                        checked={newProject.members.includes(user.id)}
+                        onChange={() => handleMemberChange(user.id)}
+                      />
+                      <label htmlFor={`user-${user.id}`} className="ml-2">{user.name}</label>
+                    </div>
+                  ))}
               </div>
+              {error && <p className="text-red-500">{error}</p>}
             </form>
           </Modal>
         )}

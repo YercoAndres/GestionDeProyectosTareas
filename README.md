@@ -9,10 +9,15 @@ React + Vite, CSS y Tailwind
 Back end
 NodeJs, Express y MySQL
 
-#Dependencias 
+#   Dependencias 
 
-frontend/gestion_proyectos_tareas
+#   Frontend/gestion_proyectos_tareas
 npm install vite@latest
+Para ejecutar:
+npm run dev
 
-backend
+
+#   Backend
 npm install express mysql2 bcryptjs jsonwebtoken cors dotenv
+Para ejecutar:
+node server.js

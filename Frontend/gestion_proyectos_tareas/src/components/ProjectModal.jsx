@@ -17,7 +17,7 @@ export default function ProjectModal({ project, onClose }) {
     const taskWithProjectId = { ...task, projectId: project.id };
 
     try {
-      const response = await fetch('http://localhost:5000/api/tasks', {
+      const response = await fetch('http://localhost:5000/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskWithProjectId)
