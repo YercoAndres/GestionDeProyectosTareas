@@ -32,14 +32,14 @@ export default function About() {
           href="#"
           className="block w-full rounded bg-cyan-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-white hover:text-cyan-600 focus:outline-none focus:ring  sm:w-auto"
         >
-          Get Started
+          Registrate
         </a>
 
         <a
           href="#"
           className="block w-full rounded bg-white hover:bg-cyan-600 hover:text-white px-12 py-3 text-sm font-medium text-black-600 shadow focus:outline-none focus:ring  sm:w-auto"
         >
-          Learn More
+          Saber mas
         </a>
       </div>
     </div>

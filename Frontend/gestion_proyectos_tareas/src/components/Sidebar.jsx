@@ -49,14 +49,14 @@ const Sidebar = ({ children }) => {
         id="sidebar"
         className={`fixed inset-y-0 left-0 transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 transition-transform duration-300 ease-in-out bg-gray-800 text-white w-64 flex flex-col`}
+        } md:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
       >
         <div className="flex items-center justify-between md:hidden">
           <h2 className="text-2xl font-bold text-center">ProjectTask</h2>
           <button
             onClick={toggleMenu}
             type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:focus:ring-gray-600"
+            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:focus:ring-gray-600"
           >
             <span className="sr-only">Close menu</span>
             <svg
@@ -80,18 +80,18 @@ const Sidebar = ({ children }) => {
           <h2 className="hidden md:block p-4 text-2xl font-bold border-b border-gray-700">
             ProjectTask
           </h2>
-          <Link to="/dashboard" className="block p-2 rounded hover:bg-gray-700">
+          <Link to="/dashboard" className="block p-2 rounded hover:bg-cyan-700">
             Dashboard
           </Link>
           <Link
             to="/dashboard/projects"
-            className="block p-2 rounded hover:bg-gray-700"
+            className="block p-2 rounded hover:bg-cyan-700"
           >
             Proyectos
           </Link>
           <Link
             to="/dashboard/tasks"
-            className="block p-2 rounded hover:bg-gray-700"
+            className="block p-2 rounded hover:bg-cyan-700"
           >
             Tareas
           </Link>
