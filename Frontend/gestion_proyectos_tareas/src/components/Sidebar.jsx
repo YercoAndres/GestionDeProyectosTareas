@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Sidebar = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,7 @@ const Sidebar = ({ children }) => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    toast.success('Sesión cerrada correctamente');
     navigate('/');
   };
 
