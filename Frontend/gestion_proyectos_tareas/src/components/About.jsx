@@ -3,52 +3,306 @@ import React from 'react';
 
 export default function About() {
   return (
-    <section id='about' className='py-20 bg-white text-black'>
-      <div className='container mx-auto flex flex-col items-center px-4'>
-        
-        {/* Título Principal */}
-        <h1 className='text-4xl font-bold p-8 text-center'>Gestión de proyectos y tareas de forma simplificada</h1>
-        
-        {/* Imagen principal */}
-      
-        <img src="/main.png" alt="Logo" className='w-full h-96 mb-6' />
+ 
+<>
+<section
+  className="relative bg-[url(../public/main.jpg)] bg-cover bg-center bg-no-repeat "
+>
+  <div
+    className="absolute inset-0 bg-gray-900/75 sm:bg-transparent sm:from-gray-900/95 sm:to-gray-900/25 ltr:sm:bg-gradient-to-r rtl:sm:bg-gradient-to-l"
+  ></div>
 
-        <div className='flex flex-col items-center'>
-          
-          {/* Texto sobre nosotros */}
-          <div className='text-center max-w-3xl'>
-            <h2 className='text-2xl font-bold'>Sobre Nosotros</h2>
-            <p className='text-lg mt-4 p-2'>
-              Somos una empresa dedicada a la gestión de proyectos, brindando soluciones
-              tecnológicas personalizadas a nuestros clientes para que logren sus objetivos
-              de manera eficiente.
-            </p>
+  <div
+    className="relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:flex lg:h-screen lg:items-center lg:px-8"
+  >
+    <div className="max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
+      <h1 className="text-3xl font-extrabold text-white sm:text-5xl">
+        Gestion de Proyectos
 
-            {/* Imágenes de servicios */}
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6'>
-              <div className='flex justify-center'>
-                <img src="../public/1.png" alt="Servicio 1" className='w-16 h-16 m-2 animate-pulse' />
-              </div>
-              <div className='flex justify-center'>
-                <img src="../public/2.png" alt="Servicio 2" className='w-16 h-16 m-2 animate-pulse' />
-              </div>
-              <div className='flex justify-center'>
-                <img src="../public/3.png" alt="Servicio 3" className='w-16 h-16 m-2 animate-pulse' />
-              </div>
-            </div>
+        <strong className="block font-extrabold text-cyan-600"> Project <span className='text-white'>Task.</span> </strong>
+      </h1>
 
-            {/* Texto adicional */}
-            <p className='text-lg mt-6 p-2'>
-              La plataforma que a tu equipo le encantará usar:
-              Colabora con todos los equipos y departamentos para tener visibilidad del progreso de tu trabajo.
-              Mantén a todos alineados con una plataforma que disfrutarán usar para garantizar una ejecución más ágil.
-            </p>
-          </div>
-          
-        </div>
+      <p className="mt-4 max-w-lg text-white sm:text-xl/relaxed">
+        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nesciunt illo tenetur fuga ducimus
+        numquam ea!
+      </p>
+
+      <div className="mt-8 flex flex-wrap gap-4 text-center">
+        <a
+          href="#"
+          className="block w-full rounded bg-cyan-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-cyan-700 focus:outline-none focus:ring  sm:w-auto"
+        >
+          Get Started
+        </a>
+
+        <a
+          href="#"
+          className="block w-full rounded bg-white px-12 py-3 text-sm font-medium text-black-600 shadow focus:outline-none focus:ring  sm:w-auto"
+        >
+          Learn More
+        </a>
       </div>
-    
-    </section>
-    
+    </div>
+  </div>
+</section>
+
+{/* Seccion 2 */}
+
+<section>
+  <div className="max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+    <div className="grid grid-cols-1 gap-y-8 lg:grid-cols-2 lg:items-center lg:gap-x-16">
+      <div className="mx-auto max-w-lg text-center lg:mx-0 ltr:lg:text-left rtl:lg:text-right">
+        <h2 className="text-3xl font-bold sm:text-4xl">Find your career path</h2>
+
+        <p className="mt-4 text-gray-600">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut vero aliquid sint distinctio
+          iure ipsum cupiditate? Quis, odit assumenda? Deleniti quasi inventore, libero reiciendis
+          minima aliquid tempora. Obcaecati, autem.
+        </p>
+
+        <a
+          href="#"
+          className="mt-8 inline-block rounded bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-yellow-400"
+        >
+          Get Started Today
+        </a>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <a
+          className="block rounded-xl border border-gray-100 p-4 shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 focus:outline-none focus:ring"
+          href="#"
+        >
+          <span className="inline-block rounded-lg bg-gray-50 p-3">
+            <svg
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+              ></path>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+              ></path>
+            </svg>
+          </span>
+
+          <h2 className="mt-2 font-bold">Accountant</h2>
+
+          <p className="hidden sm:mt-1 sm:block sm:text-sm sm:text-gray-600">
+            Lorem ipsum dolor sit amet consectetur.
+          </p>
+        </a>
+
+        <a
+          className="block rounded-xl border border-gray-100 p-4 shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 focus:outline-none focus:ring"
+          href="#"
+        >
+          <span className="inline-block rounded-lg bg-gray-50 p-3">
+            <svg
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+              ></path>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+              ></path>
+            </svg>
+          </span>
+
+          <h2 className="mt-2 font-bold">Accountant</h2>
+
+          <p className="hidden sm:mt-1 sm:block sm:text-sm sm:text-gray-600">
+            Lorem ipsum dolor sit amet consectetur.
+          </p>
+        </a>
+
+        <a
+          className="block rounded-xl border border-gray-100 p-4 shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 focus:outline-none focus:ring"
+          href="#"
+        >
+          <span className="inline-block rounded-lg bg-gray-50 p-3">
+            <svg
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+              ></path>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+              ></path>
+            </svg>
+          </span>
+
+          <h2 className="mt-2 font-bold">Accountant</h2>
+
+          <p className="hidden sm:mt-1 sm:block sm:text-sm sm:text-gray-600">
+            Lorem ipsum dolor sit amet consectetur.
+          </p>
+        </a>
+
+        <a
+          className="block rounded-xl border border-gray-100 p-4 shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 focus:outline-none focus:ring"
+          href="#"
+        >
+          <span className="inline-block rounded-lg bg-gray-50 p-3">
+            <svg
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+              ></path>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+              ></path>
+            </svg>
+          </span>
+
+          <h2 className="mt-2 font-bold">Accountant</h2>
+
+          <p className="hidden sm:mt-1 sm:block sm:text-sm sm:text-gray-600">
+            Lorem ipsum dolor sit amet consectetur.
+          </p>
+        </a>
+
+        <a
+          className="block rounded-xl border border-gray-100 p-4 shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 focus:outline-none focus:ring"
+          href="#"
+        >
+          <span className="inline-block rounded-lg bg-gray-50 p-3">
+            <svg
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+              ></path>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+              ></path>
+            </svg>
+          </span>
+
+          <h2 className="mt-2 font-bold">Accountant</h2>
+
+          <p className="hidden sm:mt-1 sm:block sm:text-sm sm:text-gray-600">
+            Lorem ipsum dolor sit amet consectetur.
+          </p>
+        </a>
+
+        <a
+          className="block rounded-xl border border-gray-100 p-4 shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 focus:outline-none focus:ring"
+          href="#"
+        >
+          <span className="inline-block rounded-lg bg-gray-50 p-3">
+            <svg
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z"></path>
+              <path
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+              ></path>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+              ></path>
+            </svg>
+          </span>
+
+          <h2 className="mt-2 font-bold">Accountant</h2>
+
+          <p className="hidden sm:mt-1 sm:block sm:text-sm sm:text-gray-600">
+            Lorem ipsum dolor sit amet consectetur.
+          </p>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Seccion 3 */}
+<section>
+  <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <div className="max-w-3xl">
+      <h2 className="text-3xl font-bold sm:text-4xl">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quod alias doloribus impedit.
+      </h2>
+    </div>
+
+    <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+      <div className="relative h-64 overflow-hidden sm:h-80 lg:h-full">
+        <img
+          alt=""
+          src="https://images.unsplash.com/photo-1496843916299-590492c751f4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
+
+      <div className="lg:py-16">
+        <article className="space-y-4 text-gray-600">
+          <p>
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aut qui hic atque tenetur quis
+            eius quos ea neque sunt, accusantium soluta minus veniam tempora deserunt? Molestiae
+            eius quidem quam repellat.
+          </p>
+
+          <p>
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolorum explicabo quidem
+            voluptatum voluptas illo accusantium ipsam quis, vel mollitia? Vel provident culpa
+            dignissimos possimus, perferendis consectetur odit accusantium dolorem amet voluptates
+            aliquid, ducimus tempore incidunt quas. Veritatis molestias tempora distinctio
+            voluptates sint! Itaque quasi corrupti, sequi quo odit illum impedit!
+          </p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>  
+</>  
   );
 }

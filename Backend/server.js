@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/projects', projectRoutes);
-app.use('/', taskRoutes); // Cambiado de `/projects` a `/`
+app.use('/tasks', taskRoutes); // Cambiado de `/projects` a `/`
 app.use('/api/users', userRoutes); // Usa la ruta de usuarios
 
 app.use(errorHandler);

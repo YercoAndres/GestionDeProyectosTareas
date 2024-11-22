@@ -7,7 +7,7 @@ export default function Tasks({ projectId }) {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/tasks?projectId=${projectId}`);
+        const response = await fetch(`http://localhost:5000/tasks?projectId=${projectId}`);
         if (!response.ok) {
           throw new Error('Error al obtener las tareas');
         }
@@ -23,7 +23,7 @@ export default function Tasks({ projectId }) {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+      const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
