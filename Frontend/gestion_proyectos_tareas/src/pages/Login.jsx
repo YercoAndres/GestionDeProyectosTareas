@@ -77,7 +77,7 @@ function Login() {
           <div className="mt-4 text-center">
             <p className="text-gray-600">
               ¿No tienes una cuenta?{' '}
-              <Link to="/register" className="text-blue-500 hover:text-blue-700">
+              <Link to="/register" className="text-blue-500 font-bold hover:text-blue-700">
                 Regístrate aquí
               </Link>
             </p>

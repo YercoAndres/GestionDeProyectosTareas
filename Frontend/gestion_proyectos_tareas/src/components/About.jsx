@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link } from "react-router-dom";
+
+
 
 
 export default function About() {
@@ -23,20 +26,19 @@ export default function About() {
       </h1>
 
       <p className="mt-4 max-w-lg text-white sm:text-xl/relaxed">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nesciunt illo tenetur fuga ducimus
-        numquam ea!
+      Transforma tus ideas en proyectos exitosos y lleva a tu equipo al siguiente nivel con la plataforma que organiza, conecta y logra resultados!
       </p>
 
       <div className="mt-8 flex flex-wrap gap-4 text-center">
-        <a
-          href="#"
+        
+          <Link to = "/register"  
           className="block w-full rounded bg-cyan-600 px-12 py-3 text-sm font-medium text-white shadow hover:bg-white hover:text-cyan-600 focus:outline-none focus:ring  sm:w-auto"
         >
           Registrate
-        </a>
+          </Link>
 
         <a
-          href="#"
+          href="#aboutinfo"
           className="block w-full rounded bg-white hover:bg-cyan-600 hover:text-white px-12 py-3 text-sm font-medium text-black-600 shadow focus:outline-none focus:ring  sm:w-auto"
         >
           Saber mas
@@ -48,12 +50,12 @@ export default function About() {
 
 
 
-{/* Seccion 3 */}
-<section>
+{/* Seccion 2 */}
+<section id='aboutinfo'>
   <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
     <div className="max-w-3xl">
       <h2 className="text-3xl font-bold sm:text-4xl">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quod alias doloribus impedit.
+      Haciendo Más Simples Tus Proyectos
       </h2>
     </div>
 
@@ -61,7 +63,7 @@ export default function About() {
       <div className="relative h-64 overflow-hidden sm:h-80 lg:h-full">
         <img
           alt=""
-          src="https://images.unsplash.com/photo-1496843916299-590492c751f4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1771&q=80"
+          src="aboutmain.jpg"
           className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
@@ -69,17 +71,11 @@ export default function About() {
       <div className="lg:py-16">
         <article className="space-y-4 text-gray-600">
           <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aut qui hic atque tenetur quis
-            eius quos ea neque sunt, accusantium soluta minus veniam tempora deserunt? Molestiae
-            eius quidem quam repellat.
+          En Project Task, creemos que detrás de cada gran logro hay un equipo bien organizado y enfocado. Nuestra plataforma nació para simplificar la gestión de proyectos, optimizar la colaboración y ayudar a los equipos a alcanzar sus objetivos con eficiencia. Diseñamos herramientas modernas y accesibles que se adaptan a las necesidades de cualquier proyecto, desde pequeños emprendimientos hasta grandes organizaciones.
           </p>
 
           <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolorum explicabo quidem
-            voluptatum voluptas illo accusantium ipsam quis, vel mollitia? Vel provident culpa
-            dignissimos possimus, perferendis consectetur odit accusantium dolorem amet voluptates
-            aliquid, ducimus tempore incidunt quas. Veritatis molestias tempora distinctio
-            voluptates sint! Itaque quasi corrupti, sequi quo odit illum impedit!
+          Nuestra misión es transformar la forma en que las personas trabajan juntas, convirtiendo tareas complejas en metas alcanzables. Con Project Task, asignar responsabilidades, planificar fechas clave, monitorear avances y celebrar logros nunca ha sido tan fácil. Estamos comprometidos con ser tu aliado estratégico para llevar tu productividad y la de tu equipo al siguiente nivel.
           </p>
         </article>
       </div>
