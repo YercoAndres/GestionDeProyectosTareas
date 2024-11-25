@@ -40,7 +40,7 @@ function Login() {
 
   return (
     <>
-      <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 justify-center items-center bg-gray-100 px-4 md:px-0">
+      <div className="min-h-screen grid grid-cols-1 md:grid-cols-2  justify-center items-center bg-gray-100 px-4 md:px-0">
         <div className="w-full max-w-md mx-auto md:ml-32">
           <form onSubmit={handleLogin} className="bg-white shadow-md rounded px-8 md:px-14 py-10">
             <h2 className="text-2xl font-bold text-center mb-6">Inicio de Sesión</h2>
@@ -80,11 +80,15 @@ function Login() {
               <Link to="/register" className="text-blue-500 font-bold hover:text-blue-700">
                 Regístrate aquí
               </Link>
+           
             </p>
+            <Link to="/" className="text-blue-500 font-bold hover:text-blue-700">
+             Ir al menú principal
+              </Link>
           </div>
         </div>
-        <div className="hidden md:block w-full h-full ">
-          <img src="../public/login.png" alt="Login" className="w-full h-full" />
+        <div className="hidden lg:block w-full h-full ">
+          <img src="../public/login.png" alt="Login" loading="Lazy" className="w-full h-full" />
         </div>
       </div>
     </>

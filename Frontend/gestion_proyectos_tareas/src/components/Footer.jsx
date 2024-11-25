@@ -45,7 +45,7 @@ export default function Footer() {
     <ul className="mt-6 flex justify-start gap-6 sm:mt-0 sm:justify-end">  
       <li>
         <a
-          href="#"
+          href="https://github.com/YercoAndres/GestionDeProyectosTareas"
           rel="noreferrer"
           target="_blank"
           className="text-gray-700 transition hover:opacity-75 dark:text-gray-200"

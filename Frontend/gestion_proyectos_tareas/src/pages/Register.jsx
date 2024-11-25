@@ -120,8 +120,8 @@ function Register() {
               </Link>
         </div>
       </div>
-      <div className="hidden md:block w-full h-full ">
-    <img src="../public/login.png" alt="Login" className="w-full h-full" />
+      <div className="hidden lg:block w-full h-full ">
+      <img src="../public/login.png" alt="Login" loading="Lazy" className="w-full h-full" />
      </div>
     </div>
 

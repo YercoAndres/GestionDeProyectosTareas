@@ -48,7 +48,7 @@ export default function Dashboard( ) {
           <div className="bg-blue-100 p-6 rounded-3xl shadow-md grid justify-center">
             <p className=" font-bold text-center text-blue-600">{projects.length}</p>
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Proyectos </h2>
-            <img src="../public/projecticon.png" alt="iconProject" className='max-w-15 max-h-10 mx-auto block ' />
+            <img src="../public/projecticon.png" loading='lazy' alt="iconProject" className='max-w-15 max-h-10 mx-auto block ' />
             
             
           </div>
@@ -56,13 +56,13 @@ export default function Dashboard( ) {
           <div className="bg-green-100 p-6 rounded-3xl shadow-md grid justify-center items-center">
             <p className=" font-bold text-center text-green-600">{projects.length}</p>
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Tareas</h2>
-            <img src="../public/taskicon.png" alt="iconTask" className='max-w-15 max-h-10 mx-auto block' />
+            <img src="../public/taskicon.png" loading='lazy' alt="iconTask" className='max-w-15 max-h-10 mx-auto block' />
           </div>
           {/* Total de usuarios */}
           <div className="bg-amber-50 p-6 rounded-3xl shadow-md grid justify-center items-center">
             <p className=" font-bold text-center text-amber-300">{users.length}</p>
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Miembros Registrados</h2>
-            <img src="../public/membersicon.png" alt="iconMembers" className='max-w-15 max-h-10 mx-auto block' />
+            <img src="../public/membersicon.png" loading='lazy' alt="iconMembers" className='max-w-15 max-h-10 mx-auto block' />
           </div>
         </div>
 

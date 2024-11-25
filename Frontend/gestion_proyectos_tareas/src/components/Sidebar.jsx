@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Home, Folder, User, LogOut } from 'lucide-react';
 
 const Sidebar = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +19,7 @@ const Sidebar = ({ children }) => {
 
   return (
     <div className="flex">
-      <div className="md:hidden">
+      <div className=" lg:hidden">
         <button
           onClick={toggleMenu}
           type="button"
@@ -49,9 +50,9 @@ const Sidebar = ({ children }) => {
         id="sidebar"
         className={`fixed inset-y-0 left-0 transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
+        } lg:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
       >
-        <div className="flex items-center justify-between md:hidden">
+        <div className="flex items-center justify-between lg:hidden">
           <h2 className="text-2xl font-bold text-center">ProjectTask</h2>
           <button
             onClick={toggleMenu}
@@ -80,32 +81,40 @@ const Sidebar = ({ children }) => {
           <h2 className="hidden md:block p-4 text-2xl font-bold border-b border-gray-700">
             ProjectTask
           </h2>
-          <Link to="/dashboard" className="block p-2 rounded hover:bg-cyan-700">
+          
+          <Link to="/dashboard" className="block p-2 rounded hover:bg-cyan-700 "
+          >
+            <Home size={24} className="inline-block mr-3 " />
             Dashboard
           </Link>
           <Link
             to="/dashboard/projects"
-            className="block p-2 rounded hover:bg-cyan-700"
+            className="block p-2 rounded hover:bg-cyan-700 "
           >
+            <Folder size={24} className="inline-block mr-3 " />
             Proyectos
           </Link>
-          <Link
+          {/* <Link
             to="/dashboard/tasks"
             className="block p-2 rounded hover:bg-cyan-700"
           >
             Tareas
-          </Link>
+          </Link> */}
         </nav>
+        
         <Link
+        
           to="/dashboard/settings"
-          className="p-4 mt-auto bg-blue-600 hover:bg-blue-700 w-full text-center"
+          className="p-4 mt-auto block rounded  border-t border-gray-700 hover:bg-cyan-700 "
         >
+          <User size={24} className="inline-block mr-3 " />
           Ver Perfil
         </Link>
         <button
           onClick={handleLogout}
-          className="p-4 mt-auto bg-red-600 hover:bg-red-700 w-full text-center"
+          className="p-4 mt-auto block rounded  text-start text-red-600 hover:bg-red-600 hover:text-white"
         >
+          <LogOut size={24} className="inline-block mr-3 " />
           Cerrar Sesión
         </button>
       </div>
