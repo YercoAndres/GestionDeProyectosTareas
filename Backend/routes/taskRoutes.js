@@ -5,5 +5,6 @@ const taskController = require('../controllers/taskController');
 
 // Define la ruta para agregar una tarea a un proyecto
 router.post('/:projectId/tasks', taskController.createTask);
+router.get('/:projectId/tasks', taskController.getTasksByProjectId);
 
 module.exports = router;
