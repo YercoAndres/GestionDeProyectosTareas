@@ -40,7 +40,7 @@ const getAllProjects = (req, res) => {
 
 // Crear un nuevo proyecto
 const createProject = (req, res) => {
-  const { name, description, startDate, endDate, members } = req.body;
+  const { name, description, startDate, endDate, members, status } = req.body;
 
   // Verificar si todos los miembros existen
   const memberQueries = members.map(memberId => {
@@ -62,10 +62,11 @@ const createProject = (req, res) => {
         description: description || '',
         start_date: startDate,
         end_date: endDate,
+        status: status || 'En Progreso'
       };
 
-      const query = 'INSERT INTO projects (name, description, start_date, end_date) VALUES (?, ?, ?, ?)';
-      connection.query(query, [projectData.name, projectData.description, projectData.start_date, projectData.end_date], (err, result) => {
+      const query = 'INSERT INTO projects (name, description, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)';
+      connection.query(query, [projectData.name, projectData.description, projectData.start_date, projectData.end_date, projectData.status], (err, result) => {
         if (err) {
           console.error('Error al insertar el proyecto:', err);
           return res.status(500).json({ error: 'Error al crear el proyecto' });

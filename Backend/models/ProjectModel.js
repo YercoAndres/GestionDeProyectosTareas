@@ -5,9 +5,9 @@ const getAllProjects = (callback) => {
 };
 
 const createProject = (project, callback) => {
-  const { name, description, start_Date, end_Date, members } = project;
-  const query = 'INSERT INTO projects (name, description, start_date, end_date, members) VALUES (?, ?, ?, ?, ?)';
-  connection.query(query, [name, description, start_Date, end_Date, members], (err, results) => {
+  const { name, description, start_Date, end_Date, members, status } = project;
+  const query = 'INSERT INTO projects (name, description, start_date, end_date, members, status) VALUES (?, ?, ?, ?, ?, ?)';
+  connection.query(query, [name, description, start_Date, end_Date, members, status], (err, results) => {
     if (err) return callback(err);
     callback(null, results.insertId);
   });

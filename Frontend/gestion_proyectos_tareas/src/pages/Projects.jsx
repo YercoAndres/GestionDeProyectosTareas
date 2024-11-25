@@ -19,6 +19,7 @@ const Projects = () => {
     startDate: '',
     endDate: '',
     members: [],
+    status: 'En Progreso',
     id: null
   });
   const [users, setUsers] = useState([]);
@@ -33,6 +34,7 @@ const Projects = () => {
         startDate: '',
         endDate: '',
         members: [],
+        status: 'En Progreso',
         id: null
       });
       setError(null);
@@ -79,7 +81,8 @@ const Projects = () => {
     }
     const projectToAdd = {
       ...newProject,
-      members: newProject.members
+      members: newProject.members,
+      status: newProject.status
     };
   
     if (newProject.id) {
@@ -99,7 +102,7 @@ const Projects = () => {
       })
       .then(data => {
         setProjects(projects.map(project => project.id === newProject.id ? { ...projectToAdd, id: newProject.id } : project));
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null });
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status:'En Progreso', id: null });
         setError('');
         setShowModal(false);
       })
@@ -190,7 +193,7 @@ const Projects = () => {
           <FaPlus className="mr-2" /> Agregar Proyecto
         </button>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4 mt-6 m">
           {projects.map(project => (
             <ProjectCard 
               key={project.id} 
@@ -237,6 +240,19 @@ const Projects = () => {
                 required 
                 className="border p-2 mb-4 w-full"
               />
+
+          
+            <div className='grid grid-cols-1 justify-center'>
+
+            <select name="status" id="status" className='w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'>
+                    <option value="">Selecciona una opcion</option>
+                    <option value={newProject.status}>En Progreso</option>
+                    <option value={newProject.status}>En Pausa</option>
+                    <option value={newProject.status}>Completado</option>
+            </select>
+
+           
+            
               <h3 className="text-lg font-semibold mb-2">Seleccionar Miembros</h3>
                 <input
                   type="text"
@@ -245,6 +261,10 @@ const Projects = () => {
                   onChange={e => setSearchTerm(e.target.value)}
                   className="mb-4 p-2 border border-gray-300 rounded"
                 />
+           </div>
+                      
+
+
                 <div className="mb-4 max-h-64 overflow-y-auto">
                   {filteredUsers.map(user => (
                     <div key={user.id} className="flex items-center mb-2">
@@ -257,6 +277,7 @@ const Projects = () => {
                       <label htmlFor={`user-${user.id}`} className="ml-2">{user.name}</label>
                     </div>
                   ))}
+                
               </div>
               {error && <p className="text-red-500">{error}</p>}
             </form>

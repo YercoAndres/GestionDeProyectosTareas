@@ -33,7 +33,7 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
   }, []); // El efecto solo se ejecuta una vez cuando el componente se monta
 
   return (
-    <div className="border p-4 rounded shadow-md">
+    <div className="border p-4 rounded shadow-md ">
       <h2 className="text-xl font-semibold">{project.name}</h2>
       <p>{project.description}</p>
       <p>Fechas: {formatDate(project.start_date)} - {formatDate(project.end_date)}</p>
@@ -44,7 +44,7 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
           className={`bg-green-500 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
-          Ver Proyecto
+          Agregar tarea
         </button>
         <button 
           onClick={onEdit} 

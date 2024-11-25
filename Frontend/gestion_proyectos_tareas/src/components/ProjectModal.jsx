@@ -37,9 +37,7 @@ export default function ProjectModal({ project, onClose }) {
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-8 rounded shadow-lg max-w-lg w-full">
-        <h2 className="text-2xl font-semibold mb-4">{project.name}</h2>
-        <p className="text-gray-700 mb-2"><strong>Descripción:</strong> {project.description}</p>
-        <p className="text-gray-700 mb-4"><strong>Miembros:</strong> {project.members.join(', ')}</p>
+    
 
         <h3 className="text-xl font-semibold mb-4">Agregar Tarea</h3>
         <form onSubmit={handleAddTask}>
@@ -85,20 +83,25 @@ export default function ProjectModal({ project, onClose }) {
               required
             />
           </div>
+          <div className='grid grid-cols-2 gap-4'>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
           >
             Agregar Tarea
           </button>
-        </form>
 
-        <button
+          <button
           onClick={onClose}
-          className="mt-4 bg-gray-500 hover:bg-gray-700 text-white py-2 px-4 rounded"
+          className="bg-gray-500 hover:bg-gray-700 text-white py-2 px-4 rounded"
         >
           Cerrar
         </button>
+
+        </div>
+        </form>
+
+        
       </div>
     </div>
   );
