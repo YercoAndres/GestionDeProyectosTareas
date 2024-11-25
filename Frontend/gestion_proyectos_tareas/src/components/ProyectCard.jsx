@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ProjectModal from './ProjectModal';
+import ProjectViewModal from './ProjectViewModal'; // Asegúrate de importar ProjectViewModal
 import jwt_decode from 'jwt-decode'; // Necesario para decodificar el JWT
-import { Eye, CirclePlus, Pencil, Trash} from 'lucide-react';
+import { Eye, CirclePlus, Pencil, Trash } from 'lucide-react';
 
-const ProjectCard = ({ project, onEdit, onDelete }) => {
+const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userRole, setUserRole] = useState(''); // Estado para almacenar el rol del usuario
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [tasks, setTasks] = useState([]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -24,25 +26,31 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
     setIsModalOpen(false);
   };
 
-  // Usar useEffect para evitar la actualización del estado en cada renderizado
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decoded = jwt_decode(token); // Decodifica el token
-      setUserRole(decoded.role); // Establece el rol del usuario
-    }
-  }, []); // El efecto solo se ejecuta una vez cuando el componente se monta
+  const handleOpenViewModal = () => {
+    // Fetch tasks for the project
+    fetch(`http://localhost:5000/tasks/${project.id}/tasks`)
+      .then((response) => response.json())
+      .then((data) => {
+        setTasks(data);
+        setIsViewModalOpen(true);
+      })
+      .catch((error) => console.error('Error fetching tasks:', error));
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false);
+  };
 
   return (
-    <div className="border p-4 rounded shadow-md ">
+    <div className="border p-4 rounded shadow-md">
       <h2 className="text-xl font-semibold">{project.name}</h2>
       <p>{project.description}</p>
-      <p>Fechas: {formatDate(project.start_date)} - {formatDate(project.end_date)}</p>
      
-      <div className="mt-4 flex  space-x-2">
+     
+      <div className="mt-4 flex flex-wrap space-x-2 space-y-2 sm:space-y-0">
         <button 
-          onClick={handleOpenModal} 
-          className={`bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={handleOpenViewModal} 
+          className={`bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
           <Eye size={24} className="inline-block mr-3" />
@@ -50,7 +58,7 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
         </button>
         <button 
           onClick={handleOpenModal} 
-          className={`bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
           <CirclePlus size={24} className="inline-block mr-3" />
@@ -58,7 +66,7 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
         </button>
         <button 
           onClick={onEdit} 
-          className={`bg-sky-700 hover:bg-sky-800 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-sky-700 hover:bg-sky-800 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
           <Pencil size={24} className="inline-block mr-3" />
@@ -76,6 +84,10 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
 
       {isModalOpen && (
         <ProjectModal project={project} onClose={handleCloseModal} />
+      )}
+
+      {isViewModalOpen && (
+        <ProjectViewModal project={project} tasks={tasks} onClose={handleCloseViewModal} />
       )}
     </div>
   );

@@ -11,7 +11,9 @@ const createTask = (task, callback) => {
   );
 };
 
-
+const getTasksByProjectId = (projectId, callback) => {
+  connection.query('SELECT * FROM tasks WHERE project_id = ?', [projectId], callback);
+};
 
 const deleteTasksByProjectId = (projectId, callback) => {
   connection.query('DELETE FROM tasks WHERE project_id = ?', [projectId], callback);
@@ -20,4 +22,5 @@ const deleteTasksByProjectId = (projectId, callback) => {
 module.exports = {
   createTask,
   deleteTasksByProjectId,
+  getTasksByProjectId
 };
