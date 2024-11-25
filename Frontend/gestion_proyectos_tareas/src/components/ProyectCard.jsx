@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProjectModal from './ProjectModal';
 import jwt_decode from 'jwt-decode'; // Necesario para decodificar el JWT
+import { Eye, CirclePlus, Pencil, Trash} from 'lucide-react';
 
 const ProjectCard = ({ project, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,27 +38,38 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
       <h2 className="text-xl font-semibold">{project.name}</h2>
       <p>{project.description}</p>
       <p>Fechas: {formatDate(project.start_date)} - {formatDate(project.end_date)}</p>
-      <p>Miembros: {project.members.length > 0 ? project.members.length : 'No hay miembros'}</p>
-      <div className="mt-4">
+     
+      <div className="mt-4 flex  space-x-2">
         <button 
           onClick={handleOpenModal} 
-          className={`bg-green-500 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
+          <Eye size={24} className="inline-block mr-3" />
+          Ver Proyecto
+        </button>
+        <button 
+          onClick={handleOpenModal} 
+          className={`bg-green-400 hover:bg-green-500 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={userRole === 'user'}
+        >
+          <CirclePlus size={24} className="inline-block mr-3" />
           Agregar tarea
         </button>
         <button 
           onClick={onEdit} 
-          className={`bg-blue-500 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-blue-400 hover:bg-blue-500 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
+          <Pencil size={24} className="inline-block mr-3" />
           Editar
         </button>
         <button 
           onClick={onDelete} 
-          className={`bg-red-500 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
+          <Trash size={24} className="inline-block mr-3" />
           Eliminar
         </button>
       </div>

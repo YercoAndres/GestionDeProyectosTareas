@@ -1,9 +1,14 @@
+// Proposito Modelo de la tabla tasks
 const connection = require('../config/db');
 
-
-const createTask = (task, callback) => {
-  const { projectId, taskDescription } = task;
-  connection.query('INSERT INTO tasks (project_id, task) VALUES (?, ?)', [projectId, taskDescription], callback);
+// Función para crear una tarea
+const createTask = (task, callback) => {  
+  const { projectId, name, description, start_date, end_date, priority } = task;
+  connection.query(
+    'INSERT INTO tasks (project_id, name, description, start_date, end_date, priority) VALUES (?, ?, ?, ?, ?, ?)', 
+    [projectId, name, description, start_date, end_date, priority], 
+    callback
+  );
 };
 
 

@@ -4,22 +4,22 @@ import Sidebar from '../components/Sidebar';
 export default function Tasks({ projectId }) {
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/tasks?projectId=${projectId}`);
-        if (!response.ok) {
-          throw new Error('Error al obtener las tareas');
+  
+    useEffect(() => {
+      const fetchTasks = async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/projects/${projectId}/tasks`); // Cambia esta línea
+          if (!response.ok) {
+            throw new Error('Error al obtener las tareas');
+          }
+          const tasksData = await response.json();
+          setTasks(tasksData);
+        } catch (error) {
+          console.error('Error:', error);
         }
-        const tasksData = await response.json();
-        setTasks(tasksData);
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    };
-
-    fetchTasks();
-  }, [projectId]);
+      };
+      fetchTasks();
+    }, [projectId]);
 
   const handleDeleteTask = async (taskId) => {
     try {
