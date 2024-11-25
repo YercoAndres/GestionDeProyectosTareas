@@ -50,7 +50,7 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
         </button>
         <button 
           onClick={handleOpenModal} 
-          className={`bg-green-400 hover:bg-green-500 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
           <CirclePlus size={24} className="inline-block mr-3" />
@@ -58,7 +58,7 @@ const ProjectCard = ({ project, onEdit, onDelete }) => {
         </button>
         <button 
           onClick={onEdit} 
-          className={`bg-blue-400 hover:bg-blue-500 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-sky-700 hover:bg-sky-800 text-white px-2 py-1 rounded mr-2 ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
           <Pencil size={24} className="inline-block mr-3" />
