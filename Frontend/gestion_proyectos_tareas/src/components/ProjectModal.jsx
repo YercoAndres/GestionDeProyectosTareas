@@ -66,7 +66,7 @@ export default function ProjectModal({ project, onClose }) {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
               Descripción
             </label>
-            <input
+            <textarea
               type="text"
               id="description"
               name="description"
