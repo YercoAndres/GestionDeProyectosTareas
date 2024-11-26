@@ -5,6 +5,7 @@ import ProjectCard from '../components/ProyectCard';
 import { FaPlus } from 'react-icons/fa';
 import ConfirmDialog from '../components/ConfirmDialog';
 import jwt_decode from 'jwt-decode';
+import { toast } from 'react-toastify';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -84,6 +85,8 @@ const Projects = () => {
       members: newProject.members,
       status: newProject.status
     };
+
+    toast.success(newProject.id ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
   
     if (newProject.id) {
       fetch(`http://localhost:5000/projects/${newProject.id}`, {
@@ -110,6 +113,7 @@ const Projects = () => {
         console.error(err);
         setError('Error al editar el proyecto. Inténtalo de nuevo.');
       });
+      
     } else {
       fetch('http://localhost:5000/projects', {
         method: 'POST',
