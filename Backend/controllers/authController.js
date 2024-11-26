@@ -30,7 +30,7 @@ const login = (req, res) => {
       }
   
       const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, {
-        expiresIn: '1h'
+        expiresIn: '8h'
       });
       return res.status(200).json({ token, user }); // Asegúrate de devolver el objeto user
     });

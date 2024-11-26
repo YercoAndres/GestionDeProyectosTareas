@@ -183,7 +183,7 @@ const Projects = () => {
   const filteredUsers = users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
   return (
     <Sidebar>
-      <div className="flex-1 p-10 bg-gray-100">
+      <div className="flex-1 p-10 bg-gray-200">
         <h1 className="text-3xl font-semibold mb-6">Proyectos</h1>
         <button 
           onClick={toggleModal} 
@@ -193,7 +193,7 @@ const Projects = () => {
           <FaPlus className="mr-2" /> Agregar Proyecto
         </button>
         
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4 mt-6 m">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4 mt-6">
           {projects.map(project => (
             <ProjectCard 
               key={project.id} 
@@ -210,21 +210,37 @@ const Projects = () => {
             buttonText={newProject.id ? "Guardar Cambios" : "Crear Proyecto"}
             onSubmit={handleAddProject}
           >
-            <form onSubmit={handleAddProject}>
+            
+            {/* Inicio del Formulario  */}
+        <form onSubmit={handleAddProject} >
+
+         <div className='grid sm:grid-cols-2 gap-3'>
+            <div>
+                <label htmlFor="name" className='font-bold'>Nombre:</label>
               <input 
                 type="text" 
                 placeholder="Nombre del Proyecto" 
                 value={newProject.name} 
                 onChange={(e) => setNewProject({ ...newProject, name: e.target.value })} 
-                required className="border p-2 mb-4 w-full"
+                required
+                className="border p-2 mb-4 w-full"
               />
+            </div>
+            
+            <div>
+                <label htmlFor="description" className='font-bold'>Descripción:</label>
               <textarea 
                 placeholder="Descripción" 
                 value={newProject.description} 
                 onChange={(e) => setNewProject({ ...newProject, description: e.target.value })} 
                 className="border p-2 mb-4 w-full"
               />
-              <h2>Fecha de Inicio</h2>
+            </div>
+         </div>
+
+        <div className='grid sm:grid-cols-2 gap-3'>
+            <div>
+              <label className='font-bold'>Fecha de Inicio:</label>
               <input 
                 type="date" 
                 value={newProject.startDate} 
@@ -232,7 +248,9 @@ const Projects = () => {
                 required 
                 className="border p-2 mb-4 w-full"
               />
-              <h2>Fecha de Fin</h2>
+            </div>
+            <div>
+              <label className='font-bold'>Fecha de Fin:</label>
               <input 
                 type="date" 
                 value={newProject.endDate} 
@@ -240,11 +258,13 @@ const Projects = () => {
                 required 
                 className="border p-2 mb-4 w-full"
               />
+            </div>
+          </div>
 
-          
+            
             <div className='grid grid-cols-1 justify-center'>
-
-            <select name="status" id="status" className='w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'>
+            <label htmlFor="status" className='font-bold mt-2'>Selecciona el estado:</label>
+            <select name="status" id="status" className='w-full mt-2 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2'>
                     <option value="">Selecciona una opcion</option>
                     <option value={newProject.status}>En Progreso</option>
                     <option value={newProject.status}>En Pausa</option>
@@ -253,19 +273,19 @@ const Projects = () => {
 
            
             
-              <h3 className="text-lg font-semibold mb-2">Seleccionar Miembros</h3>
+              <label className='font-bold mt-2'>Seleccionar Miembros</label>
                 <input
                   type="text"
-                  placeholder="Buscar..."
+                  placeholder="Buscar miembro..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="mb-4 p-2 border border-gray-300 rounded"
+                  className="mt-2 mb-4 p-2 border border-gray-300 rounded"
                 />
            </div>
                       
 
 
-                <div className="mb-4 max-h-64 overflow-y-auto">
+                <div className="mb-4 max-h-64 overflow-y-auto p-2 border border-gray-300 rounded-lg">
                   {filteredUsers.map(user => (
                     <div key={user.id} className="flex items-center mb-2">
                       <input
@@ -281,6 +301,7 @@ const Projects = () => {
               </div>
               {error && <p className="text-red-500">{error}</p>}
             </form>
+           
           </Modal>
         )}
         {confirmDialogVisible && (

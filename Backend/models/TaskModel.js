@@ -15,6 +15,15 @@ const getTasksByProjectId = (projectId, callback) => {
   connection.query('SELECT * FROM tasks WHERE project_id = ?', [projectId], callback);
 };
 
+getTasks = (req, res) => {
+  db.query('SELECT * FROM tasks', (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error al obtener las tareas' });
+    }
+    res.json(result);
+  });
+};
+
 const deleteTasksByProjectId = (projectId, callback) => {
   connection.query('DELETE FROM tasks WHERE project_id = ?', [projectId], callback);
 };

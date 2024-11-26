@@ -22,33 +22,41 @@ const deleteProject = (id, callback) => {
   connection.beginTransaction(err => {
     if (err) return callback(err);
 
-    // Elimina las filas relacionadas en project_members
-    connection.query('DELETE FROM project_members WHERE project_id = ?', [id], (err, result) => {
+    connection.query('DELETE FROM tasks WHERE project_id = ?', [id], (err, result) => {
       if (err) {
         return connection.rollback(() => {
           callback(err);
         });
       }
 
-      // Elimina el proyecto
-      connection.query('DELETE FROM projects WHERE id = ?', [id], (err, result) => {
+      // Elimina las filas relacionadas en project_members
+      connection.query('DELETE FROM project_members WHERE project_id = ?', [id], (err, result) => {
         if (err) {
           return connection.rollback(() => {
             callback(err);
           });
         }
 
-        connection.commit(err => {
+        // Elimina el proyecto
+        connection.query('DELETE FROM projects WHERE id = ?', [id], (err, result) => {
           if (err) {
             return connection.rollback(() => {
               callback(err);
             });
           }
-          callback(null, result);
+
+          connection.commit(err => {
+            if (err) {
+              return connection.rollback(() => {
+                callback(err);
+              });
+            }
+            callback(null, result);
+          });
         });
       });
     });
-  });
+  }); // <-- Aquí cierra la función beginTransaction
 };
 
 const getProjectsByUserId = (userId, callback) => {

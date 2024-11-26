@@ -35,4 +35,15 @@ const getTasksByProjectId = (req, res) => {
 };
 
 
-module.exports = { createTask, getTasksByProjectId };
+getTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find(); // Aquí deberías obtener las tareas desde tu base de datos
+    res.json(tasks); // Envía las tareas como respuesta en formato JSON
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener las tareas' });
+  }
+};
+
+
+
+module.exports = { createTask, getTasksByProjectId, getTasks };

@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 
 export default function Dashboard( ) {
   const [projects, setProjects] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
   const [projectInfo, setProjectInfo] = useState(null);
@@ -12,17 +13,22 @@ export default function Dashboard( ) {
       try {
         const projectsResponse = await fetch('http://localhost:5000/projects');
         const usersResponse = await fetch('http://localhost:5000/api/users');
+        const tasksResponse = await fetch('http://localhost:5000/tasks')
         
         const projectsData = await projectsResponse.json();
         const usersData = await usersResponse.json();
+        const tasksData = await tasksResponse.json();
 
         setProjects(projectsData);
         setUsers(usersData);
+        setTasks(tasksData);
+        
+  
       } catch (error) {
         console.error('Error al cargar los datos', error);
       }
     };
-
+   
     fetchDashboardData();
   }, []);
 
@@ -54,7 +60,7 @@ export default function Dashboard( ) {
           </div>
           {/* Total de tareas */}
           <div className="bg-green-100 p-6 rounded-3xl shadow-md grid justify-center items-center">
-            <p className=" font-bold text-center text-green-600">{projects.length}</p>
+            <p className=" font-bold text-center text-green-600">{tasks.length}</p>
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Tareas</h2>
             <img src="../public/taskicon.png" loading='lazy' alt="iconTask" className='max-w-15 max-h-10 mx-auto block' />
           </div>
