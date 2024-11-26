@@ -1,10 +1,10 @@
 // FILE: EditProfileModal.jsx
-import React, { useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+import React, {  } from 'react';
+import { toast } from 'react-toastify';
 
-export default function EditProfileModal({ user, setUser, onClose }) {
-  const [password, setPassword] = useState('');
+export default function EditProfileModal({ user, setUser, onClose, userRole}) {
 
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUser({
@@ -13,20 +13,12 @@ export default function EditProfileModal({ user, setUser, onClose }) {
     });
   };
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
+  
+
 
   const handleSave = async () => {
     const updatedUser = { ...user };
-    if (password) {
-      updatedUser.password = password;
-    } else {
-      delete updatedUser.password; // Eliminar la contraseña si no se ha cambiado
-    }
-    if (handleSave.role === 'user') {
-      toast.error('No tienes permisos para realizar esta acción');
-      return;}
+
     try {
       const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
         method: 'PUT',
@@ -40,8 +32,8 @@ export default function EditProfileModal({ user, setUser, onClose }) {
         throw new Error('Error al actualizar el usuario');
       }
 
-      // Actualizar el rol en el localStorage
-      localStorage.setItem('userRole', updatedUser.role);
+    
+     toast.success('Usuario actualizado correctamente');
 
       onClose();
     } catch (error) {
@@ -51,7 +43,7 @@ export default function EditProfileModal({ user, setUser, onClose }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-md">
+      <div className="bg-white p-6 rounded shadow-md md:w-2/3">
         <h2 className="text-2xl font-semibold mb-4">Editar Perfil</h2>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
@@ -77,18 +69,7 @@ export default function EditProfileModal({ user, setUser, onClose }) {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-            Contraseña
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={handlePasswordChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
+
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
             Rol
@@ -97,6 +78,7 @@ export default function EditProfileModal({ user, setUser, onClose }) {
             name="role"
             value={user.role}
             onChange={handleInputChange}
+            disabled={userRole === 'user'}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           >
             <option value="user">User</option>

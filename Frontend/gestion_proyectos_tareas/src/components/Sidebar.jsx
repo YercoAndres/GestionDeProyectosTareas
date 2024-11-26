@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Home, Folder, User, LogOut } from 'lucide-react';
+import { Home, Folder, User, LogOut  } from 'lucide-react';
 
 const Sidebar = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,8 +52,11 @@ const Sidebar = ({ children }) => {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
       >
+         
         <div className="flex items-center justify-between lg:hidden">
+          
           <h2 className="text-2xl font-bold text-center">ProjectTask</h2>
+          
           <button
             onClick={toggleMenu}
             type="button"

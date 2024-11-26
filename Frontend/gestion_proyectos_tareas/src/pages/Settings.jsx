@@ -11,6 +11,7 @@ export default function Settings() {
     role: 'user',
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [openPassModal, setOpenPassModal] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem('userId'); // Recupera el ID del usuario desde localStorage
@@ -31,6 +32,8 @@ export default function Settings() {
       fetchUserData();
     }
   }, []);
+
+ 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -93,7 +96,11 @@ export default function Settings() {
             onClick={handleEditToggle}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            {isEditing ? 'Guardar' : 'Editar'}
+            Editar
+          </button>
+          <button
+          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 ml-3 rounded focus:outline-none focus:shadow-outline'>
+            Cambiar Password
           </button>
         </div>
       </div>

@@ -13,6 +13,8 @@ import { Eye, CirclePlus, Pencil, Trash } from 'lucide-react';
         setShowInfo(!showInfo);
       }
 
+      
+
             // Función para obtener las tareas desde la API
             const fetchTasks = async () => {
               try {
@@ -132,8 +134,8 @@ import { Eye, CirclePlus, Pencil, Trash } from 'lucide-react';
 
           <button 
             onClick={toggleInfo} 
-            className={`bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={userRole === 'user'}
+            className={'bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded'}
+           
           >
             
             <Eye size={24} className="inline-block mr-3" />
@@ -142,8 +144,8 @@ import { Eye, CirclePlus, Pencil, Trash } from 'lucide-react';
           
           <button 
             onClick={handleOpenModal} 
-            className={`bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={userRole === 'user'}
+            className={'bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded' }
+            
           >
             <CirclePlus size={24} className="inline-block mr-3" />
             Agregar tarea

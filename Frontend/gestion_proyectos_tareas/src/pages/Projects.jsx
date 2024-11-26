@@ -197,7 +197,8 @@ const Projects = () => {
           {projects.map(project => (
             <ProjectCard 
               key={project.id} 
-              project={project} 
+              project={project}
+              userRole={userRole} 
               onEdit={() => handleEditProject(project)} 
               onDelete={() => handleDeleteProject(project.id)} 
             />

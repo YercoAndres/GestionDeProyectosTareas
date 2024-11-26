@@ -24,14 +24,9 @@ const User = {
     db.query(query, [id], callback);
   },
   updateUser: (id, userData, callback) => {
-    const { name, email, password, role } = userData;
-    const query = password
-      ? 'UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?'
-      : 'UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?';
-    const params = password
-      ? [name, email, bcrypt.hashSync(password, 10), role, id]
-      : [name, email, role, id];
-    db.query(query, params, callback);
+    const { name, email, role } = userData;
+    const query = 'UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?';
+    db.query(query, [name, email, role, id], callback);
   }
 };
 
