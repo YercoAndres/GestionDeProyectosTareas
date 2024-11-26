@@ -1,20 +1,19 @@
-// FILE: Settings.jsx
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import EditProfileModal from '../components/EditProfileModal';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 
 export default function Settings() {
   const [user, setUser] = useState({
     name: '',
     email: '',
-    password: '',
     role: 'user',
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId'); // Recupera el ID del usuario desde localStorage
-
+    const userId = localStorage.getItem('userId');
     if (userId) {
       const fetchUserData = async () => {
         try {
@@ -80,30 +79,46 @@ export default function Settings() {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
               Rol
             </label>
-            <input
-              type="text"
+            <select
               name="role"
               value={user.role}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              disabled
-            />
+              disabled={!isEditing}
+            >
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+            </select>
           </div>
-          <button
-            onClick={handleEditToggle}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            {isEditing ? 'Guardar' : 'Editar'}
-          </button>
+          <div className="flex space-x-4">
+            <button
+              onClick={handleEditToggle}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              {isEditing ? 'Guardar' : 'Editar Perfil'}
+            </button>
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cambiar Contraseña
+            </button>
+          </div>
         </div>
+        {isEditing && user && (
+          <EditProfileModal
+            user={user}
+            setUser={setUser}
+            onClose={handleEditToggle}
+          />
+        )}
+        {showPasswordModal && (
+          <ChangePasswordModal
+            userId={user.id}
+            onClose={() => setShowPasswordModal(false)}
+          />
+        )}
       </div>
-      {isEditing && user && (
-        <EditProfileModal
-          user={user}
-          setUser={setUser}
-          onClose={handleEditToggle}
-        />
-      )}
     </div>
   );
 }
