@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProjectModal from './ProjectModal';
-import { Eye, CirclePlus, Pencil, Trash } from 'lucide-react';
+import { Eye, CirclePlus, Pencil, Trash, SquareX } from 'lucide-react';
 
 const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,7 +60,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="border p-4 rounded shadow-md bg-white">
+    <div className="border p-4 rounded-xl shadow-md bg-white">
       <h3 className="text-2xl font-bold text-cyan-900">Proyecto: {project.name}</h3>
       {showInfo && (
         <>
@@ -83,27 +83,76 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
               <p className="text-gray-700">{formatDate(project.end_date)}</p>
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Miembros:</label>
-              <p className="text-gray-700">{project.members}</p>
-            </div>
+  <label className="block text-gray-700 text-sm font-bold mb-2">Miembros:</label>
+  {Array.isArray(project.members) && project.members.length > 0 ? (
+    <ul className="text-gray-700 list-disc pl-5">
+      {project.members.map((member, index) => (
+        <li key={index}>{member}</li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-gray-700">No hay miembros asignados.</p>
+  )}
+</div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Prioridad:</label>
               <p className="text-gray-700 pl-3">{project.priority}</p>
             </div>
+            </div>
             <div className="mb-4">
               <label className="block text-gray-700 text-xl font-semibold mb-2">Tareas asignadas al proyecto:</label>
-              <div className="grid sm:grid-cols-2 gap-2">
+              <div className="grid sm:grid-cols-4 gap-4">
                 {Array.isArray(tasks) && tasks.length > 0 ? (
                   tasks.map((task) => (
                     <div
                       key={task.id}
-                      className={`text-gray-700 border rounded-lg p-3 ${priorityColor(task.priority)}`}
+                      className={`text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(task.priority)}`}
                     >
-                      <p>{task.priority}</p>
-                      <p>{task.name}</p>
-                      <p>{task.description}</p>
-                      <p>{formatDate(task.start_date)}</p>
-                      <p>{formatDate(task.end_date)}</p>
+                      <div className='grid-cols-1	'>
+                    <div className='flex justify-end gap-2'>
+                      <button>
+                      <Pencil size={24} className="inline-block" />
+                      </button>
+                      <button>
+                      <SquareX size={24} className="inline-block" />
+                      </button>
+                    </div>
+                        <div>
+                          <label className='font-bold' htmlFor="name">Nombre de la tarea:</label>
+                          <p>{task.name}</p>
+                          </div>
+
+                        <div>
+                          <label className='font-bold' htmlFor="description">Descripción:</label>
+                          <p>{task.description}</p>
+                          </div>
+                        <div>
+                          </div>
+
+                          <div>
+                          <label className='font-bold' htmlFor="startdate">Fecha de inicio:</label>
+                          <p>{formatDate(task.start_date)}</p>
+                          </div>
+                        <div>
+                          </div>
+
+                          <div>
+                          <label className='font-bold' htmlFor="enddate">Fecha de fin:</label>
+                          <p>{formatDate(task.end_date)}</p>
+                          </div>
+                        <div>
+                          </div>
+
+                          <div>
+                          <label className='font-bold' htmlFor="priority">Prioridad:</label>
+                          <p>{task.priority}</p>
+                          </div>
+                        <div>
+                          </div>
+
+                      </div>
+
+
                     </div>
                   ))
                 ) : (
@@ -111,27 +160,26 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
                 )}
               </div>
             </div>
-          </div>
         </>
       )}
-      <div className="mt-4 flex flex-wrap space-x-2 space-y-2 sm:space-y-0">
+      <div className="mt-10 flex flex-wrap justify-end gap-3">
         <button
           onClick={toggleInfo}
-          className={'bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded'}
+          className={'bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded-lg'}
         >
           <Eye size={24} className="inline-block mr-3" />
           {showInfo ? 'Ocultar Proyecto' : 'Ver Proyecto'}
         </button>
         <button
           onClick={handleOpenModal}
-          className={'bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded'}
+          className={'bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg'}
         >
           <CirclePlus size={24} className="inline-block mr-3" />
           Agregar tarea
         </button>
         <button
           onClick={onEdit}
-          className={`bg-sky-700 hover:bg-sky-800 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-sky-700 hover:bg-sky-800 text-white px-2 py-1 rounded-lg ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
           <Pencil size={24} className="inline-block mr-3" />
@@ -139,7 +187,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
         </button>
         <button
           onClick={onDelete}
-          className={`bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-lg ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={userRole === 'user'}
         >
           <Trash size={24} className="inline-block mr-3" />

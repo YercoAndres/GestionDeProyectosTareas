@@ -192,7 +192,7 @@ const Projects = () => {
         <button 
           onClick={toggleModal} 
           disabled={userRole === 'user'}
-          className={`bg-blue-500 text-white px-4 py-2 rounded flex items-center ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center ${userRole === 'user' ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <FaPlus className="mr-2" /> Agregar Proyecto
         </button>
