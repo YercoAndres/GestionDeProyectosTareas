@@ -32,6 +32,10 @@ const User = {
       ? [name, email, bcrypt.hashSync(password, 10), role, id]
       : [name, email, role, id];
     db.query(query, params, callback);
+  },
+  updatePassword: (userId, hashedPassword, callback) => {
+    const query = 'UPDATE users SET password = ? WHERE id = ?';
+    db.query(query, [hashedPassword, userId], callback);
   }
 };
 

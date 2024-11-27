@@ -32,28 +32,37 @@ export default function ChangePasswordModal({ userId, onClose }) {
     e.preventDefault();
     
     if (!validatePasswords()) return;
-
+  
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/change-password`, {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No hay sesión activa');
+        return;
+      }
+  
+      const response = await fetch(`http://localhost:5000/api/auth/users/${userId}/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           currentPassword: passwords.currentPassword,
           newPassword: passwords.newPassword,
         }),
       });
-
+  
+      const data = await response.json();
+      
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
+        throw new Error(data.message || 'Error al cambiar la contraseña');
       }
-
-      toast.success('Contraseña actualizada correctamente');
+  
+      toast.success(data.message);
       onClose();
     } catch (error) {
-      toast.error(error.message || 'Error al cambiar la contraseña');
+      console.error('Error al cambiar la contraseña:', error);
+      toast.error(error.message);
     }
   };
 
