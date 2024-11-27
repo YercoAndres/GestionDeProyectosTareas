@@ -124,6 +124,7 @@ export default function Dashboard( ) {
           <div className="bg-white p-6 rounded shadow-md">
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Tareas</h2>
             <p className="text-2xl font-bold text-center">{projects.length}</p>
+              
           </div>
           <div className="bg-white p-6 rounded shadow-md">
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Miembros Registrados</h2>

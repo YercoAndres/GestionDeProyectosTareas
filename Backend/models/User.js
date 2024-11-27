@@ -27,6 +27,10 @@ const User = {
     const { name, email, role } = userData;
     const query = 'UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?';
     db.query(query, [name, email, role, id], callback);
+  },
+  updatePassword: (userId, hashedPassword, callback) => {
+    const query = 'UPDATE users SET password = ? WHERE id = ?';
+    db.query(query, [hashedPassword, userId], callback);
   }
 };
 
