@@ -65,6 +65,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   };
 
   const handleDeleteTask = async (taskId) => {
+    console.log(`Attempting to delete task with id ${taskId}`);
     try {
       const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
         method: 'DELETE',
@@ -72,6 +73,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
           'Content-Type': 'application/json',
         },
       });
+      console.log(`Response status: ${response.status}`);
       if (response.ok) {
         setTasks(tasks.filter(task => task.id !== taskId));
         console.log(`Task with id ${taskId} deleted successfully`);
@@ -144,14 +146,15 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-xl font-semibold mb-2">Tareas asignadas al proyecto:</label>
-            <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
               {Array.isArray(tasks) && tasks.length > 0 ? (
                 tasks.map((task) => (
                   <div
                     key={task.id}
                     className={`text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(task.priority)}`}
                   >
-                    <div>
+                   
+                    <div >
 
                       <div className='grid grid-cols-2 mb-4'>
                         
@@ -159,10 +162,10 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
                       <div className='flex justify-end gap-2'>
                       <button onClick={() => handleOpenModal(task)}>
-                          <Pencil size={24} className="inline-block text-blue-600 " />
+                          <Pencil size={24} className="inline-block  " />
                         </button>
                         <button onClick={() => handleOpenConfirmDialog(task.id)}>
-                          <SquareX size={24} className="inline-block text-red-700" />
+                          <SquareX size={24} className="inline-block " />
                         </button>
                       </div>
                        

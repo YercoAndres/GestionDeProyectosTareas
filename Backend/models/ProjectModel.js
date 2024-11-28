@@ -68,10 +68,19 @@ const getProjectsByUserId = (userId, callback) => {
   connection.query(query, [userId], callback);
 };
 
+const updateProjectStatus = (projectId, status, callback) => {
+  connection.query(
+    'UPDATE projects SET status = ? WHERE id = ?',
+    [status, projectId],
+    callback
+  );
+};
+
 module.exports = {
   getAllProjects,
   createProject,
   updateProject,
   deleteProject,
   getProjectsByUserId,
+  updateProjectStatus
 };

@@ -2,10 +2,10 @@ const connection = require('../config/db');
 
 // Función para crear una tarea
 const createTask = (task, callback) => {  
-  const { projectId, name, description, start_date, end_date, priority } = task;
+  const { projectId, name, description, start_date, end_date, priority, estado } = task;
   connection.query(
-    'INSERT INTO tasks (project_id, name, description, start_date, end_date, priority) VALUES (?, ?, ?, ?, ?, ?)', 
-    [projectId, name, description, start_date, end_date, priority], 
+    'INSERT INTO tasks (project_id, name, description, start_date, end_date, priority, estado) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+    [projectId, name, description, start_date, end_date, priority, estado], 
     callback
   );
 };
@@ -29,10 +29,20 @@ const deleteTask = (taskId, callback) => {
   connection.query('DELETE FROM tasks WHERE id = ?', [taskId], callback);
 };
 
+const updateTask = (taskId, task, callback) => {
+  const { name, description, start_date, end_date, priority, estado } = task;
+  connection.query(
+    'UPDATE tasks SET name = ?, description = ?, start_date = ?, end_date = ?, priority = ?, estado = ? WHERE id = ?',
+    [name, description, start_date, end_date, priority, estado, taskId],
+    callback
+  );
+};
+
 module.exports = {
   createTask,
   getTasksByProjectId,
   getAllTasks,
   deleteTasksByProjectId,
-  deleteTask
+  deleteTask,
+  updateTask
 };

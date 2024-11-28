@@ -1,4 +1,5 @@
-const Task = require('../models/TaskModel'); 
+const Task = require('../models/TaskModel');
+const Project = require('../models/ProjectModel'); // Asegúrate de tener un modelo de proyecto
 
 // Función para crear una tarea
 const createTask = (req, res) => {
@@ -9,7 +10,8 @@ const createTask = (req, res) => {
     description: req.body.description, 
     start_date: req.body.start_date, 
     end_date: req.body.end_date, 
-    priority: req.body.priority 
+    priority: req.body.priority,
+    estado: req.body.estado || 'en progreso'
   }; 
 
   Task.createTask(newTask, (err, results) => {
@@ -41,18 +43,54 @@ const getAllTasks = (req, res) => {
     res.json(tasks);
   });
 };
+
+// Función para eliminar una tarea
 const deleteTask = (req, res) => {
-  const { id } = req.params;
-  connection.query('DELETE FROM tasks WHERE id = ?', [id], (error, results) => {
-    if (error) {
-      console.error('Error al eliminar la tarea:', error);
+  const { taskId } = req.params;
+  Task.deleteTask(taskId, (err, result) => {
+    if (err) {
+      console.error('Error al eliminar la tarea:', err);
       return res.status(500).json({ message: 'Error al eliminar la tarea' });
     }
-    if (results.affectedRows === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Tarea no encontrada' });
     }
     res.status(200).json({ message: 'Tarea eliminada correctamente' });
   });
 };
 
-module.exports = { createTask, getTasksByProjectId, getAllTasks, deleteTask };
+// Función para actualizar una tarea
+const updateTask = (req, res) => {
+  const { taskId } = req.params;
+  const updatedTask = req.body;
+
+  Task.updateTask(taskId, updatedTask, (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error al actualizar la tarea' });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    // Verificar si todas las tareas del proyecto están completadas
+    Task.getTasksByProjectId(updatedTask.projectId, (err, tasks) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error al verificar las tareas del proyecto' });
+      }
+
+      const allCompleted = tasks.every(task => task.estado === 'completado');
+      if (allCompleted) {
+        Project.updateProjectStatus(updatedTask.projectId, 'completado', (err) => {
+          if (err) {
+            return res.status(500).json({ message: 'Error al actualizar el estado del proyecto' });
+          }
+          res.status(200).json({ message: 'Tarea y estado del proyecto actualizados correctamente' });
+        });
+      } else {
+        res.status(200).json({ message: 'Tarea actualizada correctamente' });
+      }
+    });
+  });
+};
+
+module.exports = { createTask, getTasksByProjectId, getAllTasks, updateTask, deleteTask };

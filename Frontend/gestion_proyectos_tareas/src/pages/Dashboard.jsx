@@ -99,10 +99,11 @@ export default function Dashboard() {
         </div>
 
         {/* Total de tareas del proyecto seleccionado */}
-        <div className="bg-cyan-800 p-6 rounded-3xl shadow-md grid justify-center items-center">
+        <div className="bg-cyan-800 p-6 rounded-3xl shadow-md grid justify-center items-center mt-4">
           <p className="font-bold text-center text-white text-5xl">
             {filteredTasks.length}
           </p>
+
           <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">
             Tareas del proyecto seleccionado:
           </h2>

@@ -8,6 +8,7 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
     start_date: '',
     end_date: '',
     priority: '',
+    status: 'en progreso'
   });
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
     const taskWithProjectId = { ...task, projectId: project.id };
 
     try {
-      const response = await fetch(`http://localhost:5000/tasks/${project.id}/tasks${initialTask ? `/${initialTask.id}` : ''}`, {
+      const response = await fetch(`http://localhost:5000/tasks${initialTask ? `/${initialTask.id}` : `/${project.id}/tasks`}`, {
         method: initialTask ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskWithProjectId)
@@ -124,6 +125,22 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
               <option value="baja">Baja</option>
               <option value="media">Media</option>
               <option value="alta">Alta</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="estado">
+              Estado
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={task.status}
+              onChange={handleTaskChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            >
+              <option value="en progreso">En Progreso</option>
+              <option value="completado">Completado</option>
             </select>
           </div>
           <div className='grid grid-cols-2 gap-4'>
