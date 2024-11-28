@@ -110,12 +110,12 @@ function Register() {
         <div className="mt-4 text-center">
           <p className="text-white">
             ¿Ya tienes una cuenta?{' '}
-            <Link to="/login" className="text-amber-200 font-bold hover:text-amber-300">
+            <Link to="/login" className="text-emerald-400 font-bold hover:text-emerald-500">
               Ingresa aquí
             </Link>
           </p>
 
-            <Link to="/" className="text-amber-200 font-bold hover:text-amber-300">
+            <Link to="/" className="text-emerald-400 font-bold hover:text-emerald-500">
              Ir al menú principal
               </Link>
         </div>

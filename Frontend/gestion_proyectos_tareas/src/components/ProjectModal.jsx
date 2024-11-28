@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-export default function ProjectModal({ project, onClose }) {
+export default function ProjectModal({ project, task: initialTask, onClose }) {
   const [task, setTask] = useState({
     name: '',
     description: '',
@@ -11,42 +10,46 @@ export default function ProjectModal({ project, onClose }) {
     priority: '',
   });
 
-  
+  useEffect(() => {
+    if (initialTask) {
+      setTask(initialTask);
+    }
+  }, [initialTask]);
 
   const handleTaskChange = (e) => {
     const { name, value } = e.target;
     setTask((prevTask) => ({ ...prevTask, [name]: value }));
   };
 
-  const handleAddTask = async (e) => {
+  const handleSaveTask = async (e) => {
     e.preventDefault();
     const taskWithProjectId = { ...task, projectId: project.id };
 
     try {
-      const response = await fetch(`http://localhost:5000/tasks/${project.id}/tasks`, {
-        method: 'POST',
+      const response = await fetch(`http://localhost:5000/tasks/${project.id}/tasks${initialTask ? `/${initialTask.id}` : ''}`, {
+        method: initialTask ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskWithProjectId)
       });
-      
+
       if (!response.ok) {
-        throw new Error('Error al agregar la tarea');
+        throw new Error(`Error al ${initialTask ? 'editar' : 'agregar'} la tarea`);
       }
-      
-      toast.success('Tarea agregada exitosamente');
+
+      toast.success(`Tarea ${initialTask ? 'editada' : 'agregada'} exitosamente`);
       onClose();
-      
+
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error al agregar la tarea');
+      toast.error(`Error al ${initialTask ? 'editar' : 'agregar'} la tarea`);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-8 rounded shadow-lg max-w-lg w-full">
-        <h3 className="text-xl font-semibold mb-4">Agregar Tarea</h3>
-        <form onSubmit={handleAddTask}>
+        <h3 className="text-xl font-semibold mb-4">{initialTask ? 'Editar Tarea' : 'Agregar Tarea'}</h3>
+        <form onSubmit={handleSaveTask}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
               Título de la Tarea
@@ -128,7 +131,7 @@ export default function ProjectModal({ project, onClose }) {
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
             >
-              Agregar Tarea
+              {initialTask ? 'Guardar Cambios' : 'Agregar Tarea'}
             </button>
             <button
               onClick={onClose}

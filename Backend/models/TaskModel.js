@@ -25,9 +25,14 @@ const deleteTasksByProjectId = (projectId, callback) => {
   connection.query('DELETE FROM tasks WHERE project_id = ?', [projectId], callback);
 };
 
+const deleteTask = (taskId, callback) => {
+  connection.query('DELETE FROM tasks WHERE id = ?', [taskId], callback);
+};
+
 module.exports = {
   createTask,
   getTasksByProjectId,
   getAllTasks,
-  deleteTasksByProjectId
+  deleteTasksByProjectId,
+  deleteTask
 };

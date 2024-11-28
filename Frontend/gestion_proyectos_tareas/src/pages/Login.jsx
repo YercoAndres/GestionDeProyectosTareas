@@ -79,12 +79,12 @@ function Login() {
           <div className="mt-4 text-center">
             <p className="text-gray-200">
               ¿No tienes una cuenta?{' '}
-              <Link to="/register" className="text-amber-200 font-bold hover:text-amber-300">
+              <Link to="/register" className="text-emerald-400 font-bold hover:text-emerald-500">
                 Regístrate aquí
               </Link>
            
             </p>
-            <Link to="/" className="text-amber-200 font-bold hover:text-amber-300">
+            <Link to="/" className="text-emerald-400 font-bold hover:text-emerald-500">
              Ir al menú principal
               </Link>
           </div>

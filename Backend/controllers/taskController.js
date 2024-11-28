@@ -41,5 +41,18 @@ const getAllTasks = (req, res) => {
     res.json(tasks);
   });
 };
+const deleteTask = (req, res) => {
+  const { id } = req.params;
+  connection.query('DELETE FROM tasks WHERE id = ?', [id], (error, results) => {
+    if (error) {
+      console.error('Error al eliminar la tarea:', error);
+      return res.status(500).json({ message: 'Error al eliminar la tarea' });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    res.status(200).json({ message: 'Tarea eliminada correctamente' });
+  });
+};
 
-module.exports = { createTask, getTasksByProjectId, getAllTasks };
+module.exports = { createTask, getTasksByProjectId, getAllTasks, deleteTask };

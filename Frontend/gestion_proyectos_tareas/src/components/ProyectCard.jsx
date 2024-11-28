@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import ProjectModal from './ProjectModal';
+import ConfirmDialog from './ConfirmDialog';
 import { Eye, CirclePlus, Pencil, Trash, SquareX } from 'lucide-react';
 
 const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [tasks, setTasks] = useState([]); // Inicialización como arreglo vacío
+  const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   const toggleInfo = () => {
     setShowInfo(!showInfo);
   };
 
-  // Función para obtener las tareas desde la API
   const fetchTasks = async () => {
     try {
       const response = await fetch(`http://localhost:5000/tasks/${project.id}/tasks`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched tasks:', data); // Log the fetched data
-        setTasks(data || []); // Set tasks directly from the response data
+        console.log('Fetched tasks:', data);
+        setTasks(data || []);
       } else {
         console.error('Error al obtener las tareas:', response.statusText);
       }
@@ -31,7 +34,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     if (showInfo) {
       fetchTasks();
     }
-  }, [showInfo]); // Ejecutar cuando showInfo cambie
+  }, [showInfo]);
 
   const priorityColor = (priority) => {
     switch (priority) {
@@ -51,12 +54,52 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     return date.toLocaleDateString('es-ES', options);
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (task = null) => {
+    setSelectedTask(task);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
+    setSelectedTask(null);
     setIsModalOpen(false);
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) {
+        setTasks(tasks.filter(task => task.id !== taskId));
+        console.log(`Task with id ${taskId} deleted successfully`);
+      } else {
+        const errorData = await response.json();
+        console.error('Error al eliminar la tarea:', errorData.message || response.statusText);
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+    }
+  };
+  
+  const handleConfirmDelete = () => {
+    if (taskToDelete) {
+      handleDeleteTask(taskToDelete);
+      setTaskToDelete(null);
+      setIsConfirmDialogOpen(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setTaskToDelete(null);
+    setIsConfirmDialogOpen(false);
+  };
+
+  const handleOpenConfirmDialog = (taskId) => {
+    setTaskToDelete(taskId);
+    setIsConfirmDialogOpen(true);
   };
 
   return (
@@ -83,83 +126,68 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
               <p className="text-gray-700">{formatDate(project.end_date)}</p>
             </div>
             <div className="mb-4">
-  <label className="block text-gray-700 text-sm font-bold mb-2">Miembros:</label>
-  {Array.isArray(project.members) && project.members.length > 0 ? (
-    <ul className="text-gray-700 list-disc pl-5">
-      {project.members.map((member, index) => (
-        <li key={index}>{member}</li>
-      ))}
-    </ul>
-  ) : (
-    <p className="text-gray-700">No hay miembros asignados.</p>
-  )}
-</div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Miembros:</label>
+              {Array.isArray(project.members) && project.members.length > 0 ? (
+                <ul className="text-gray-700 list-disc pl-5">
+                  {project.members.map((member, index) => (
+                    <li key={index}>{member}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-700">No hay miembros asignados.</p>
+              )}
+            </div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Estado:</label>
               <p className="text-gray-700">{project.status}</p>
             </div>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-xl font-semibold mb-2">Tareas asignadas al proyecto:</label>
-              <div className="grid sm:grid-cols-4 gap-4">
-                {Array.isArray(tasks) && tasks.length > 0 ? (
-                  tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className={`text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(task.priority)}`}
-                    >
-                      <div className='grid-cols-1	'>
-                    <div className='flex justify-end gap-2'>
-                      <button>
-                      <Pencil size={24} className="inline-block" />
-                      </button>
-                      <button>
-                      <SquareX size={24} className="inline-block" />
-                      </button>
-                    </div>
-                        <div>
-                          <label className='font-bold' htmlFor="name">Nombre de la tarea:</label>
-                          <p>{task.name}</p>
-                          </div>
-
-                        <div>
-                          <label className='font-bold' htmlFor="description">Descripción:</label>
-                          <p>{task.description}</p>
-                          </div>
-                        <div>
-                          </div>
-
-                          <div>
-                          <label className='font-bold' htmlFor="startdate">Fecha de inicio:</label>
-                          <p>{formatDate(task.start_date)}</p>
-                          </div>
-                        <div>
-                          </div>
-
-                          <div>
-                          <label className='font-bold' htmlFor="enddate">Fecha de fin:</label>
-                          <p>{formatDate(task.end_date)}</p>
-                          </div>
-                        <div>
-                          </div>
-
-                          <div>
-                          <label className='font-bold' htmlFor="priority">Prioridad:</label>
-                          <p>{task.priority}</p>
-                          </div>
-                        <div>
-                          </div>
-
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-xl font-semibold mb-2">Tareas asignadas al proyecto:</label>
+            <div className="grid sm:grid-cols-4 gap-4">
+              {Array.isArray(tasks) && tasks.length > 0 ? (
+                tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className={`text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(task.priority)}`}
+                  >
+                    <div className='grid-cols-1'>
+                      <div className='flex justify-end gap-2'>
+                        <button onClick={() => handleOpenModal(task)}>
+                          <Pencil size={24} className="inline-block" />
+                        </button>
+                        <button onClick={() => handleOpenConfirmDialog(task.id)}>
+                          <SquareX size={24} className="inline-block" />
+                        </button>
                       </div>
-
-
+                      <div>
+                        <label className='font-bold' htmlFor="name">Nombre de la tarea:</label>
+                        <p>{task.name}</p>
+                      </div>
+                      <div>
+                        <label className='font-bold' htmlFor="description">Descripción:</label>
+                        <p>{task.description}</p>
+                      </div>
+                      <div>
+                        <label className='font-bold' htmlFor="startdate">Fecha de inicio:</label>
+                        <p>{formatDate(task.start_date)}</p>
+                      </div>
+                      <div>
+                        <label className='font-bold' htmlFor="enddate">Fecha de fin:</label>
+                        <p>{formatDate(task.end_date)}</p>
+                      </div>
+                      <div>
+                        <label className='font-bold' htmlFor="priority">Prioridad:</label>
+                        <p>{task.priority}</p>
+                      </div>
                     </div>
-                  ))
-                ) : (
-                  <p>No hay tareas asignadas.</p>
-                )}
-              </div>
+                  </div>
+                ))
+              ) : (
+                <p>No hay tareas asignadas.</p>
+              )}
             </div>
+          </div>
         </>
       )}
       <div className="mt-10 flex flex-wrap justify-end gap-3">
@@ -171,7 +199,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
           {showInfo ? 'Ocultar Proyecto' : 'Ver Proyecto'}
         </button>
         <button
-          onClick={handleOpenModal}
+          onClick={() => handleOpenModal()}
           className={'bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg'}
         >
           <CirclePlus size={24} className="inline-block mr-3" />
@@ -195,7 +223,14 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
         </button>
       </div>
       {isModalOpen && (
-        <ProjectModal project={project} onClose={handleCloseModal} />
+        <ProjectModal project={project} task={selectedTask} onClose={handleCloseModal} />
+      )}
+      {isConfirmDialogOpen && (
+        <ConfirmDialog
+          message="¿Estás seguro de que deseas eliminar esta tarea?"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
       )}
     </div>
   );
