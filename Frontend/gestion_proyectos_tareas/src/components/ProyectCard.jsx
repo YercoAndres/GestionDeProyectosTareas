@@ -103,7 +103,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="border p-4 rounded-xl shadow-md bg-white">
+    <div className="border p-4 rounded-xl shadow-md bg-white  ">
       <h3 className="text-2xl font-bold text-cyan-900">Proyecto: {project.name}</h3>
       {showInfo && (
         <>
@@ -144,21 +144,29 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-xl font-semibold mb-2">Tareas asignadas al proyecto:</label>
-            <div className="grid sm:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {Array.isArray(tasks) && tasks.length > 0 ? (
                 tasks.map((task) => (
                   <div
                     key={task.id}
                     className={`text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(task.priority)}`}
                   >
-                    <div className='grid-cols-1'>
+                    <div>
+
+                      <div className='grid grid-cols-2 mb-4'>
+                        
+                      <p className='font-bold text-xl'>{task.priority}</p>
+
                       <div className='flex justify-end gap-2'>
-                        <button onClick={() => handleOpenModal(task)}>
-                          <Pencil size={24} className="inline-block" />
+                      <button onClick={() => handleOpenModal(task)}>
+                          <Pencil size={24} className="inline-block text-blue-600 " />
                         </button>
                         <button onClick={() => handleOpenConfirmDialog(task.id)}>
-                          <SquareX size={24} className="inline-block" />
+                          <SquareX size={24} className="inline-block text-red-700" />
                         </button>
+                      </div>
+                       
+                    
                       </div>
                       <div>
                         <label className='font-bold' htmlFor="name">Nombre de la tarea:</label>
@@ -177,9 +185,10 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
                         <p>{formatDate(task.end_date)}</p>
                       </div>
                       <div>
-                        <label className='font-bold' htmlFor="priority">Prioridad:</label>
-                        <p>{task.priority}</p>
-                      </div>
+                      {/* Debemos agregarlo a la BD */}
+                        <label className='font-bold' htmlFor="status">Estado:</label>  
+                        <p>{task.status}</p>
+                        </div>
                     </div>
                   </div>
                 ))

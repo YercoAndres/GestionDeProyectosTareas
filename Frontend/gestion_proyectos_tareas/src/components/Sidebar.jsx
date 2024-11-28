@@ -19,7 +19,7 @@ const Sidebar = ({ children }) => {
 
   return (
     <div className="flex">
-      <div className=" lg:hidden">
+      <div className=" lg:hidden bg-cyan-950">
         <button
           onClick={toggleMenu}
           type="button"
@@ -53,7 +53,7 @@ const Sidebar = ({ children }) => {
         } lg:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
       >
          
-        <div className="flex items-center justify-between lg:hidden">
+        <div className="flex items-center justify-between lg:hidden ">
           
           <h2 className="text-2xl font-bold text-center">ProjectTask</h2>
           
