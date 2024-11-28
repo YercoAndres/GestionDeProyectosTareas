@@ -1,42 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 
-export default function Dashboard( ) {
+export default function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
   const [projectInfo, setProjectInfo] = useState(null);
+  const [filteredTasks, setFilteredTasks] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         const projectsResponse = await fetch('http://localhost:5000/projects');
         const usersResponse = await fetch('http://localhost:5000/api/users');
-        const tasksResponse = await fetch('http://localhost:5000/tasks')
-        
+        const tasksResponse = await fetch('http://localhost:5000/tasks');
+
         const projectsData = await projectsResponse.json();
         const usersData = await usersResponse.json();
         const tasksData = await tasksResponse.json();
 
         setProjects(projectsData);
         setUsers(usersData);
-        setTasks(tasksData);
-        
-  
+        setTasks(Array.isArray(tasksData) ? tasksData : []);
+
       } catch (error) {
         console.error('Error al cargar los datos', error);
       }
     };
-   
     fetchDashboardData();
   }, []);
 
-  const handleSelectChange = (event) => {
-    const projectId = event.target.value;
+
+  const handleSelectChange = (e) => {
+    const projectId = e.target.value;
     setSelectedProject(projectId);
     const project = projects.find((p) => p.id === projectId);
     setProjectInfo(project);
+
+
+    const tasksData = Array.isArray(tasks) ? tasks : [];
+    const filtered = tasksData.filter((task) => {
+      return task.project_id === parseInt(projectId);
+    });
+    setFilteredTasks(filtered);
   };
 
   return (
@@ -49,88 +56,59 @@ export default function Dashboard( ) {
         </h1>
 
         {/* Tarjetas Responsivas */}
-        <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-5xl text-gray-500 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-5xl text-gray-500">
           {/* Total de proyectos */}
-          <div className="bg-blue-100 p-6 rounded-3xl shadow-md grid justify-center">
-            <p className=" font-bold text-center text-blue-600">{projects.length}</p>
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Proyectos </h2>
-            <img src="../public/projecticon.png" loading='lazy' alt="iconProject" className='max-w-15 max-h-10 mx-auto block ' />
-            
-            
-          </div>
+          <div className="bg-gradient-to-t from-blue-400 via-blue-500 to-blue-600 p-6 rounded-3xl shadow-md grid justify-center">
+            <p className="font-bold text-center text-white">{projects.length}</p>
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">Proyectos</h2>
+            <img src="../public/projecticon.png" loading="lazy" alt="iconProject" className="max-w-15 max-h-10 mx-auto block" />
+          </div>      
           {/* Total de tareas */}
-          <div className="bg-green-100 p-6 rounded-3xl shadow-md grid justify-center items-center">
-            <p className=" font-bold text-center text-green-600">{tasks.length}</p>
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Tareas</h2>
-            <img src="../public/taskicon.png" loading='lazy' alt="iconTask" className='max-w-15 max-h-10 mx-auto block' />
+          <div className="bg-gradient-to-t from-green-500 via-green-500 to-green-600 p-6 rounded-3xl shadow-md grid justify-center items-center">
+            <p className="font-bold text-center text-white">{tasks.length}</p>
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">Tareas</h2>
+            <img src="../public/taskicon.png" loading="lazy" alt="iconTask" className="max-w-15 max-h-10 mx-auto block" />
           </div>
+
           {/* Total de usuarios */}
-          <div className="bg-amber-50 p-6 rounded-3xl shadow-md grid justify-center items-center">
-            <p className=" font-bold text-center text-amber-300">{users.length}</p>
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Miembros Registrados</h2>
-            <img src="../public/membersicon.png" loading='lazy' alt="iconMembers" className='max-w-15 max-h-10 mx-auto block' />
+          <div className="bg-gradient-to-t from-amber-400 via-amber-500 to-amber-600 p-6 rounded-3xl shadow-md grid justify-center items-center">
+            <p className="font-bold text-center text-white">{users.length}</p>
+            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">Miembros Registrados</h2>
+            <img src="../public/membersicon.png" loading="lazy" alt="iconMembers" className="max-w-15 max-h-10 mx-auto block" />
           </div>
+
         </div>
 
         {/* Selector Responsivo */}
-        <div className="bg-white p-8 rounded shadow-md mt-6 max-w-full mx-auto grid justify-center text-gray-500">
-        <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">
-          Elige el proyecto para visualizar el estado:
-        </h2>
-        <select
-          value={selectedProject}
-          onChange={handleSelectChange}
-          className="max-w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Selecciona un proyecto</option>
-          {projects.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Información del Proyecto Seleccionado */}
-      {projectInfo && (
-        <div className="bg-white p-8 rounded shadow-md mt-6 max-w-full mx-auto grid justify-center text-gray-500">
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">
-            Información del Proyecto
+        <div className="bg-white p-8 rounded-3xl shadow-md mt-6 max-w-full mx-auto grid justify-center text-gray-800">
+          <h2 className="text-lg md:text-xl font-semibold mb-4 text-center ">
+            Elige el proyecto para visualizar el estado:
           </h2>
-          <p><strong>Nombre:</strong> {projectInfo.name}</p>
-          
-          {/* Agrega más campos según sea necesario */}
+          <select
+            value={selectedProject}
+            onChange={handleSelectChange}
+            className="max-w-full p-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white text-gray-800"
+          >
+            <option value="">Selecciona un proyecto</option>
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
 
-
-        {/* Otro Contenido Responsivo */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white p-6 rounded shadow-md">
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">En progreso</h2>
-            <select 
-              value={selectedProject} 
-              onChange={handleSelectChange} 
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Selecciona un proyecto</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="bg-white p-6 rounded shadow-md">
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Tareas</h2>
-            <p className="text-2xl font-bold text-center">{projects.length}</p>
-              
-          </div>
-          <div className="bg-white p-6 rounded shadow-md">
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center">Miembros Registrados</h2>
-            <p className="text-2xl font-bold text-center">{users.length}</p>
-          </div>
+        {/* Total de tareas del proyecto seleccionado */}
+        <div className="bg-cyan-800 p-6 rounded-3xl shadow-md grid justify-center items-center">
+          <p className="font-bold text-center text-white text-5xl">
+            {filteredTasks.length}
+          </p>
+          <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">
+            Tareas del proyecto seleccionado:
+          </h2>
+          <img src="../public/taskicon.png" loading="lazy" alt="iconTask" className="max-w-15 max-h-10 mx-auto block" />
         </div>
+
       </div>
     </div>
   );

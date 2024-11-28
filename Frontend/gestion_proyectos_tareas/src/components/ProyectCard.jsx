@@ -95,8 +95,8 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   )}
 </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Prioridad:</label>
-              <p className="text-gray-700 pl-3">{project.priority}</p>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Estado:</label>
+              <p className="text-gray-700">{project.status}</p>
             </div>
             </div>
             <div className="mb-4">

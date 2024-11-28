@@ -35,7 +35,7 @@ const Projects = () => {
         startDate: '',
         endDate: '',
         members: [],
-        status: 'En Progreso',
+        status: '',
         id: null
       });
       setError(null);
@@ -131,7 +131,7 @@ const Projects = () => {
       })
       .then(data => {
         setProjects([...projects, { ...projectToAdd, id: data.projectId }]);
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], id: null });
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status:'', id: null });
         setError('');
         setShowModal(false);
       })
@@ -269,12 +269,18 @@ const Projects = () => {
             
             <div className='grid grid-cols-1 justify-center'>
             <label htmlFor="status" className='font-bold mt-2'>Selecciona el estado:</label>
-            <select name="status" id="status" className='w-full mt-2 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2'>
-                    <option value="">Selecciona una opcion</option>
-                    <option value={newProject.status}>En Progreso</option>
-                    <option value={newProject.status}>En Pausa</option>
-                    <option value={newProject.status}>Completado</option>
-            </select>
+            <select 
+                name="status" 
+                id="status" 
+                className='w-full mt-2 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2'
+                value={newProject.status}
+                onChange={(e) => setNewProject({ ...newProject, status: e.target.value })}
+              >
+                <option value="">Selecciona una opcion</option>
+                <option value="En Progreso">En Progreso</option>
+                <option value="En Pausa">En Pausa</option>
+                <option value="Completado">Completado</option>
+              </select>
 
            
             
