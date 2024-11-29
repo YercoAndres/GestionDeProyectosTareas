@@ -10,6 +10,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [members, setMembers] = useState([]);
 
   const toggleInfo = () => {
     setShowInfo(!showInfo);
@@ -20,7 +21,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
       const response = await fetch(`http://localhost:5000/tasks/${project.id}/tasks`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched tasks:', data);
+        console.log('Fetched tasks:', data); // Aquí puedes ver la respuesta de la API
         setTasks(data || []);
       } else {
         console.error('Error al obtener las tareas:', response.statusText);
@@ -30,9 +31,24 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     }
   };
 
+  const fetchMembers = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/projects/${project.id}/members`);
+      if (response.ok) {
+        const data = await response.json();
+        setMembers(data);
+      } else {
+        console.error('Error al obtener los miembros:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+    }
+  };
+
   useEffect(() => {
     if (showInfo) {
       fetchTasks();
+      fetchMembers();
     }
   }, [showInfo]);
 
@@ -52,6 +68,15 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     }
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('es-ES', options);
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  const getResponsableName = (responsableId) => {
+    const member = members.find(member => member.id === responsableId);
+    return member ? member.name : 'Responsable no asignado';
   };
 
   const handleOpenModal = (task = null) => {
@@ -104,6 +129,8 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     setIsConfirmDialogOpen(true);
   };
 
+  console.log('Project members:', members); // Agrega este console.log para depurar
+
   return (
     <div className="border p-4 rounded-xl shadow-md bg-white  ">
       <h3 className="text-2xl font-bold text-cyan-900">Proyecto: {project.name}</h3>
@@ -129,10 +156,10 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Miembros:</label>
-              {Array.isArray(project.members) && project.members.length > 0 ? (
+              {Array.isArray(members) && members.length > 0 ? (
                 <ul className="text-gray-700 list-disc pl-5">
-                  {project.members.map((member, index) => (
-                    <li key={index}>{member}</li>
+                  {members.map((member, index) => (
+                    <li key={index}>{member.name}</li>
                   ))}
                 </ul>
               ) : (
@@ -151,25 +178,19 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
                 tasks.map((task) => (
                   <div
                     key={task.id}
-                    className={`text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(task.priority)}`}
+                    className={` hover:scale-105 hover cursor-pointer text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(task.priority)}`}
                   >
-                   
-                    <div >
-
-                      <div className='grid grid-cols-2 mb-4'>
-                        
-                      <p className='font-bold text-xl'>{task.priority}</p>
-
-                      <div className='flex justify-end gap-2'>
-                      <button onClick={() => handleOpenModal(task)}>
-                          <Pencil size={24} className="inline-block  " />
-                        </button>
-                        <button onClick={() => handleOpenConfirmDialog(task.id)}>
-                          <SquareX size={24} className="inline-block " />
-                        </button>
-                      </div>
-                       
-                    
+                    <div>
+                      <div className='grid grid-cols-2 mb-4 '>
+                        <p className='font-bold text-xl'>{task.priority}</p>
+                        <div className='flex justify-end gap-2'>
+                          <button onClick={() => handleOpenModal(task)}>
+                            <Pencil size={24} className="inline-block  " />
+                          </button>
+                          <button onClick={() => handleOpenConfirmDialog(task.id)}>
+                            <SquareX size={24} className="inline-block " />
+                          </button>
+                        </div>
                       </div>
                       <div>
                         <label className='font-bold' htmlFor="name">Nombre de la tarea:</label>
@@ -188,10 +209,14 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
                         <p>{formatDate(task.end_date)}</p>
                       </div>
                       <div>
-                      {/* Debemos agregarlo a la BD */}
+                        <label className='font-bold' htmlFor="responsable">Responsable:</label>
+                        <p>{getResponsableName(task.responsable_id)}</p>
+                      </div>
+                      <div>
                         <label className='font-bold' htmlFor="status">Estado:</label>  
-                        <p>{task.status}</p>
-                        </div>
+                        <p>{task.estado ? capitalizeFirstLetter(task.estado) : 'Estado no disponible'}</p>
+                        {console.log(task.estado)}
+                      </div>
                     </div>
                   </div>
                 ))
@@ -202,10 +227,10 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
           </div>
         </>
       )}
-      <div className="mt-10 flex flex-wrap justify-end gap-3">
+      <div className="mt-10 flex flex-wrap justify-end gap-3  ">
         <button
           onClick={toggleInfo}
-          className={'bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded-lg'}
+          className={'bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded-lg '}
         >
           <Eye size={24} className="inline-block mr-3" />
           {showInfo ? 'Ocultar Proyecto' : 'Ver Proyecto'}

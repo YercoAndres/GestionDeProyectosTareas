@@ -11,7 +11,8 @@ const createTask = (req, res) => {
     start_date: req.body.start_date, 
     end_date: req.body.end_date, 
     priority: req.body.priority,
-    estado: req.body.estado || 'en progreso'
+    estado: req.body.estado || 'en progreso',
+    responsable_id: req.body.responsable_id
   }; 
 
   Task.createTask(newTask, (err, results) => {

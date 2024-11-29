@@ -20,7 +20,7 @@ const Projects = () => {
     startDate: '',
     endDate: '',
     members: [],
-    status: 'En Progreso',
+    status: 'En Progreso', // Asegúrate de que el estado inicial sea 'En Progreso'
     id: null
   });
   const [users, setUsers] = useState([]);
@@ -35,7 +35,7 @@ const Projects = () => {
         startDate: '',
         endDate: '',
         members: [],
-        status: '',
+        status: 'En Progreso',
         id: null
       });
       setError(null);
@@ -83,9 +83,9 @@ const Projects = () => {
     const projectToAdd = {
       ...newProject,
       members: newProject.members,
-      status: newProject.status
+      status: newProject.status || 'En Progreso' // Asegúrate de que el estado se establezca correctamente
     };
-
+  
     toast.success(newProject.id ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
   
     if (newProject.id) {
@@ -105,7 +105,7 @@ const Projects = () => {
       })
       .then(data => {
         setProjects(projects.map(project => project.id === newProject.id ? { ...projectToAdd, id: newProject.id } : project));
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status:'En Progreso', id: null });
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status: 'En Progreso', id: null });
         setError('');
         setShowModal(false);
       })
@@ -113,7 +113,6 @@ const Projects = () => {
         console.error(err);
         setError('Error al editar el proyecto. Inténtalo de nuevo.');
       });
-      
     } else {
       fetch('http://localhost:5000/projects', {
         method: 'POST',
@@ -131,7 +130,7 @@ const Projects = () => {
       })
       .then(data => {
         setProjects([...projects, { ...projectToAdd, id: data.projectId }]);
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status:'', id: null });
+        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status: 'En Progreso', id: null });
         setError('');
         setShowModal(false);
       })

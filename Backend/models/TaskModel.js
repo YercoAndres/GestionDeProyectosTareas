@@ -2,10 +2,10 @@ const connection = require('../config/db');
 
 // Función para crear una tarea
 const createTask = (task, callback) => {  
-  const { projectId, name, description, start_date, end_date, priority, estado } = task;
+  const { projectId, name, description, start_date, end_date, priority, estado, responsable_id } = task;
   connection.query(
-    'INSERT INTO tasks (project_id, name, description, start_date, end_date, priority, estado) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-    [projectId, name, description, start_date, end_date, priority, estado], 
+    'INSERT INTO tasks (project_id, name, description, start_date, end_date, priority, estado, responsable_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+    [projectId, name, description, start_date, end_date, priority, estado, responsable_id], 
     callback
   );
 };
@@ -30,10 +30,10 @@ const deleteTask = (taskId, callback) => {
 };
 
 const updateTask = (taskId, task, callback) => {
-  const { name, description, start_date, end_date, priority, estado } = task;
+  const { name, description, start_date, end_date, priority, estado, responsable_id } = task;
   connection.query(
-    'UPDATE tasks SET name = ?, description = ?, start_date = ?, end_date = ?, priority = ?, estado = ? WHERE id = ?',
-    [name, description, start_date, end_date, priority, estado, taskId],
+    'UPDATE tasks SET name = ?, description = ?, start_date = ?, end_date = ?, priority = ?, estado = ?, responsable_id = ? WHERE id = ?',
+    [name, description, start_date, end_date, priority, estado, responsable_id, taskId],
     callback
   );
 };

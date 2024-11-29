@@ -8,14 +8,34 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
     start_date: '',
     end_date: '',
     priority: '',
-    status: 'en progreso'
+    estado: 'en progreso',
+    responsable_id: ''
   });
+  const [members, setMembers] = useState([]);
 
   useEffect(() => {
     if (initialTask) {
       setTask(initialTask);
     }
   }, [initialTask]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/projects/${project.id}/members`);
+        if (response.ok) {
+          const data = await response.json();
+          setMembers(data);
+        } else {
+          console.error('Error al obtener los miembros:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error al conectar con la API:', error);
+      }
+    };
+
+    fetchMembers();
+  }, [project.id]);
 
   const handleTaskChange = (e) => {
     const { name, value } = e.target;
@@ -132,15 +152,33 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
               Estado
             </label>
             <select
-              id="status"
-              name="status"
-              value={task.status}
+              id="estado"
+              name="estado"
+              value={task.estado}
               onChange={handleTaskChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             >
               <option value="en progreso">En Progreso</option>
               <option value="completado">Completado</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="responsable_id">
+              Responsable
+            </label>
+            <select
+              id="responsable_id"
+              name="responsable_id"
+              value={task.responsable_id}
+              onChange={handleTaskChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            >
+              <option value="">Selecciona un responsable</option>
+              {members.map((member) => (
+                <option key={member.id} value={member.id}>{member.name}</option>
+              ))}
             </select>
           </div>
           <div className='grid grid-cols-2 gap-4'>

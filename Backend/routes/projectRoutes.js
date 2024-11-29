@@ -15,4 +15,6 @@ router.put('/:id', authorizeRole(['manager']), projectController.updateProject);
 // Eliminar un proyecto (solo para managers)
 router.delete('/:id', authorizeRole(['manager']), projectController.deleteProject);
 
+router.get('/:projectId/members', projectController.getProjectMembers);
+
 module.exports = router;

@@ -124,10 +124,23 @@ const deleteProject = (req, res) => {
   });
 };
 
+const getProjectMembers = (req, res) => {
+  const { projectId } = req.params;
+  Project.getProjectMembers(projectId, (err, members) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(members);
+  });
+};
+
+
+
 module.exports = {
   getAllProjects,
   createProject,
   updateProject,
-  deleteProject
+  deleteProject,
+  getProjectMembers
 
 };
