@@ -112,6 +112,7 @@ const updateProject = (req, res) => {
     res.json({ message: 'Project updated successfully' });
   });
 };
+
 const deleteProject = (req, res) => {
   const { id } = req.params; // Obtén el ID del proyecto de los parámetros
 
@@ -126,15 +127,16 @@ const deleteProject = (req, res) => {
 
 const getProjectMembers = (req, res) => {
   const { projectId } = req.params;
+  console.log('Obteniendo miembros para el proyecto:', projectId); // Log para depurar
   Project.getProjectMembers(projectId, (err, members) => {
     if (err) {
-      return res.status(500).json({ error: err.message });
+      console.error('Error al obtener los miembros del proyecto:', err);
+      return res.status(500).json({ message: 'Error al obtener los miembros del proyecto' });
     }
+    console.log('Miembros obtenidos:', members); // Log para depurar
     res.json(members);
   });
 };
-
-
 
 module.exports = {
   getAllProjects,
@@ -142,5 +144,4 @@ module.exports = {
   updateProject,
   deleteProject,
   getProjectMembers
-
 };

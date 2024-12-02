@@ -76,6 +76,21 @@ const updateProjectStatus = (projectId, status, callback) => {
   );
 };
 
+const getProjectMembers = (projectId, callback) => {
+  const query = `
+    SELECT u.id, u.name 
+    FROM project_members pm
+    JOIN users u ON pm.user_id = u.id
+    WHERE pm.project_id = ?
+  `;
+  connection.query(query, [projectId], (err, results) => {
+    if (err) {
+      console.error('Error al ejecutar la consulta:', err);
+      return callback(err);
+    }
+    callback(null, results);
+  });
+};
 
 
 module.exports = {
@@ -84,5 +99,6 @@ module.exports = {
   updateProject,
   deleteProject,
   getProjectsByUserId,
-  updateProjectStatus
+  updateProjectStatus,
+  getProjectMembers
 };

@@ -30,12 +30,13 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
       console.error('Error al conectar con la API:', error);
     }
   };
-
   const fetchMembers = async () => {
     try {
       const response = await fetch(`http://localhost:5000/projects/${project.id}/members`);
+      console.log('Response status:', response.status); // Log de estado de la respuesta
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched members:', data); // Log de los datos obtenidos
         setMembers(data);
       } else {
         console.error('Error al obtener los miembros:', response.statusText);
@@ -156,11 +157,13 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Miembros:</label>
-              {Array.isArray(members) && members.length > 0 ? (
+              {Array.isArray(members) && members.length > 0 
+              ? (
                 <ul className="text-gray-700 list-disc pl-5">
                   {members.map((member, index) => (
                     <li key={index}>{member.name}</li>
                   ))}
+                  {console.log(members)}
                 </ul>
               ) : (
                 <p className="text-gray-700">No hay miembros asignados.</p>
