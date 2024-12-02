@@ -21,7 +21,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
       const response = await fetch(`http://localhost:5000/tasks/${project.id}/tasks`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched tasks:', data); // Aquí puedes ver la respuesta de la API
+       
         setTasks(data || []);
       } else {
         console.error('Error al obtener las tareas:', response.statusText);
@@ -33,10 +33,8 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const fetchMembers = async () => {
     try {
       const response = await fetch(`http://localhost:5000/projects/${project.id}/members`);
-      console.log('Response status:', response.status); // Log de estado de la respuesta
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched members:', data); // Log de los datos obtenidos
         setMembers(data);
       } else {
         console.error('Error al obtener los miembros:', response.statusText);
@@ -91,7 +89,6 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   };
 
   const handleDeleteTask = async (taskId) => {
-    console.log(`Attempting to delete task with id ${taskId}`);
     try {
       const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
         method: 'DELETE',
@@ -99,10 +96,9 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
           'Content-Type': 'application/json',
         },
       });
-      console.log(`Response status: ${response.status}`);
+  
       if (response.ok) {
         setTasks(tasks.filter(task => task.id !== taskId));
-        console.log(`Task with id ${taskId} deleted successfully`);
       } else {
         const errorData = await response.json();
         console.error('Error al eliminar la tarea:', errorData.message || response.statusText);
@@ -130,7 +126,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     setIsConfirmDialogOpen(true);
   };
 
-  console.log('Project members:', members); // Agrega este console.log para depurar
+  //('Project members:', members); 
 
   return (
     <div className="border p-4 rounded-xl shadow-md bg-white  ">
@@ -163,7 +159,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
                   {members.map((member, index) => (
                     <li key={index}>{member.name}</li>
                   ))}
-                  {console.log(members)}
+                
                 </ul>
               ) : (
                 <p className="text-gray-700">No hay miembros asignados.</p>
@@ -218,7 +214,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
                       <div>
                         <label className='font-bold' htmlFor="status">Estado:</label>  
                         <p>{task.estado ? capitalizeFirstLetter(task.estado) : 'Estado no disponible'}</p>
-                        {console.log(task.estado)}
+                      
                       </div>
                     </div>
                   </div>

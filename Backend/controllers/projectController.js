@@ -127,13 +127,11 @@ const deleteProject = (req, res) => {
 
 const getProjectMembers = (req, res) => {
   const { projectId } = req.params;
-  console.log('Obteniendo miembros para el proyecto:', projectId); // Log para depurar
   Project.getProjectMembers(projectId, (err, members) => {
     if (err) {
       console.error('Error al obtener los miembros del proyecto:', err);
       return res.status(500).json({ message: 'Error al obtener los miembros del proyecto' });
     }
-    console.log('Miembros obtenidos:', members); // Log para depurar
     res.json(members);
   });
 };
