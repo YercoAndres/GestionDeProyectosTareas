@@ -10,7 +10,7 @@ export default function About() {
 
   return (
     <>
-      <section className="relative bg-[url(../public/main.jpg)] bg-cover bg-center bg-no-repeat ">
+      <section className="relative bg-[url(../public/assets/main.jpg)] bg-cover bg-center bg-no-repeat ">
         <div className="absolute inset-0 bg-gray-900/75 sm:bg-transparent sm:from-gray-900/95 sm:to-gray-900/25 ltr:sm:bg-gradient-to-r rtl:sm:bg-gradient-to-l"></div>
         <div className="relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:flex lg:h-screen lg:items-center lg:px-8">
           <div className="max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
@@ -43,7 +43,7 @@ export default function About() {
           </div>
           <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative h-64 overflow-hidden sm:h-80 lg:h-full">
-              <img alt="aboutmain" src="aboutmain.jpg" loading='lazy' className="absolute inset-0 h-full w-full object-cover" />
+              <img alt="aboutmain" src="../public/assets/aboutmain.jpg" loading='lazy' className="absolute inset-0 h-full w-full object-cover" />
             </div>
             <div className="lg:py-16">
               <article className="space-y-4 text-gray-600">

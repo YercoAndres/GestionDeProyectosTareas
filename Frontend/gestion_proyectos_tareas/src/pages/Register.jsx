@@ -121,7 +121,7 @@ function Register() {
         </div>
       </div>
       <div className="hidden lg:block w-full h-full ">
-      <img src="../public/fondo.png" alt="Login" loading="Lazy" className="w-full h-full" />
+      <img src="../public/assets/fondo.png" alt="Login" loading="Lazy" className="w-full h-full" />
      </div>
     </div>
 
