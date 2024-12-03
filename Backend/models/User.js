@@ -14,9 +14,18 @@ const User = {
   },
   
   getAllUsers: (callback) => {
-    const query = 'SELECT * FROM users'; // Consulta para obtener todos los usuarios
-    db.query(query, callback); // Ejecuta la consulta y llama al callback
+    const query = 'SELECT * FROM users';
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error en la consulta:', err);
+        callback(err);
+      } else {
+        console.log('Resultados de la consulta:', results);  // Log de los resultados
+        callback(null, results);  // Asegúrate de pasar los resultados correctamente
+      }
+    });
   },
+  
 
   // Nueva función para obtener un usuario por ID
   findById: (id, callback) => {
