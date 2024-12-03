@@ -3,8 +3,6 @@ import ProjectModal from './ProjectModal';
 import ConfirmDialog from './ConfirmDialog';
 import { Eye, CirclePlus, Pencil, Trash, SquareX } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL;
-
 const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -20,9 +18,10 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`${API_URL}/projects/${project.id}/tasks`);
+      const response = await fetch(`http://localhost:5000/tasks/${project.id}/tasks`);
       if (response.ok) {
         const data = await response.json();
+       
         setTasks(data || []);
       } else {
         console.error('Error al obtener las tareas:', response.statusText);
@@ -31,10 +30,9 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
       console.error('Error al conectar con la API:', error);
     }
   };
-
   const fetchMembers = async () => {
     try {
-      const response = await fetch(`${API_URL}/projects/${project.id}/members`);
+      const response = await fetch(`http://localhost:5000/projects/${project.id}/members`);
       if (response.ok) {
         const data = await response.json();
         setMembers(data);
@@ -92,7 +90,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+      const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -127,6 +125,8 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     setTaskToDelete(taskId);
     setIsConfirmDialogOpen(true);
   };
+
+  //('Project members:', members); 
 
   return (
     <div className="border p-4 rounded-xl shadow-md bg-white  ">
