@@ -4,7 +4,8 @@ const User = require('../models/User'); // Asegúrate de que el modelo de User e
 const getAllUsers = (req, res) => {
   User.getAllUsers((err, users) => {
     if (err) {
-      return res.status(500).json({ error: 'Error fetching users' });
+      console.error('Error fetching users:', err); // Log the error
+      return res.status(500).json({ error: 'Error fetching users', details: err.message });
     }
     res.json(users);
   });

@@ -14,6 +14,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+app.get('/test', (req, res) => {
+    res.send('Servidor funcionando correctamente');
+  });
 app.use('/api/auth', authRoutes);
 app.use('/projects', projectRoutes);
 app.use('/tasks', taskRoutes); 
