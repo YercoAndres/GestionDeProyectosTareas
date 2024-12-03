@@ -18,7 +18,7 @@ export default function Footer() {
 
       <ul className="mt-6 space-y-4 text-sm">
         <li>
-          <a href="#" className="text-gray-700 transition hover:opacity-75 dark:text-gray-200">
+          <a href="https://github.com/YercoAndres" className="text-gray-700 transition hover:opacity-75 dark:text-gray-200">
             Yerco Soto Negrete
           </a>
         </li>
