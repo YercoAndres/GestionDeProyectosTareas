@@ -61,20 +61,20 @@ export default function Dashboard() {
           <div className="bg-gradient-to-t from-blue-400 via-blue-500 to-blue-600 p-6 rounded-3xl shadow-md grid justify-center">
             <p className="font-bold text-center text-white">{projects.length}</p>
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">Proyectos</h2>
-            <img src="../public/projecticon.png" loading="lazy" alt="iconProject" className="max-w-15 max-h-10 mx-auto block" />
+            <img src="../assets/projecticon.png" loading="lazy" alt="iconProject" className="max-w-15 max-h-10 mx-auto block" />
           </div>      
           {/* Total de tareas */}
           <div className="bg-gradient-to-t from-green-500 via-green-500 to-green-600 p-6 rounded-3xl shadow-md grid justify-center items-center">
             <p className="font-bold text-center text-white">{tasks.length}</p>
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">Tareas</h2>
-            <img src="../public/taskicon.png" loading="lazy" alt="iconTask" className="max-w-15 max-h-10 mx-auto block" />
+            <img src="../assets/taskicon.png" loading="lazy" alt="iconTask" className="max-w-15 max-h-10 mx-auto block" />
           </div>
 
           {/* Total de usuarios */}
           <div className="bg-gradient-to-t from-amber-400 via-amber-500 to-amber-600 p-6 rounded-3xl shadow-md grid justify-center items-center">
             <p className="font-bold text-center text-white">{users.length}</p>
             <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">Miembros Registrados</h2>
-            <img src="../public/membersicon.png" loading="lazy" alt="iconMembers" className="max-w-15 max-h-10 mx-auto block" />
+            <img src="../assets/membersicon.png" loading="lazy" alt="iconMembers" className="max-w-15 max-h-10 mx-auto block" />
           </div>
 
         </div>
@@ -107,7 +107,7 @@ export default function Dashboard() {
           <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">
             Tareas del proyecto seleccionado:
           </h2>
-          <img src="../public/taskicon.png" loading="lazy" alt="iconTask" className="max-w-15 max-h-10 mx-auto block" />
+          <img src="../assets/taskicon.png" loading="lazy" alt="iconTask" className="max-w-15 max-h-10 mx-auto block" />
         </div>
 
       </div>
