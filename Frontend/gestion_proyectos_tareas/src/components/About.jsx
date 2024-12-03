@@ -43,7 +43,7 @@ export default function About() {
           </div>
           <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative h-64 overflow-hidden sm:h-80 lg:h-full">
-              <img alt="aboutmain" src="../public/assets/aboutmain.jpg" loading='lazy' className="absolute inset-0 h-full w-full object-cover" />
+              <img alt="aboutmain" src="../assets/aboutmain.jpg" loading='lazy' className="absolute inset-0 h-full w-full object-cover" />
             </div>
             <div className="lg:py-16">
               <article className="space-y-4 text-gray-600">
