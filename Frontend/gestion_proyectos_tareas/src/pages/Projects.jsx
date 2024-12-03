@@ -6,6 +6,7 @@ import { FaPlus } from 'react-icons/fa';
 import ConfirmDialog from '../components/ConfirmDialog';
 import jwt_decode from 'jwt-decode';
 import { toast } from 'react-toastify';
+import { fetchProjects, fetchUsers, createProject, updateProject, deleteProject } from '../api';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -49,15 +50,13 @@ const Projects = () => {
       setUserRole(decodedToken.role);
     }
 
-    fetch('http://localhost:5000/projects')
-      .then(response => response.json())
+    fetchProjects()
       .then(data => {
         setProjects(data);
       })
       .catch(error => console.error('Error fetching projects:', error));
 
-    fetch('http://localhost:5000/api/users')
-      .then(response => response.json())
+    fetchUsers()
       .then(data => {
         setUsers(data);
       })
@@ -89,55 +88,29 @@ const Projects = () => {
     toast.success(newProject.id ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
   
     if (newProject.id) {
-      fetch(`http://localhost:5000/projects/${newProject.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(projectToAdd),
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error al editar el proyecto');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setProjects(projects.map(project => project.id === newProject.id ? { ...projectToAdd, id: newProject.id } : project));
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status: 'En Progreso', id: null });
-        setError('');
-        setShowModal(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Error al editar el proyecto. Inténtalo de nuevo.');
-      });
+      updateProject(newProject.id, projectToAdd)
+        .then(data => {
+          setProjects(projects.map(project => project.id === newProject.id ? { ...projectToAdd, id: newProject.id } : project));
+          setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status: 'En Progreso', id: null });
+          setError('');
+          setShowModal(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setError('Error al editar el proyecto. Inténtalo de nuevo.');
+        });
     } else {
-      fetch('http://localhost:5000/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(projectToAdd),
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error al crear el proyecto');
-        }
-        return response.json();
-      })
-      .then(data => {
-        setProjects([...projects, { ...projectToAdd, id: data.projectId }]);
-        setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status: 'En Progreso', id: null });
-        setError('');
-        setShowModal(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Error al crear el proyecto. Inténtalo de nuevo.');
-      });
+      createProject(projectToAdd)
+        .then(data => {
+          setProjects([...projects, { ...projectToAdd, id: data.projectId }]);
+          setNewProject({ name: '', description: '', startDate: '', endDate: '', members: [], status: 'En Progreso', id: null });
+          setError('');
+          setShowModal(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setError('Error al crear el proyecto. Inténtalo de nuevo.');
+        });
     }
   };
 
@@ -162,16 +135,8 @@ const Projects = () => {
   
   const handleConfirmDelete = () => {
     if (projectToDelete) {
-      fetch(`http://localhost:5000/projects/${projectToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Error al eliminar el proyecto');
-          }
+      deleteProject(projectToDelete)
+        .then(() => {
           setProjects(projects.filter(project => project.id !== projectToDelete));
           setProjectToDelete(null);
           setConfirmDialogVisible(false);
