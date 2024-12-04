@@ -12,9 +12,9 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const projectsResponse = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
+        const projectsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/projects`);
         const usersResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users`);
-        const tasksResponse = await fetch(`${import.meta.env.VITE_API_URL}/tasks`);
+        const tasksResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks`);
 
         const projectsData = await projectsResponse.json();
         const usersData = await usersResponse.json();
