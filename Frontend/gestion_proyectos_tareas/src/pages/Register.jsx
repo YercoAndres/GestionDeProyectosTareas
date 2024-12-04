@@ -9,6 +9,9 @@ function Register() {
   const [role, setRole] = useState('');
   const navigate = useNavigate();
 
+
+  const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/register`;
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -17,7 +20,7 @@ function Register() {
     return;
   }
 
-    const response = await fetch('http://localhost:5000/api/auth/register', {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

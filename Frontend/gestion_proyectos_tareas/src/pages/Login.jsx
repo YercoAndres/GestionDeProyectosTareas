@@ -92,6 +92,9 @@ function Login() {
               Ir al menú principal
             </Link>
           </div>
+          <div className="hidden lg:block w-full h-full ">
+            <img src="../assets/fondo.png" alt="Login" loading="Lazy" className="w-full h-full" />
+          </div>
         </div>
       </div>
     </>
