@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ProjectModal from './ProjectModal';
 import ConfirmDialog from './ConfirmDialog';
 import { Eye, CirclePlus, Pencil, Trash, SquareX } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,7 +19,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${project.id}/tasks`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${project.id}/tasks`);
       if (response.ok) {
         const data = await response.json();
         setTasks(data || []);
@@ -32,7 +33,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const fetchMembers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/projects/${project.id}/members`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${project.id}/members`);
       if (response.ok) {
         const data = await response.json();
         setMembers(data);
@@ -90,7 +91,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/tasks/${taskId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -106,6 +107,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     } catch (error) {
       console.error('Error al conectar con la API:', error);
     }
+    toast.success('Tarea eliminada exitosamente');
   };
   
   const handleConfirmDelete = () => {

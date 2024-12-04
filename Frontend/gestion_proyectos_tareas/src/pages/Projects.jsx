@@ -89,7 +89,7 @@ const Projects = () => {
     toast.success(newProject.id ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
   
     if (newProject.id) {
-      fetch(`${import.meta.env.VITE_API_URL}/projects/${newProject.id}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/projects/${newProject.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const Projects = () => {
         setError('Error al editar el proyecto. Inténtalo de nuevo.');
       });
     } else {
-      fetch(`${import.meta.env.VITE_API_URL}/projects`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,6 +180,7 @@ const Projects = () => {
           console.error('Error al eliminar el proyecto:', err);
           setError('Error al eliminar el proyecto. Inténtalo de nuevo.');
         });
+        toast.success('Proyecto eliminado correctamente');
     }
   };
 
