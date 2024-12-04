@@ -22,7 +22,7 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/projects/${project.id}/members`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/projects/${project.id}/members`);
         if (response.ok) {
           const data = await response.json();
           setMembers(data);
@@ -47,7 +47,7 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
     const taskWithProjectId = { ...task, projectId: project.id };
 
     try {
-      const response = await fetch(`http://localhost:5000/tasks${initialTask ? `/${initialTask.id}` : `/${project.id}/tasks`}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/tasks${initialTask ? `/${initialTask.id}` : `/${project.id}/tasks`}`, {
         method: initialTask ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskWithProjectId)
@@ -91,7 +91,6 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
               Descripción
             </label>
             <textarea
-              type="text"
               id="description"
               name="description"
               placeholder='Ingresa la descripción de la tarea'

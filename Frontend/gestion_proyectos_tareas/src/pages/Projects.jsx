@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
-import ProjectCard from '../components/ProyectCard';
+import ProjectCard from '../components/ProjectCard';
 import { FaPlus } from 'react-icons/fa';
 import ConfirmDialog from '../components/ConfirmDialog';
 import jwt_decode from 'jwt-decode';
@@ -49,14 +49,14 @@ const Projects = () => {
       setUserRole(decodedToken.role);
     }
 
-    fetch('http://localhost:5000/projects')
+    fetch(`${import.meta.env.VITE_API_URL}/projects`)
       .then(response => response.json())
       .then(data => {
         setProjects(data);
       })
       .catch(error => console.error('Error fetching projects:', error));
 
-    fetch('http://localhost:5000/api/users')
+    fetch(`${import.meta.env.VITE_API_URL}/api/users`)
       .then(response => response.json())
       .then(data => {
         setUsers(data);
@@ -89,7 +89,7 @@ const Projects = () => {
     toast.success(newProject.id ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
   
     if (newProject.id) {
-      fetch(`http://localhost:5000/projects/${newProject.id}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/projects/${newProject.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const Projects = () => {
         setError('Error al editar el proyecto. Inténtalo de nuevo.');
       });
     } else {
-      fetch('http://localhost:5000/projects', {
+      fetch(`${import.meta.env.VITE_API_URL}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,7 +162,7 @@ const Projects = () => {
   
   const handleConfirmDelete = () => {
     if (projectToDelete) {
-      fetch(`http://localhost:5000/projects/${projectToDelete}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/projects/${projectToDelete}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

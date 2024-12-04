@@ -12,9 +12,9 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const projectsResponse = await fetch('http://localhost:5000/projects');
-        const usersResponse = await fetch('http://localhost:5000/api/users');
-        const tasksResponse = await fetch('http://localhost:5000/tasks');
+        const projectsResponse = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
+        const usersResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users`);
+        const tasksResponse = await fetch(`${import.meta.env.VITE_API_URL}/tasks`);
 
         const projectsData = await projectsResponse.json();
         const usersData = await usersResponse.json();
@@ -31,13 +31,11 @@ export default function Dashboard() {
     fetchDashboardData();
   }, []);
 
-
   const handleSelectChange = (e) => {
     const projectId = e.target.value;
     setSelectedProject(projectId);
     const project = projects.find((p) => p.id === projectId);
     setProjectInfo(project);
-
 
     const tasksData = Array.isArray(tasks) ? tasks : [];
     const filtered = tasksData.filter((task) => {

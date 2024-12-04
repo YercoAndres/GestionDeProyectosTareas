@@ -1,109 +1,124 @@
-import { useState, useEffect } from "react";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import Sidebar from '../components/Sidebar';
+import EditProfileModal from '../components/EditProfileModal';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+export default function Settings() {
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    role: 'user',
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
-    console.log(import.meta.env.VITE_API_URL); // Verificar el valor de la variable de entorno
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
+          if (!response.ok) {
+            throw new Error('Error al obtener los datos del usuario');
+          }
+          const userData = await response.json();
+          setUser(userData);
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+      fetchUserData();
+    }
   }, []);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser({
+      ...user,
+      [name]: value,
+    });
+  };
 
-    const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/login`;
-    console.log('API URL:', apiUrl); // Verificar la URL completa
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error en la solicitud');
-      }
-
-      const data = await response.json();
-
-      if (data.user && data.user.id) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userId', data.user.id); // Almacena el ID del usuario
-        toast.success('Inicio de sesión exitoso');
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1000);
-      } else {
-        toast.error('Error: Datos del usuario no encontrados');
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
   };
 
   return (
-    <>
-      <ToastContainer />
-      <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 justify-center items-center bg-cyan-950 px-4 md:px-0">
-        <div className="w-full max-w-md mx-auto md:ml-32">
-          <form onSubmit={handleLogin} className="bg-gray-100 shadow-md rounded-3xl px-8 md:px-14 py-10 mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6 text-indigo-950">Inicio de Sesión</h2>
-            <div className="mb-4">
-              <label className="block text-indigo-950 text-sm font-bold mb-2" htmlFor="email">Correo</label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-4 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-indigo-950 text-sm font-bold mb-2" htmlFor="password">Contraseña</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-4 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div className="flex items-center justify-center">
-              <button 
-                type="submit" 
-                className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-xl transition-transform transform hover:scale-105 focus:outline-none focus:shadow-outline">
-                Iniciar Sesión
-              </button>
-            </div>
-          </form>
-          <div className="mt-4 text-center">
-            <p className="text-gray-200">
-              ¿No tienes una cuenta?{' '}
-              <Link to="/register" className="text-emerald-400 font-bold hover:text-emerald-500">
-                Regístrate aquí
-              </Link>
-            </p>
-            <Link to="/" className="text-emerald-400 font-bold hover:text-emerald-500">
-              Ir al menú principal
-            </Link>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1 p-10 bg-gray-100">
+        <h1 className="text-3xl font-semibold mb-6">Configuración de Perfil</h1>
+        <div className="bg-white p-6 rounded shadow-md">
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              Nombre
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={user.name}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              disabled={!isEditing}
+            />
           </div>
-          <div className="hidden lg:block w-full h-full ">
-            <img src="../assets/fondo.png" alt="Login" loading="Lazy" className="w-full h-full" />
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={user.email}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+              Rol
+            </label>
+            <select
+              name="role"
+              value={user.role}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              disabled={!isEditing}
+            >
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+            </select>
+          </div>
+          <div className="flex space-x-4">
+            <button
+              onClick={handleEditToggle}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              {isEditing ? 'Guardar' : 'Editar Perfil'}
+            </button>
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cambiar Contraseña
+            </button>
           </div>
         </div>
+        {isEditing && user && (
+          <EditProfileModal
+            user={user}
+            setUser={setUser}
+            onClose={handleEditToggle}
+          />
+        )}
+        {showPasswordModal && (
+          <ChangePasswordModal
+            userId={user.id}
+            onClose={() => setShowPasswordModal(false)}
+          />
+        )}
       </div>
-    </>
+    </div>
   );
 }
-
-export default Login;

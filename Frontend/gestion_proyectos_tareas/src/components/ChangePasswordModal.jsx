@@ -40,7 +40,7 @@ export default function ChangePasswordModal({ userId, onClose }) {
         return;
       }
   
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/change-password`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

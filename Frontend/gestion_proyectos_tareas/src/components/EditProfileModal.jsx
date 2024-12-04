@@ -1,10 +1,8 @@
 // FILE: EditProfileModal.jsx
-import React, {  } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
 
-export default function EditProfileModal({ user, setUser, onClose, userRole}) {
-
-  
+export default function EditProfileModal({ user, setUser, onClose, userRole }) {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUser({
@@ -13,14 +11,11 @@ export default function EditProfileModal({ user, setUser, onClose, userRole}) {
     });
   };
 
-  
-
-
   const handleSave = async () => {
     const updatedUser = { ...user };
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -32,12 +27,11 @@ export default function EditProfileModal({ user, setUser, onClose, userRole}) {
         throw new Error('Error al actualizar el usuario');
       }
 
-    
-     toast.success('Usuario actualizado correctamente');
-
+      toast.success('Usuario actualizado correctamente');
       onClose();
     } catch (error) {
       console.error('Error:', error);
+      toast.error('Error al actualizar el usuario');
     }
   };
 
@@ -69,7 +63,6 @@ export default function EditProfileModal({ user, setUser, onClose, userRole}) {
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
-
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
             Rol
