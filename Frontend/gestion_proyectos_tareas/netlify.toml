@@ -1,2 +1,7 @@
 [build]
-  node_version = "14.17.0"
+  base = "Frontend/gestion_proyectos_tareas"
+  command = "npm run build"
+  publish = "Frontend/gestion_proyectos_tareas/dist"
+
+[build.environment]
+  NODE_VERSION = "14.17.0"
