@@ -17,7 +17,7 @@ export default function Settings() {
     if (userId) {
       const fetchUserData = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/users/${userId}`);
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
           if (!response.ok) {
             throw new Error('Error al obtener los datos del usuario');
           }
@@ -30,8 +30,6 @@ export default function Settings() {
       fetchUserData();
     }
   }, []);
-
- 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,7 +104,6 @@ export default function Settings() {
               Cambiar Contraseña
             </button>
           </div>
-     
         </div>
         {isEditing && user && (
           <EditProfileModal
