@@ -64,16 +64,13 @@ const createProject = (req, res) => {
         end_date: endDate,
         status: status || 'En Progreso'
       };
-
       const query = 'INSERT INTO projects (name, description, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)';
       connection.query(query, [projectData.name, projectData.description, projectData.start_date, projectData.end_date, projectData.status], (err, result) => {
         if (err) {
           console.error('Error al insertar el proyecto:', err);
           return res.status(500).json({ error: 'Error al crear el proyecto' });
         }
-
         const projectId = result.insertId;
-
         // Insertar miembros en la tabla project_members
         const memberQueries = members.map(memberId => {
           return new Promise((resolve, reject) => {
@@ -84,7 +81,6 @@ const createProject = (req, res) => {
             });
           });
         });
-
         Promise.all(memberQueries)
           .then(() => {
             res.status(201).json({ message: 'Proyecto creado con éxito', projectId });

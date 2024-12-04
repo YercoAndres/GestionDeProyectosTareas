@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const projectController = require('../controllers/projectController'); // Asegúrate de que esta ruta sea correcta
-const { authorizeRole } = require('../middlewares/authMiddleware'); // Asegúrate de importar el middleware
+const projectController = require('../controllers/projectController'); 
+const { authorizeRole } = require('../middlewares/authMiddleware'); 
 
 // Obtener todos los proyectos (acceso para manager y user)
 router.get('/', projectController.getAllProjects);
@@ -19,3 +19,4 @@ router.delete('/:id', authorizeRole(['manager']), projectController.deleteProjec
 router.get('/:projectId/members', projectController.getProjectMembers);
 
 module.exports = router;
+

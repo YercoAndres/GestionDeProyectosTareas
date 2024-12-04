@@ -1,4 +1,3 @@
-// FILE: Login.jsx
 import { useState } from "react";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,7 +11,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('http://localhost:5000/api/auth/login', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +36,6 @@ function Login() {
       toast.error(data.message);
     }
   };
-
   return (
     <>
       <div className="min-h-screen grid grid-cols-1 md:grid-cols-2  justify-center items-center bg-cyan-950  px-4 md:px-0">
