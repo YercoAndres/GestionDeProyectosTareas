@@ -11,17 +11,22 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error en la solicitud');
+      }
 
-    if (response.ok) {
+      const data = await response.json();
+
       if (data.user && data.user.id) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.user.id); // Almacena el ID del usuario
@@ -32,8 +37,8 @@ function Login() {
       } else {
         toast.error('Error: Datos del usuario no encontrados');
       }
-    } else {
-      toast.error(data.message);
+    } catch (error) {
+      toast.error(error.message);
     }
   };
   return (
