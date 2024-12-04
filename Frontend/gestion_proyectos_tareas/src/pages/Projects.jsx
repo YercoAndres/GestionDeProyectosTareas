@@ -162,7 +162,7 @@ const Projects = () => {
   
   const handleConfirmDelete = () => {
     if (projectToDelete) {
-      fetch(`${import.meta.env.VITE_API_URL}/projects/${projectToDelete}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectToDelete}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
