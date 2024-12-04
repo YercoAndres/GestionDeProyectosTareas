@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@material-tailwind/react": "^2.1.10",
-    "ant": "^0.2.0",
     "jwt-decode": "^3.1.2",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
