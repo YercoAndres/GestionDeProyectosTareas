@@ -8,29 +8,28 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log(import.meta.env.VITE_API_URL); // Verificar el valor de la variable de entorno
-  }, []);
-
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
+    const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/login`;
+    console.log('API URL:', apiUrl); // Verificar la URL completa
+  
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error en la solicitud');
       }
-
+  
       const data = await response.json();
-
+  
       if (data.user && data.user.id) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.user.id); // Almacena el ID del usuario
@@ -45,7 +44,6 @@ function Login() {
       toast.error(error.message);
     }
   };
-
   return (
     <>
       <ToastContainer />
