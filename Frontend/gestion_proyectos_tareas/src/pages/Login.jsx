@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, Link } from "react-router-dom";
@@ -7,6 +7,10 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(import.meta.env.VITE_API_URL); // Verificar el valor de la variable de entorno
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
