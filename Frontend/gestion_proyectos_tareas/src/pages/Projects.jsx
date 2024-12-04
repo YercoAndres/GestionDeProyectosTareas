@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
-import ProjectCard from '../components/ProjectCard';
+import ProjectCard from '../components/ProyectCard';
 import { FaPlus } from 'react-icons/fa';
 import ConfirmDialog from '../components/ConfirmDialog';
 import jwt_decode from 'jwt-decode';
