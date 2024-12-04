@@ -64,6 +64,7 @@ export default function ChangePasswordModal({ userId, onClose }) {
       console.error('Error al cambiar la contraseña:', error);
       toast.error(error.message);
     }
+    toast.success('Contraseña cambiada exitosamente');
   };
 
   return (

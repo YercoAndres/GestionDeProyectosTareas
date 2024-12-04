@@ -138,6 +138,7 @@ const Projects = () => {
         console.error(err);
         setError('Error al crear el proyecto. Inténtalo de nuevo.');
       });
+      toast.success('Proyecto creado correctamente');
     }
   };
 

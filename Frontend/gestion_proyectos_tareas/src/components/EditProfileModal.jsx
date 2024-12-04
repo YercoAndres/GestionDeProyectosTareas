@@ -27,12 +27,13 @@ export default function EditProfileModal({ user, setUser, onClose, userRole }) {
         throw new Error('Error al actualizar el usuario');
       }
 
-      toast.success('Usuario actualizado correctamente');
+      
       onClose();
     } catch (error) {
       console.error('Error:', error);
       toast.error('Error al actualizar el usuario');
     }
+    toast.success('Usuario actualizado correctamente');
   };
 
   return (
