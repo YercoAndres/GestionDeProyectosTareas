@@ -24,7 +24,7 @@ export default function Footer() {
         </li>
 
         <li>
-          <a href="#" className="text-gray-700 transition hover:opacity-75 dark:text-gray-200">
+          <a href="https://github.com/Gonzaliodas" className="text-gray-700 transition hover:opacity-75 dark:text-gray-200">
             Gonzalo Veliz Atencia
           </a>
         </li>
