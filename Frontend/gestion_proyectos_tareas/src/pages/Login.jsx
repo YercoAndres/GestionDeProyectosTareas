@@ -8,18 +8,12 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log(import.meta.env.VITE_API_URL); // Verificar el valor de la variable de entorno
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/login`;
-    console.log('API URL:', apiUrl); // Verificar la URL completa
-
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,18 +46,19 @@ function Login() {
   return (
     <>
       <ToastContainer />
-      <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 justify-center items-center bg-cyan-950 px-4 md:px-0">
-        <div className="w-full max-w-md mx-auto md:ml-32">
-          <form onSubmit={handleLogin} className="bg-gray-100 shadow-md rounded-3xl px-8 md:px-14 py-10 mb-8">
-            <h2 className="text-2xl font-bold text-center mb-6 text-indigo-950">Inicio de Sesión</h2>
+      <div className="flex justify-center items-center min-h-screen w-full  bg-gradient-to-b from-gray-700 via-gray-900 to-black ">
+        <div className="w-full max-w-lg  ">
+          <form onSubmit={handleLogin} className="bg-slate-50 shadow-2xl rounded-xl px-8 md:px-14 py-10 mb-8 ">
+            <h2 className="text-2xl font-bold text-center mb-6 text-slate-900">Inicio de Sesión</h2>
             <div className="mb-4">
-              <label className="block text-indigo-950 text-sm font-bold mb-2" htmlFor="email">Correo</label>
+              <label className="block text-slate-900 text-sm font-bold mb-2" htmlFor="email">Correo</label>
               <input
                 type="email"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-4 focus:ring-blue-500"
+                className="shadow-md appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
+                placeholder="Escribe tu correo"
                 required
               />
             </div>
@@ -74,20 +69,23 @@ function Login() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="shadow-md appearance-none border border-gray-300 rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-4 focus:ring-blue-500"
+                className="shadow-md appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
+                placeholder="Escribe tu contraseña"
                 required
               />
             </div>
             <div className="flex items-center justify-center">
               <button 
                 type="submit" 
-                className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-xl transition-transform transform hover:scale-105 focus:outline-none focus:shadow-outline">
+                className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-xl  focus:outline-none focus:shadow-outline">
                 Iniciar Sesión
               </button>
             </div>
           </form>
           <div className="mt-4 text-center">
-            <p className="text-gray-200">
+           
+            <Link className="text-emerald-400 font-bold hover:text-emerald-500"> ¿Olvidaste tu contraseña?</Link>
+            <p className="text-slate-200">
               ¿No tienes una cuenta?{' '}
               <Link to="/register" className="text-emerald-400 font-bold hover:text-emerald-500">
                 Regístrate aquí
@@ -98,9 +96,9 @@ function Login() {
             </Link>
           </div>
         </div>
-        <div className="hidden lg:block w-full h-full ">
+        {/* <div className="hidden lg:block w-full h-full ">
           <img src="../assets/fondo.png" alt="Login" loading="Lazy" className="w-full h-full" />
-        </div>
+        </div> */}
       </div>
     </>
   );

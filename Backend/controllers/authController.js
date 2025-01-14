@@ -1,6 +1,7 @@
 const user = require ('../models/User');
 const jwt = require ('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { sendEmail } = require('./mailController'); 
 
 const register = (req, res) => {
     const { name, email, password, role } = req.body; // extraiga los datos del cuerpo de la solicitud 
@@ -9,8 +10,9 @@ const register = (req, res) => {
         if (results.length > 0) {
             return res.status(400).json({message: 'Usuario ya existe'})
         } else {
-            user.create({ name, email, password, role}, (err, results)=>{
+            user.create({ name, email, password, role}, (err, res)=>{
                 if(err) throw err;
+                sendEmail(req, res);
                 return res.status(201).json ({message: 'Usuario registrado de forma exitosa'})               
             });
         }

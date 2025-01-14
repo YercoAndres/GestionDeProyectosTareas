@@ -19,7 +19,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${project.id}/tasks`);
+      const response = await fetch(`http://localhost:5000/api/tasks/${project.id}/tasks`);
       if (response.ok) {
         const data = await response.json();
         setTasks(data || []);
@@ -33,7 +33,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const fetchMembers = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${project.id}/members`);
+      const response = await fetch(`http://localhost:5000/api/projects/${project.id}/members`);
       if (response.ok) {
         const data = await response.json();
         setMembers(data);
@@ -91,7 +91,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`, {
+      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

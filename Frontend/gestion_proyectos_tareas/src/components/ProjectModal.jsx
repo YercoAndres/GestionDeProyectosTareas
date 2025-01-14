@@ -22,7 +22,7 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${project.id}/members`);
+        const response = await fetch(`http://localhost:5000/api/projects/${project.id}/members`);
         if (response.ok) {
           const data = await response.json();
           setMembers(data);
@@ -47,7 +47,7 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
     const taskWithProjectId = { ...task, projectId: project.id };
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks${initialTask ? `/${initialTask.id}` : `/${project.id}/tasks`}`, {
+      const response = await fetch(`http://localhost:5000/api/tasks${initialTask ? `/${initialTask.id}` : `/${project.id}/tasks`}`, {
         method: initialTask ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskWithProjectId)

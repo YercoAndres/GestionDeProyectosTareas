@@ -49,14 +49,14 @@ const Projects = () => {
       setUserRole(decodedToken.role);
     }
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/projects`)
+    fetch('http://localhost:5000/api/projects')
       .then(response => response.json())
       .then(data => {
         setProjects(data);
       })
       .catch(error => console.error('Error fetching projects:', error));
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/users`)
+    fetch(`http://localhost:5000/api/users`)
       .then(response => response.json())
       .then(data => {
         setUsers(data);
@@ -89,7 +89,7 @@ const Projects = () => {
     toast.success(newProject.id ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
   
     if (newProject.id) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/projects/${newProject.id}`, {
+      fetch(`http://localhost:5000/api/projects/${newProject.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const Projects = () => {
         setError('Error al editar el proyecto. Inténtalo de nuevo.');
       });
     } else {
-      fetch(`${import.meta.env.VITE_API_URL}/api/projects`, {
+      fetch(`http://localhost:5000/api/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ const Projects = () => {
   
   const handleConfirmDelete = () => {
     if (projectToDelete) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectToDelete}`, {
+      fetch(`http://localhost:5000/api/projects/${projectToDelete}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
