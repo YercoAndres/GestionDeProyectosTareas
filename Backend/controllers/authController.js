@@ -1,23 +1,42 @@
 const user = require ('../models/User');
 const jwt = require ('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { sendEmail } = require('./mailController'); 
+const AuthEmail = require('../emails/AuthEmail');
+const generateToken = require('../utils/token');
+
+
 
 const register = (req, res) => {
-    const { name, email, password, role } = req.body; // extraiga los datos del cuerpo de la solicitud 
-    // verificamos si el correo existe
-    user.findByEmail(email, (err, results)=>{
-        if (results.length > 0) {
-            return res.status(400).json({message: 'Usuario ya existe'})
-        } else {
-            user.create({ name, email, password, role}, (err, res)=>{
-                if(err) throw err;
-                sendEmail(req, res);
-                return res.status(201).json ({message: 'Usuario registrado de forma exitosa'})               
-            });
-        }
-    });
+  const { name, email, password, role } = req.body; // Extraer datos del cuerpo de la solicitud
+
+  // Verificar si el correo ya existe
+  user.findByEmail(email, (err, results) => {
+      if (err) {
+          return res.status(500).json({ message: 'Error en la base de datos' });
+      }
+
+      if (results.length > 0) {
+          return res.status(400).json({ message: 'Usuario ya existe' });
+      }
+
+      // Crear usuario
+      user.create({ name, email, password, role }, (err, result) => {
+          if (err) {
+              return res.status(500).json({ message: 'Error al registrar usuario' });
+          }
+
+     
+      
+      
+      // Enviar correo de confirmación
+       AuthEmail({ email, name });
+
+          return res.status(201).json({ message: 'Usuario registrado de forma exitosa' });
+      });
+  });
 };
+
+
 const login = (req, res) => {
     const { email, password } = req.body;
   

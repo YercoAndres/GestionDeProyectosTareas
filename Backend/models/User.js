@@ -32,6 +32,7 @@ const User = {
     const query = 'UPDATE users SET password = ? WHERE id = ?';
     db.query(query, [hashedPassword, userId], callback);
   }
+
 };
 
 module.exports = User;
