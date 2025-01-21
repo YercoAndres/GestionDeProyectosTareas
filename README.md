@@ -1,25 +1,60 @@
-# GestionDeProyectosTareas
+#  Gestion de Proyectos y Tareas
 
-Aplicacion Web de Gestion de tareas y proyectos para ramo de Taller de Proyecto carrera ingenieria en informatica AIEP
+Este proyecto es una aplicación web diseñada para facilitar la gestión de proyectos y tareas, desarrollada como proyecto final del segundo año de la carrera de Ingeniería en Informática en AIEP.
 
-# Tecnologias
+# Descripción
 
-Front End
-React + Vite, CSS y Tailwind
+La aplicación permite a los usuarios:
 
-Back end
-NodeJs, Express y MySQL
+Crear y gestionar proyectos: Los usuarios con rol de manager pueden crear nuevos proyectos y asignar tareas a los miembros del equipo.
 
-# Dependencias
+Visualizar y actualizar tareas: Los miembros del equipo pueden ver las tareas asignadas y actualizar su estado según el progreso.
 
-# Frontend/gestion_proyectos_tareas
+Colaboración en tiempo real: La plataforma facilita la comunicación y colaboración entre los miembros del equipo para asegurar una gestión eficiente de los proyectos.
 
-npm install vite@latest
-Para ejecutar:
+Tecnologías Utilizadas
+
+Frontend: Desarrollado con React y Vite para una experiencia de usuario rápida y eficiente. Se utiliza Tailwind CSS para el diseño y estilo de la interfaz.
+
+Backend: Construido con Node.js y Express para manejar las operaciones del servidor. La base de datos utilizada es MySQL para el almacenamiento de datos.
+
+#  Instalación
+
+Frontend
+
+Navega al directorio del frontend:
+
+cd frontend/gestion_proyectos_tareas
+
+Instala las dependencias:
+
+npm install
+
+Inicia la aplicación:
+
 npm run dev
 
-# Backend
+Backend
 
-npm install express mysql2 bcryptjs jsonwebtoken cors dotenv
-Para ejecutar:
+Navega al directorio del backend:
+
+cd backend
+
+Instala las dependencias:
+
+npm install
+
+Inicia el servidor:
+
 node server.js
+
+#  Uso
+
+Registro: El registro está disponible en la página principal y ahi puedes seleccionar si deseas ser manager o user.
+
+Autenticación: Estamos utilizando autenticacion con JWT y ademas se les envia un token de verificacion de la cuenta.
+
+
+#  Licencia
+
+Este proyecto está bajo la Licencia MIT. Para más detalles, consulta el archivo LICENSE en el repositorio.
