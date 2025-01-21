@@ -57,4 +57,4 @@ Autenticación: Estamos utilizando autenticacion con JWT y ademas se les envia u
 
 #  Licencia
 
-Este proyecto está bajo la Licencia MIT. Para más detalles, consulta el archivo LICENSE en el repositorio.
+Este proyecto está bajo la Licencia MIT.
