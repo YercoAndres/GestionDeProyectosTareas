@@ -18,7 +18,6 @@ connection.connect(err => {
   console.log(colors.bgCyan('Conectado a la base de datos'));
 });
 
-console.log('Conectado a la base de datos');
 
 module.exports = connection;
 

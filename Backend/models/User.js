@@ -8,6 +8,21 @@ const User = {
     db.query(query, [userData.name, userData.email, hashedPassword, userData.role], callback);
   },
   
+  saveToken: (userId, token, callback) => {
+    // Verifica la consulta SQL, asegurándonos de que se inserten correctamente los valores
+    const query = 'INSERT INTO tokens (user_id, token, expiresAt) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))';
+    db.query(query, [userId, token], (err, results) => {
+        if (err) {
+            console.error("Error al ejecutar la consulta de guardado de token:", err);
+            return callback(err);
+        } else {
+            console.log("Token insertado correctamente en la BD:", results);
+            return callback(null, results);
+        }
+    });
+  },
+
+  
   findByEmail: (email, callback) => {
     const query = 'SELECT * FROM users WHERE email = ?';
     db.query(query, [email], callback);

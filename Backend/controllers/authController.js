@@ -2,39 +2,37 @@ const user = require ('../models/User');
 const jwt = require ('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const AuthEmail = require('../emails/AuthEmail');
-const generateToken = require('../utils/token');
+const generateToken = require('../utils/token'); // Importa la función correctamente
 
 
 
 const register = (req, res) => {
-  const { name, email, password, role } = req.body; // Extraer datos del cuerpo de la solicitud
+  const { name, email, password, role } = req.body;
 
-  // Verificar si el correo ya existe
   user.findByEmail(email, (err, results) => {
-      if (err) {
-          return res.status(500).json({ message: 'Error en la base de datos' });
-      }
-
-      if (results.length > 0) {
-          return res.status(400).json({ message: 'Usuario ya existe' });
-      }
+      if (err) return res.status(500).json({ message: 'Error en la base de datos' });
+      if (results.length > 0) return res.status(400).json({ message: 'Usuario ya existe' });
 
       // Crear usuario
       user.create({ name, email, password, role }, (err, result) => {
-          if (err) {
-              return res.status(500).json({ message: 'Error al registrar usuario' });
-          }
+          if (err) return res.status(500).json({ message: 'Error al registrar usuario' });
 
-     
-      
-      
-      // Enviar correo de confirmación
-       AuthEmail({ email, name });
+          const userId = result.insertId; // Obtener el ID del usuario recién creado
+          console.log(userId)
+          const token = generateToken(); // Generar el token de verificación
+          
+          // Guardar el token en la base de datos
+          user.saveToken(userId, token, (err) => {
+              if (err) return res.status(500).json({ message: 'Error al guardar el token' });
 
-          return res.status(201).json({ message: 'Usuario registrado de forma exitosa' });
+              // Enviar correo de confirmación
+              AuthEmail({ email, name, token });
+
+              return res.status(201).json({ message: 'Usuario registrado exitosamente. Verifica tu email.' });
+          });
       });
   });
-};
+}
 
 
 const login = (req, res) => {
@@ -51,9 +49,9 @@ const login = (req, res) => {
       }
   
       const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, {
-        expiresIn: '8h'
+        expiresIn: '1h'
       });
-      return res.status(200).json({ token, user }); // Asegúrate de devolver el objeto user
+      return res.status(200).json({ token, user }); 
     });
   };
 

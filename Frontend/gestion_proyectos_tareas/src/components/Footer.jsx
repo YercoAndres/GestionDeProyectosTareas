@@ -1,6 +1,9 @@
 import React from 'react';
 
 export default function Footer() {
+
+  const year = new Date()
+
   return (
 
 <footer className="bg-white dark:bg-cyan-950">
@@ -66,7 +69,7 @@ export default function Footer() {
   </div>
 
   <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-    &copy; 2024. Todos los derechos reservados.
+    &copy; {year.getFullYear()} . Todos los derechos reservados.
   </p>
 </div>
 </footer>
