@@ -14,13 +14,24 @@ function Register() {
 
 
   const handleRegister = async (e) => {
+    // prevenir la recarga de la pagina
     e.preventDefault();
-  
-    if (!role) {
-      toast.error('Por Favor selecciona un rol');
+
+
+    // Validaciones antes de enviar el formulario
+
+    if(!name || !email || !password || !repeatPassword || !role){
+      toast.error('Debes llenar todos los campos')
+      return;
+    }
+
+    if(password !== repeatPassword){
+      toast.error('Las contraseñas no coinciden')
       return;
     }
   
+  
+    // fetch para enviar los datos a la api del backend
     const response = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
       headers: {
@@ -28,8 +39,9 @@ function Register() {
       },
       body: JSON.stringify({ name, email, password, role }),
     });
-  
     const data = await response.json();
+
+    // validacion si la respuesta es ok o no
   
     if (response.ok) {
       toast.success('Usuario registrado de forma correcta, por favor revisa tu correo para verificar tu cuenta', {
@@ -47,9 +59,9 @@ function Register() {
   return (
     
     
-<div className="flex justify-center items-center min-h-screen w-full bg-gradient-to-b from-gray-700 via-gray-900 to-black ">
-  <div className="w-full max-w-md">
-    <form onSubmit={handleRegister} className="bg-gray-100 shadow-md rounded-xl px-8 md:px-14 py-10 mb-8">
+<div className="grid lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 min-h-screen w-full items-center justify-center  bg-slate-100 ">
+  <div className="w-full max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+    <form onSubmit={handleRegister} className="bg-slate-50 shadow-2xl rounded-xl px-8 md:px-14 py-10 mb-8">
       <h2 className="text-2xl font-bold text-center mb-6">Registrate</h2>
       
       <div className="mb-4">
@@ -62,7 +74,6 @@ function Register() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-          required
           placeholder="Escribe tu nombre"
         />
       </div>
@@ -77,7 +88,6 @@ function Register() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-          required
           placeholder="Escribe tu correo"
         />
       </div>
@@ -92,7 +102,6 @@ function Register() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-          required
           placeholder="Escribe tu contraseña"
         />
       </div>
@@ -108,7 +117,6 @@ function Register() {
           onChange={(e) => setRepeatPassword(e.target.value)}
           className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
           placeholder="Escribe tu contraseña nuevamente"
-          required
         />
       </div>
 
@@ -154,18 +162,19 @@ function Register() {
     </form>
 
     <div className="mt-4 text-center">
-      <p className="text-white">
+      <p className="text-black">
         ¿Ya tienes una cuenta?{' '}
-        <Link to="/login" className="text-emerald-400 font-bold hover:text-emerald-500">
+        <Link to="/login" className="text-black font-bold hover:text-blue-500">
           Ingresa aquí
         </Link>
       </p>
 
-      <Link to="/" className="text-emerald-400 font-bold hover:text-emerald-500">
+      <Link to="/" className="text-black0 font-bold hover:text-blue-500">
         Ir al menú principal
       </Link>
     </div>
   </div>
+  <div className="hidden lg:block w-full h-full bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-sky-400 to-indigo-900"> </div> 
 </div>
 
 

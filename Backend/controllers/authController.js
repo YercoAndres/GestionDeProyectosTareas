@@ -18,7 +18,6 @@ const register = (req, res) => {
           if (err) return res.status(500).json({ message: 'Error al registrar usuario' });
 
           const userId = result.insertId; // Obtener el ID del usuario recién creado
-          console.log(userId)
           const token = generateToken(); // Generar el token de verificación
           
           // Guardar el token en la base de datos
@@ -39,8 +38,12 @@ const login = (req, res) => {
     const { email, password } = req.body;
   
     user.findByEmail(email, (err, results) => {
-      if (results.length === 0) {
-        return res.status(400).json({ message: 'Usuario no encontrado' });
+
+      // Primero hacemos la validacion de que los campos deben estar llenados y si encuentra el usuario
+      if(!email || !password){
+        return res.status(400).json({message: 'Debes llenar todos los campos'})
+      } else if (results.length === 0) {
+        return res.status(400).json({ message: 'Usuario no encontrado'});
       }
       const user = results[0];
       const isMatch = bcrypt.compareSync(password, user.password);
