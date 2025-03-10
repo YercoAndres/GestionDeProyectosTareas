@@ -45,7 +45,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex h-screen">
       {/* Sidebar */}
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-100">

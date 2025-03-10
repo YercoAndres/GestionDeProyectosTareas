@@ -188,7 +188,7 @@ const Projects = () => {
   const filteredUsers = users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
   return (
     <Sidebar>
-      <div className="flex-1 p-10 bg-gray-200">
+      <div className="p-5 bg-gray-700 h-screen">
         <h1 className="text-3xl font-semibold mb-6">Proyectos</h1>
         <button 
           onClick={toggleModal} 
@@ -198,7 +198,7 @@ const Projects = () => {
           <FaPlus className="mr-2" /> Agregar Proyecto
         </button>
         
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4 mt-6 " >
           {projects.map(project => (
             <ProjectCard 
               key={project.id} 
@@ -209,18 +209,21 @@ const Projects = () => {
             />
           ))}
         </div>
+
+        
         {showModal && (
           <Modal 
             onClose={toggleModal}
             title={newProject.id ? "Editar Proyecto" : "Agregar Proyecto"}
             buttonText={newProject.id ? "Guardar Cambios" : "Crear Proyecto"}
             onSubmit={handleAddProject}
+            
           >
             
             {/* Inicio del Formulario  */}
         <form onSubmit={handleAddProject} >
 
-         <div className='grid sm:grid-cols-2 gap-3'>
+         <div className='grid sm:grid-cols-2 gap-3 '>
             <div>
                 <label htmlFor="name" className='font-bold'>Nombre:</label>
               <input 

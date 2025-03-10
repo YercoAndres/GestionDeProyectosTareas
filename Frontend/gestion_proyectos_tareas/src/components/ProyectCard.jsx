@@ -229,7 +229,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
           onClick={toggleInfo}
           className={'bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded-lg'}
         >
-          <Eye size={24} className="inline-block mr-3" />
+          <Eye size={24} className='inline-block mr-3 ' />
           {showInfo ? 'Ocultar Proyecto' : 'Ver Proyecto'}
         </button>
         <button

@@ -19,7 +19,7 @@ const Sidebar = ({ children }) => {
 
   return (
     <div className="flex">
-      <div className=" lg:hidden bg-cyan-950">
+      <div className="  bg-cyan-950">
         <button
           onClick={toggleMenu}
           type="button"
@@ -50,12 +50,14 @@ const Sidebar = ({ children }) => {
         id="sidebar"
         className={`fixed inset-y-0 left-0 transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
+        } 4xl:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
       >
          
-        <div className="flex items-center justify-between lg:hidden ">
+        <div className="flex items-center justify-end">
           
-          <h2 className="text-2xl font-bold text-center">ProjectTask</h2>
+        <h2 className="p-4 text-2xl font-bold border-b border-gray-700">
+            ProjectTask
+          </h2>
           
           <button
             onClick={toggleMenu}
@@ -81,9 +83,7 @@ const Sidebar = ({ children }) => {
           </button>
         </div>
         <nav className="flex-1 p-4 space-y-4">
-          <h2 className="hidden md:block p-4 text-2xl font-bold border-b border-gray-700">
-            ProjectTask
-          </h2>
+        
           
           <Link to="/dashboard" className="block p-2 rounded hover:bg-cyan-700 "
           >
