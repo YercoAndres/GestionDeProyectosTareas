@@ -16,7 +16,7 @@ const User = {
             console.error("Error al ejecutar la consulta de guardado de token:", err);
             return callback(err);
         } else {
-            console.log("Token insertado correctamente en la BD:", results);
+            console.log("Token insertado correctamente en la BD:");
             return callback(null, results);
         }
     });

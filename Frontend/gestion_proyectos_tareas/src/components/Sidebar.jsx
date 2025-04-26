@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Home, Folder, User, LogOut  } from 'lucide-react';
+import { useLoading } from '../contexts/LoadingContext';
 
 const Sidebar = ({ children }) => {
+  const { set: setLoading } = useLoading();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -12,9 +14,11 @@ const Sidebar = ({ children }) => {
   };
 
   const handleLogout = () => {
+    setLoading(true);
     localStorage.removeItem('token');
     toast.success('Sesión cerrada correctamente');
     navigate('/');
+    setLoading(false);
   };
 
   return (

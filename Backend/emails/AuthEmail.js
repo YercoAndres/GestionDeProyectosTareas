@@ -2,17 +2,15 @@ const { transporter } = require("../config/nodemailer");
 
 const AuthEmail = async (user) => {
     try {
-        // const verificationUrl = `http://tudominio.com/verificar?token=${user.token}&email=${user.email}`;
-  // <p><a href="${verificationUrl}">Confirmar cuenta</a></p>
+        
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: user.email,
             subject: 'ProjectTask - Confirma tu cuenta',
             html: `
-                <p>Hola ${user.name},</p>
-                <p>Has creado tu cuenta en <strong>ProjectTask</strong>. Para activarla, haz clic en el siguiente enlace:</p>
-              
-                <p>O ingresa el siguiente código en la aplicación: <strong>${user.token}</strong></p>
+                <p>Hola ${user.name},</p>    
+                <p>Gracias por registrarte en nuestra aplicacion, ahora solo debes confirmar tu cuenta, para poder utilizarla.</p>          
+                <p>Ingresa el siguiente código en la aplicación: <strong>${user.token}</strong></p>
                 <p>Este código expira en 10 minutos.</p>
             `
         };
@@ -27,3 +25,4 @@ const AuthEmail = async (user) => {
 };
 
 module.exports = AuthEmail;
+
