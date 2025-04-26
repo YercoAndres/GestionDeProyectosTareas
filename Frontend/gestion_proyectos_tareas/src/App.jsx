@@ -33,7 +33,7 @@ function App() {
       <ToastContainer
       position='top-right'
       transition={Zoom}
-      autoClose={4000}
+     
       />
     </>
   );
