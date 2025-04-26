@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function ProjectModal({ project, task: initialTask, onClose }) {
   const [task, setTask] = useState({
-    name: '',
-    description: '',
-    start_date: '',
-    end_date: '',
-    priority: '',
-    estado: 'en progreso',
-    responsable_id: ''
+    name: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+    priority: "",
+    estado: "en progreso",
+    responsable_id: "",
   });
   const [members, setMembers] = useState([]);
 
@@ -22,15 +22,17 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/projects/${project.id}/members`);
+        const response = await fetch(
+          `http://localhost:5000/api/projects/${project.id}/members`
+        );
         if (response.ok) {
           const data = await response.json();
           setMembers(data);
         } else {
-          console.error('Error al obtener los miembros:', response.statusText);
+          console.error("Error al obtener los miembros:", response.statusText);
         }
       } catch (error) {
-        console.error('Error al conectar con la API:', error);
+        console.error("Error al conectar con la API:", error);
       }
     };
 
@@ -47,32 +49,45 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
     const taskWithProjectId = { ...task, projectId: project.id };
 
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks${initialTask ? `/${initialTask.id}` : `/${project.id}/tasks`}`, {
-        method: initialTask ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskWithProjectId)
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/tasks${
+          initialTask ? `/${initialTask.id}` : `/${project.id}/tasks`
+        }`,
+        {
+          method: initialTask ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(taskWithProjectId),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`Error al ${initialTask ? 'editar' : 'agregar'} la tarea`);
+        throw new Error(
+          `Error al ${initialTask ? "editar" : "agregar"} la tarea`
+        );
       }
 
-      toast.success(`Tarea ${initialTask ? 'editada' : 'agregada'} exitosamente`);
+      toast.success(
+        `Tarea ${initialTask ? "editada" : "agregada"} exitosamente`
+      );
       onClose();
-
     } catch (error) {
-      console.error('Error:', error);
-      toast.error(`Error al ${initialTask ? 'editar' : 'agregar'} la tarea`);
+      console.error("Error:", error);
+      toast.error(`Error al ${initialTask ? "editar" : "agregar"} la tarea`);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-8 rounded shadow-lg max-w-lg w-full">
-        <h3 className="text-xl font-semibold mb-4">{initialTask ? 'Editar Tarea' : 'Agregar Tarea'}</h3>
+        <h3 className="text-xl font-semibold mb-4">
+          {initialTask ? "Editar Tarea" : "Agregar Tarea"}
+        </h3>
         <form onSubmit={handleSaveTask}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="name"
+            >
               Título de la Tarea
             </label>
             <input
@@ -81,19 +96,22 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
               name="name"
               value={task.name}
               onChange={handleTaskChange}
-              placeholder='Ingresa el nombre de la tarea'
+              placeholder="Ingresa el nombre de la tarea"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="description"
+            >
               Descripción
             </label>
             <textarea
               id="description"
               name="description"
-              placeholder='Ingresa la descripción de la tarea'
+              placeholder="Ingresa la descripción de la tarea"
               value={task.description}
               onChange={handleTaskChange}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -101,7 +119,10 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="start_date">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="start_date"
+            >
               Fecha de Inicio
             </label>
             <input
@@ -115,7 +136,10 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="end_date">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="end_date"
+            >
               Fecha de Fin
             </label>
             <input
@@ -129,7 +153,10 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="priority">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="priority"
+            >
               Prioridad
             </label>
             <select
@@ -147,7 +174,10 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="estado">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="estado"
+            >
               Estado
             </label>
             <select
@@ -163,7 +193,10 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="responsable_id">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="responsable_id"
+            >
               Responsable
             </label>
             <select
@@ -176,16 +209,18 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
             >
               <option value="">Selecciona un responsable</option>
               {members.map((member) => (
-                <option key={member.id} value={member.id}>{member.name}</option>
+                <option key={member.id} value={member.id}>
+                  {member.name}
+                </option>
               ))}
             </select>
           </div>
-          <div className='grid grid-cols-2 gap-4'>
+          <div className="grid grid-cols-2 gap-4">
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
             >
-              {initialTask ? 'Guardar Cambios' : 'Agregar Tarea'}
+              {initialTask ? "Guardar Cambios" : "Agregar Tarea"}
             </button>
             <button
               onClick={onClose}

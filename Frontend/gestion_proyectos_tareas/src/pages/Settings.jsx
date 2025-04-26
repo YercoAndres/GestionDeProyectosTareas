@@ -1,30 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import EditProfileModal from '../components/EditProfileModal';
-import ChangePasswordModal from '../components/ChangePasswordModal';
+import React, { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import EditProfileModal from "../components/EditProfileModal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 export default function Settings() {
   const [user, setUser] = useState({
-    name: '',
-    email: '',
-    role: 'user',
+    name: "",
+    email: "",
+    role: "user",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (userId) {
       const fetchUserData = async () => {
         try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/users/${userId}`
+          );
           if (!response.ok) {
-            throw new Error('Error al obtener los datos del usuario');
+            throw new Error("Error al obtener los datos del usuario");
           }
           const userData = await response.json();
           setUser(userData);
         } catch (error) {
-          console.error('Error:', error);
+          console.error("Error:", error);
         }
       };
       fetchUserData();
@@ -50,7 +52,10 @@ export default function Settings() {
         <h1 className="text-3xl font-semibold mb-6">Configuración de Perfil</h1>
         <div className="bg-white p-6 rounded shadow-md">
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="name"
+            >
               Nombre
             </label>
             <input
@@ -63,7 +68,10 @@ export default function Settings() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="email"
+            >
               Email
             </label>
             <input
@@ -76,7 +84,10 @@ export default function Settings() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="role"
+            >
               Rol
             </label>
             <select
@@ -95,7 +106,7 @@ export default function Settings() {
               onClick={handleEditToggle}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              {isEditing ? 'Guardar' : 'Editar Perfil'}
+              {isEditing ? "Guardar" : "Editar Perfil"}
             </button>
             <button
               onClick={() => setShowPasswordModal(true)}

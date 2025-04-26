@@ -1,6 +1,6 @@
 // FILE: EditProfileModal.jsx
-import React from 'react';
-import { toast } from 'react-toastify';
+import React from "react";
+import { toast } from "react-toastify";
 
 export default function EditProfileModal({ user, setUser, onClose, userRole }) {
   const handleInputChange = (e) => {
@@ -15,25 +15,27 @@ export default function EditProfileModal({ user, setUser, onClose, userRole }) {
     const updatedUser = { ...user };
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${user.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedUser),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/${user.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedUser),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Error al actualizar el usuario');
+        throw new Error("Error al actualizar el usuario");
       }
 
-      
       onClose();
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Error al actualizar el usuario');
+      console.error("Error:", error);
+      toast.error("Error al actualizar el usuario");
     }
-    toast.success('Usuario actualizado correctamente');
+    toast.success("Usuario actualizado correctamente");
   };
 
   return (
@@ -41,38 +43,47 @@ export default function EditProfileModal({ user, setUser, onClose, userRole }) {
       <div className="bg-white p-6 rounded shadow-md md:w-2/3">
         <h2 className="text-2xl font-semibold mb-4">Editar Perfil</h2>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="name"
+          >
             Nombre
           </label>
           <input
             type="text"
             name="name"
-            value={user.name || ''}
+            value={user.name || ""}
             onChange={handleInputChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="email"
+          >
             Email
           </label>
           <input
             type="email"
             name="email"
-            value={user.email || ''}
+            value={user.email || ""}
             onChange={handleInputChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="role"
+          >
             Rol
           </label>
           <select
             name="role"
             value={user.role}
             onChange={handleInputChange}
-            disabled={userRole === 'user'}
+            disabled={userRole === "user"}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           >
             <option value="user">User</option>

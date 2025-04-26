@@ -3,8 +3,6 @@ import About from "../components/About";
 import Footer from "../components/Footer";
 
 function MainPage() {
- 
-
   return (
     <>
       <Header />
@@ -17,4 +15,3 @@ function MainPage() {
 }
 
 export default MainPage;
-
