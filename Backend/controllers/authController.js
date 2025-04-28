@@ -1,8 +1,9 @@
+// dependencias importadas necesarias
 const user = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const AuthEmail = require("../emails/AuthEmail");
-const generateToken = require("../utils/token"); // Importa la función correctamente
+const generateToken = require("../utils/token");
 const Token = require("../models/TokensModels");
 
 const register = (req, res) => {
@@ -139,4 +140,40 @@ const confirmAccount = (req, res) => {
   });
 };
 
-module.exports = { register, login, changePassword, confirmAccount };
+const resendToken = (req, res) => {
+  const { email } = req.body;
+
+  user.findByEmail(email, (err, results) => {
+    if (!email) {
+      return res.status(400).json({ message: "Debes un email valido" });
+    }
+    if (err) {
+      return res.status(500).json({ message: "Error en la base de datos" });
+    }
+    if (results.length === 0) {
+      return res.status(400).json({ message: "Usuario no encontrado" });
+    }
+
+    const userId = results[0].id;
+    const token = generateToken(); // Generar un nuevo token
+
+    Token.saveToken(userId, token, (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Error al guardar el token" });
+      }
+
+      AuthEmail({ email, name: results[0].name, token }); // Enviar el nuevo token por correo
+      return res.status(200).json({
+        message: "Token reenviado exitosamente. Verifica tu email.",
+      });
+    });
+  });
+};
+
+module.exports = {
+  register,
+  login,
+  changePassword,
+  confirmAccount,
+  resendToken,
+};

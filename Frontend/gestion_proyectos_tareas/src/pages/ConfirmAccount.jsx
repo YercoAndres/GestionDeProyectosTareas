@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom"; // Importa useParams
 import { toast } from "react-toastify";
 import { useLoading } from "../contexts/LoadingContext";
+import ResendTokenAuth from "../components/ResendTokenAuth";
 
 function ConfirmAccount() {
   const { token } = useParams(); // Obtén el token desde la URL
@@ -16,7 +17,7 @@ function ConfirmAccount() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/auth/confirm-account/${token}`, // Usa el token en la URL
+        `http://localhost:5000/api/auth/confirm-account/${token}`,
         {
           method: "POST",
           headers: {
@@ -76,7 +77,7 @@ function ConfirmAccount() {
           <div className="flex items-center justify-center">
             <button
               type="submit"
-              className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-xl transition-transform transform hover:scale-105 focus:outline-none focus:shadow-outline"
+              className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-xl  focus:outline-none focus:shadow-outline"
             >
               Confirmar
             </button>
@@ -84,6 +85,10 @@ function ConfirmAccount() {
         </form>
 
         <div className="mt-4 text-center">
+          <p className="text-gray-600 ">
+            ¿No has recibido el código?
+            <ResendTokenAuth />
+          </p>
           <p className="text-black">
             ¿Ya tienes una cuenta?{" "}
             <Link
