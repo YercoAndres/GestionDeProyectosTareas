@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom"; // Importa useParams
 import { toast } from "react-toastify";
 import { useLoading } from "../contexts/LoadingContext";
 
 function ConfirmAccount() {
+  const { token } = useParams(); // Obtén el token desde la URL
   const [code, setCode] = useState("");
   const { set: setLoading } = useLoading();
-  const [codigo, setCodigo] = useState("456789"); // Código de confirmación simulado
-
   const navigate = useNavigate();
 
   const handleConfirm = async (e) => {
@@ -15,18 +14,26 @@ function ConfirmAccount() {
 
     setLoading(true);
 
-    if (code === codigo) {
-      toast.success("Usuario Confirmado de forma correcta", {
-        autoClose: 4000,
-      });
-      navigate("/Login");
-    } else {
-      toast.error(
-        "Error al confirmar el usuario, por favor verifica el código",
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/auth/confirm-account/${token}`, // Usa el token en la URL
         {
-          autoClose: 4000,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code }),
         }
       );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error en la solicitud");
+      } else {
+        toast.success("Cuenta confirmada con éxito");
+        navigate("/login");
+      }
+    } catch (error) {
+      toast.error(error.message || "Error al confirmar la cuenta");
     }
 
     setLoading(false);
@@ -48,7 +55,7 @@ function ConfirmAccount() {
               className="block text-gray-700 text-sm font-bold mb-2"
               htmlFor="name"
             >
-              Codigo de confirmación
+              Código de confirmación
             </label>
             <input
               type="text"
@@ -61,7 +68,7 @@ function ConfirmAccount() {
                 }
               }}
               className="shadow border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700  focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-              placeholder="Escribe el codigo de confirmación"
+              placeholder="Escribe el código de confirmación"
               maxLength={6}
             />
           </div>
