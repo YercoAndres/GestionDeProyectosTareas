@@ -164,7 +164,6 @@ const Projects = () => {
           console.error(err);
           setError("Error al crear el proyecto. Inténtalo de nuevo.");
         });
-      toast.success("Proyecto creado correctamente");
     }
   };
 
@@ -218,7 +217,7 @@ const Projects = () => {
   );
   return (
     <Sidebar>
-      <div className="p-5 bg-gray-700 h-screen">
+      <div className="p-5 bg-gray-200 min-h-screen">
         <h1 className="text-3xl font-semibold mb-6">Proyectos</h1>
         <button
           onClick={toggleModal}

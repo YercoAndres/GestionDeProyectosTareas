@@ -54,7 +54,7 @@ const Sidebar = ({ children }) => {
         id="sidebar"
         className={`fixed inset-y-0 left-0 transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } 4xl:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-64 flex flex-col`}
+        } 4xl:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-72 flex flex-col`}
       >
         <div className="flex items-center justify-end">
           <h2 className="p-4 text-2xl font-bold border-b border-gray-700">

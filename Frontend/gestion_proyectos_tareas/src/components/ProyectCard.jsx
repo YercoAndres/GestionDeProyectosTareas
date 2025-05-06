@@ -3,6 +3,7 @@ import ProjectModal from "./ProjectModal";
 import ConfirmDialog from "./ConfirmDialog";
 import { Eye, CirclePlus, Pencil, Trash, SquareX } from "lucide-react";
 import { toast } from "react-toastify";
+import ButtonExportProject from "./ButtonExportProject";
 
 const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -276,6 +277,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
         </>
       )}
       <div className="mt-10 flex flex-wrap justify-end gap-3">
+        <ButtonExportProject project={project} />
         <button
           onClick={toggleInfo}
           className={
