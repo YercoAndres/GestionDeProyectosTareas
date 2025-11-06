@@ -3,6 +3,18 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useLoading } from "../contexts/LoadingContext";
 
+const roles = [
+  { value: "", label: "Selecciona un rol" },
+  { value: "user", label: "Miembro de equipo" },
+  { value: "manager", label: "Project manager" },
+];
+
+const benefits = [
+  "Tableros colaborativos y vistas personalizadas.",
+  "Asignacion de tareas con recordatorios automaticos.",
+  "Reportes en tiempo real para decisiones informadas.",
+];
+
 function Register() {
   const { set: setLoading } = useLoading();
   const [name, setName] = useState("");
@@ -13,20 +25,19 @@ function Register() {
   const [role, setRole] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
+  const handleRegister = async (event) => {
+    event.preventDefault();
     setLoading(true);
     try {
       if (!name || !email || !password || !repeatPassword || !role) {
-        toast.error("Debes llenar todos los campos");
+        toast.error("Completa todos los campos para continuar");
         return;
       }
       if (password !== repeatPassword) {
-        toast.error("Las contraseñas no coinciden");
+        toast.error("Las contrasenas no coinciden");
         return;
       }
-      // fetch para enviar los datos a la api del backend
+
       const response = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: {
@@ -38,7 +49,7 @@ function Register() {
 
       if (response.ok) {
         toast.success(
-          "Usuario registrado de forma correcta, por favor revisa tu correo para confirmar tu cuenta"
+          "Registro exitoso. Revisa tu correo para confirmar la cuenta."
         );
         navigate("/");
       } else {
@@ -46,156 +57,184 @@ function Register() {
       }
     } catch (error) {
       console.error("Error al registrar el usuario:", error);
-      toast.error(
-        "Error al registrar el usuario, por favor intenta nuevamente"
-      );
+      toast.error("No pudimos registrar tu cuenta. Intenta nuevamente.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="grid lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 min-h-screen w-full items-center justify-center  bg-slate-100 ">
-      <div className="w-full max-w-lg mx-auto my-8 px-4 sm:px-6 lg:px-8">
-        <form
-          onSubmit={handleRegister}
-          className="bg-slate-50 shadow-2xl rounded-xl px-8 md:px-14 py-10 mb-8"
-        >
-          <h2 className="text-2xl font-bold text-center mb-6">Registrate</h2>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="name"
-            >
-              Nombre
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-              placeholder="Escribe tu nombre"
-            />
+    <div className="relative min-h-screen overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.35),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(56,189,248,0.35),transparent_45%)]" />
+      <div className="relative mx-auto flex min-h-screen max-w-6xl items-center px-4 py-16 lg:px-8">
+        <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+          <div className="glass-panel hidden h-full flex-col justify-between rounded-3xl p-10 text-slate-100 shadow-2xl lg:flex">
+            <div>
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.32em] text-emerald-200">
+                Crea tu espacio
+              </span>
+              <h1 className="mt-6 text-4xl font-bold leading-tight text-white">
+                Empieza a coordinar tu equipo con herramientas claras y modernas.
+              </h1>
+              <p className="mt-4 max-w-md text-sm text-slate-200/85">
+                Define roles, establece objetivos y mantente alineado con el
+                progreso de cada iniciativa desde un mismo tablero colaborativo.
+              </p>
+            </div>
+            <ul className="space-y-4 text-sm text-slate-200/90">
+              {benefits.map((benefit) => (
+                <li
+                  key={benefit}
+                  className="flex items-start gap-3 rounded-2xl bg-white/5 p-4"
+                >
+                  <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-cyan-400/90 text-[10px] font-bold text-cyan-950">
+                    OK
+                  </span>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="glass-panel flex items-center justify-between rounded-2xl px-5 py-4 text-sm text-slate-200/90">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-emerald-200/90">
+                  En minutos
+                </p>
+                <p>
+                  Configura tu primer proyecto y comparte acceso con tu equipo
+                  en solo tres pasos.
+                </p>
+              </div>
+              <img
+                src="../assets/icon.png"
+                alt="ProjectTask icon"
+                className="hidden h-16 w-16 rounded-3xl border border-white/10 bg-white/90 p-4 shadow-2xl lg:block"
+              />
+            </div>
           </div>
 
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="email"
-            >
-              Correo
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-              placeholder="Escribe tu correo"
-            />
+          <div className="glass-panel w-full rounded-3xl p-10 shadow-2xl">
+            <div className="mb-10 space-y-3 text-center">
+              <h2 className="text-3xl font-bold text-white">Crea tu cuenta</h2>
+              <p className="text-sm text-slate-200/80">
+                Completa los datos y empieza a trabajar de forma organizada hoy mismo.
+              </p>
+            </div>
+
+            <form className="space-y-6" onSubmit={handleRegister}>
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="space-y-2 text-sm font-semibold text-slate-200">
+                  Nombre completo
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-300 focus:bg-white/15"
+                    placeholder="Tu nombre"
+                    autoComplete="name"
+                    required
+                  />
+                </label>
+                <label className="space-y-2 text-sm font-semibold text-slate-200">
+                  Correo electronico
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-300 focus:bg-white/15"
+                    placeholder="tu@empresa.com"
+                    autoComplete="email"
+                    required
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="space-y-2 text-sm font-semibold text-slate-200">
+                  Contrasena
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-300 focus:bg-white/15"
+                    placeholder="Minimo 8 caracteres"
+                    autoComplete="new-password"
+                    required
+                  />
+                </label>
+                <label className="space-y-2 text-sm font-semibold text-slate-200">
+                  Repite la contrasena
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={repeatPassword}
+                    onChange={(event) => setRepeatPassword(event.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-300 focus:bg-white/15"
+                    placeholder="Confirma tu contrasena"
+                    autoComplete="new-password"
+                    required
+                  />
+                </label>
+              </div>
+
+              {password && repeatPassword && password !== repeatPassword && (
+                <p className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-200">
+                  Las contrasenas no coinciden. Asegurate de ingresar la misma clave.
+                </p>
+              )}
+
+              <div className="flex items-center gap-2 text-sm text-slate-200/85">
+                <input
+                  type="checkbox"
+                  id="show-password"
+                  checked={showPassword}
+                  onChange={() => setShowPassword((prev) => !prev)}
+                  className="h-4 w-4 rounded border-white/20 bg-white/10 text-emerald-400 focus:ring-emerald-300"
+                />
+                <label htmlFor="show-password">Mostrar contrasena</label>
+              </div>
+
+              <label className="space-y-2 text-sm font-semibold text-slate-200">
+                Selecciona tu rol
+                <select
+                  id="role"
+                  value={role}
+                  onChange={(event) => setRole(event.target.value)}
+                  className="w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-300 focus:bg-white/15"
+                  required
+                >
+                  {roles.map((roleOption) => (
+                    <option
+                      key={roleOption.value || "empty"}
+                      value={roleOption.value}
+                      className="bg-slate-800 text-white"
+                    >
+                      {roleOption.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <button type="submit" className="primary-button w-full">
+                Crear cuenta
+              </button>
+            </form>
+
+            <div className="mt-8 space-y-3 text-center text-sm text-slate-200/85">
+              <p>
+                Ya tienes una cuenta?{" "}
+                <Link to="/login" className="font-semibold hover:text-white">
+                  Inicia sesion
+                </Link>
+              </p>
+              <Link
+                to="/"
+                className="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-emerald-200 hover:text-white"
+              >
+                Volver al inicio
+              </Link>
+            </div>
           </div>
-
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="password"
-            >
-              Contraseña
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-              placeholder="Escribe tu contraseña"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="repeat-password"
-            >
-              Repite tu Contraseña
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="repeat-password"
-              value={repeatPassword}
-              onChange={(e) => setRepeatPassword(e.target.value)}
-              className="shadow appearance-none border border-gray-300 rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-              placeholder="Escribe tu contraseña nuevamente"
-            />
-          </div>
-
-          {password && repeatPassword && password !== repeatPassword && (
-            <p className="text-red-500 font-bold text-sm mb-3">
-              Las contraseñas no coinciden.
-            </p>
-          )}
-
-          <div className="mb-3">
-            <input
-              type="checkbox"
-              id="show-password"
-              checked={showPassword}
-              onChange={() => setShowPassword(!showPassword)}
-              className="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring focus:ring-blue-200 mr-1"
-            />
-            Mostrar contraseña
-          </div>
-
-          <div className="mb-6">
-            <label
-              htmlFor="role"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Rol
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              id="role"
-              className="shadow appearance-none border border-gray-300 rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="" className="text-gray-600">
-                Selecciona un rol
-              </option>
-              <option value="user">User</option>
-              <option value="manager">Manager</option>
-            </select>
-          </div>
-
-          <div className="flex items-center justify-center">
-            <button
-              type="submit"
-              className="bg-blue-700 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-xl transition-transform transform hover:scale-105 focus:outline-none focus:shadow-outline"
-            >
-              Registrar
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-4 text-center">
-          <p className="text-black">
-            ¿Ya tienes una cuenta?{" "}
-            <Link
-              to="/login"
-              className="text-black font-bold hover:text-blue-500"
-            >
-              Ingresa aquí
-            </Link>
-          </p>
-
-          <Link to="/" className="text-black0 font-bold hover:text-blue-500">
-            Ir al menú principal
-          </Link>
         </div>
       </div>
-      <div className="hidden lg:block w-full h-full bg-black"> </div>
     </div>
   );
 }

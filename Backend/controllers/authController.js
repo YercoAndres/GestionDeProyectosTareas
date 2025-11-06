@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const AuthEmail = require("../emails/AuthEmail");
 const generateToken = require("../utils/token");
 const Token = require("../models/TokensModels");
+const { EMAIL_ENABLED } = require("../config/nodemailer");
 
 const register = (req, res) => {
   const { name, email, password, role } = req.body;
@@ -15,19 +16,32 @@ const register = (req, res) => {
     if (results.length > 0)
       return res.status(400).json({ message: "Usuario ya existe" });
 
-    // Crear usuario
     user.create({ name, email, password, role }, (err, result) => {
       if (err)
         return res.status(500).json({ message: "Error al registrar usuario" });
-      const userId = result.insertId; // Obtener el ID del usuario recién creado
-      const token = generateToken(); // Generar el token de verificación
+      const userId = result.insertId;
 
-      // Guardar el token en la base de datos
+      if (!EMAIL_ENABLED) {
+        user.updateVerificationStatus(userId, true, (updateErr) => {
+          if (updateErr) {
+            return res.status(500).json({
+              message: "Error al habilitar usuario sin verificacion",
+            });
+          }
+          return res.status(201).json({
+            message:
+              "Usuario registrado. La verificacion por correo esta deshabilitada temporalmente.",
+          });
+        });
+        return;
+      }
+
+      const token = generateToken();
+
       Token.saveToken(userId, token, (err) => {
         if (err)
           return res.status(500).json({ message: "Error al guardar el token" });
 
-        // Enviar correo de confirmación
         AuthEmail({ email, name, token });
 
         return res.status(201).json({
@@ -48,26 +62,26 @@ const login = (req, res) => {
       return res.status(400).json({ message: "Usuario no encontrado" });
     }
 
-    const user = results[0];
-    const isMatch = bcrypt.compareSync(password, user.password);
+    const userData = results[0];
+    const isMatch = bcrypt.compareSync(password, userData.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Credenciales inválidas" });
+      return res.status(400).json({ message: "Credenciales invalidas" });
     }
 
-    if (!user.verify) {
+    if (!userData.verify) {
       return res.status(400).json({
         message: "Usuario no verificado, por favor confirma tu cuenta",
       });
     }
 
     const token = jwt.sign(
-      { id: user.id, name: user.name, role: user.role },
+      { id: userData.id, name: userData.name, role: userData.role },
       process.env.JWT_SECRET,
       {
         expiresIn: "1h",
       }
     );
-    return res.status(200).json({ token, user });
+    return res.status(200).json({ token, user: userData });
   });
 };
 
@@ -80,12 +94,12 @@ const changePassword = async (req, res) => {
     if (!token) {
       return res
         .status(401)
-        .json({ message: "No se proporcionó token de autenticación" });
+        .json({ message: "No se proporciono token de autenticacion" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err) => {
       if (err) {
-        return res.status(401).json({ message: "Token inválido" });
+        return res.status(401).json({ message: "Token invalido" });
       }
     });
 
@@ -99,17 +113,17 @@ const changePassword = async (req, res) => {
       if (!isMatch) {
         return res
           .status(400)
-          .json({ message: "Contraseña actual incorrecta" });
+          .json({ message: "Contrasena actual incorrecta" });
       }
 
       const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
-      user.updatePassword(userId, hashedNewPassword, (err) => {
-        if (err) {
+      user.updatePassword(userId, hashedNewPassword, (updateErr) => {
+        if (updateErr) {
           return res
             .status(500)
-            .json({ message: "Error al cambiar la contraseña" });
+            .json({ message: "Error al cambiar la contrasena" });
         }
-        res.status(200).json({ message: "Contraseña cambiada correctamente" });
+        res.status(200).json({ message: "Contrasena cambiada correctamente" });
       });
     });
   } catch (error) {
@@ -122,16 +136,16 @@ const confirmAccount = (req, res) => {
 
   Token.findToken(token, (err, result) => {
     if (err || !result) {
-      return res.status(400).json({ message: "Token inválido o expirado" });
+      return res.status(400).json({ message: "Token invalido o expirado" });
     }
 
     const userId = result.user_id;
-    user.updateVerificationStatus(userId, true, (err) => {
-      if (err) {
+    user.updateVerificationStatus(userId, true, (updateErr) => {
+      if (updateErr) {
         return res.status(500).json({ message: "Error al verificar cuenta" });
       }
-      Token.deleteToken(token, (err) => {
-        if (err) {
+      Token.deleteToken(token, (deleteErr) => {
+        if (deleteErr) {
           return res.status(500).json({ message: "Error al eliminar token" });
         }
         res.status(200).json({ message: "Cuenta verificada exitosamente" });
@@ -145,7 +159,7 @@ const resendToken = (req, res) => {
 
   user.findByEmail(email, (err, results) => {
     if (!email) {
-      return res.status(400).json({ message: "Debes un email valido" });
+      return res.status(400).json({ message: "Debes ingresar un email valido" });
     }
     if (err) {
       return res.status(500).json({ message: "Error en la base de datos" });
@@ -154,15 +168,22 @@ const resendToken = (req, res) => {
       return res.status(400).json({ message: "Usuario no encontrado" });
     }
 
-    const userId = results[0].id;
-    const token = generateToken(); // Generar un nuevo token
+    if (!EMAIL_ENABLED) {
+      return res.status(200).json({
+        message:
+          "El envio de correos esta deshabilitado temporalmente. No es necesario reenviar token.",
+      });
+    }
 
-    Token.saveToken(userId, token, (err) => {
-      if (err) {
+    const userId = results[0].id;
+    const token = generateToken();
+
+    Token.saveToken(userId, token, (saveErr) => {
+      if (saveErr) {
         return res.status(500).json({ message: "Error al guardar el token" });
       }
 
-      AuthEmail({ email, name: results[0].name, token }); // Enviar el nuevo token por correo
+      AuthEmail({ email, name: results[0].name, token });
       return res.status(200).json({
         message: "Token reenviado exitosamente. Verifica tu email.",
       });

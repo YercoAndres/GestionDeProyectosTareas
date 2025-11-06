@@ -1,110 +1,126 @@
-// FILE: EditProfileModal.jsx
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import Modal from "./Modal";
 
-export default function EditProfileModal({ user, setUser, onClose, userRole }) {
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUser({
-      ...user,
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const ROLE_OPTIONS = [
+  { value: "user", label: "Miembro de equipo" },
+  { value: "manager", label: "Project manager" },
+];
+
+export default function EditProfileModal({ user, setUser, onClose }) {
+  const [formData, setFormData] = useState({
+    name: user.name || "",
+    email: user.email || "",
+    role: user.role || "user",
+  });
+  const [saving, setSaving] = useState(false);
+
+  const formFields = useMemo(
+    () => [
+      {
+        label: "Nombre completo",
+        name: "name",
+        type: "text",
+        placeholder: "Tu nombre",
+      },
+      {
+        label: "Correo electronico",
+        name: "email",
+        type: "email",
+        placeholder: "tu@empresa.com",
+      },
+    ],
+    []
+  );
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const handleSave = async () => {
-    const updatedUser = { ...user };
+    if (!formData.name.trim() || !formData.email.trim()) {
+      toast.error("Nombre y correo son obligatorios.");
+      return;
+    }
 
+    setSaving(true);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/users/${user.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedUser),
-        }
-      );
+      const response = await fetch(`${API_BASE}/api/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) {
-        throw new Error("Error al actualizar el usuario");
+        throw new Error("No se pudo actualizar el perfil.");
       }
 
+      setUser((prev) => ({
+        ...prev,
+        ...formData,
+      }));
+      toast.success("Perfil actualizado correctamente.");
       onClose();
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Error al actualizar el usuario");
+      toast.error(error.message || "Error al actualizar el perfil.");
+    } finally {
+      setSaving(false);
     }
-    toast.success("Usuario actualizado correctamente");
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-md md:w-2/3">
-        <h2 className="text-2xl font-semibold mb-4">Editar Perfil</h2>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="name"
-          >
-            Nombre
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={user.name || ""}
-            onChange={handleInputChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
+    <Modal
+      title="Editar perfil"
+      buttonText={saving ? "Guardando..." : "Guardar cambios"}
+      onClose={onClose}
+      onSubmit={saving ? undefined : handleSave}
+    >
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          {formFields.map((field) => (
+            <label
+              key={field.name}
+              className="space-y-2 text-sm font-semibold text-slate-700"
+            >
+              {field.label}
+              <input
+                type={field.type}
+                name={field.name}
+                value={formData[field.name]}
+                onChange={handleChange}
+                placeholder={field.placeholder}
+                className="w-full rounded-2xl border border-slate-300/60 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200/70"
+                autoComplete={field.name === "email" ? "email" : "name"}
+              />
+            </label>
+          ))}
         </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="email"
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={user.email || ""}
-            onChange={handleInputChange}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="role"
-          >
-            Rol
-          </label>
+
+        <label className="space-y-2 text-sm font-semibold text-slate-700">
+          Rol asignado
           <select
             name="role"
-            value={user.role}
-            onChange={handleInputChange}
-            disabled={userRole === "user"}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full rounded-2xl border border-slate-300/60 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200/70"
           >
-            <option value="user">User</option>
-            <option value="manager">Manager</option>
+            {ROLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
-        </div>
-        <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Guardar
-          </button>
-        </div>
+        </label>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -1,9 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ProjectModal from "./ProjectModal";
 import ConfirmDialog from "./ConfirmDialog";
 import { Eye, CirclePlus, Pencil, Trash, SquareX } from "lucide-react";
 import { toast } from "react-toastify";
 import ButtonExportProject from "./ButtonExportProject";
+
+const PRIORITY_STYLES = {
+  Baja: "border-emerald-300/40 bg-emerald-400/10 text-emerald-100",
+  Media: "border-amber-300/40 bg-amber-400/10 text-amber-100",
+  Alta: "border-rose-300/40 bg-rose-400/10 text-rose-100",
+};
+
+const statusStyle = (status) => {
+  switch (status) {
+    case "Completado":
+      return "bg-emerald-400/10 text-emerald-100 border border-emerald-300/40";
+    case "En Pausa":
+      return "bg-amber-400/10 text-amber-100 border border-amber-300/40";
+    case "En Progreso":
+      return "bg-cyan-400/10 text-cyan-100 border border-cyan-300/40";
+    default:
+      return "bg-slate-400/10 text-slate-200 border border-slate-300/30";
+  }
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return "Sin fecha";
+  }
+  return date.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const capitalizeFirstLetter = (value) =>
+  value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 
 const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,77 +48,51 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [members, setMembers] = useState([]);
 
-  const toggleInfo = () => {
-    setShowInfo(!showInfo);
-  };
-
-  const fetchTasks = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/tasks/${project.id}/tasks`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setTasks(data || []);
-      } else {
-        console.error("Error al obtener las tareas:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error al conectar con la API:", error);
-    }
-  };
-
-  const fetchMembers = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/projects/${project.id}/members`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setMembers(data);
-      } else {
-        console.error("Error al obtener los miembros:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error al conectar con la API:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/tasks/${project.id}/tasks`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setTasks(data || []);
+        }
+      } catch (error) {
+        console.error("Error al obtener las tareas:", error);
+      }
+    };
+
+    const fetchMembers = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/projects/${project.id}/members`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setMembers(data || []);
+        }
+      } catch (error) {
+        console.error("Error al obtener los miembros:", error);
+      }
+    };
+
     if (showInfo) {
       fetchTasks();
       fetchMembers();
     }
-  }, [showInfo]);
+  }, [project.id, showInfo]);
 
-  const priorityColor = (priority) => {
-    switch (priority) {
-      case "Baja":
-        return "bg-green-200";
-      case "Media":
-        return "bg-yellow-200";
-      case "Alta":
-        return "bg-red-200";
-      default:
-        return "bg-gray-200";
-    }
+  const toggleInfo = () => {
+    setShowInfo((prev) => !prev);
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return "Fecha inválida";
-    }
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString("es-ES", options);
-  };
-
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
+  const priorityColor = (priority) =>
+    PRIORITY_STYLES[priority] ||
+    "border-slate-300/30 bg-slate-400/10 text-slate-200";
 
   const getResponsableName = (responsableId) => {
-    const member = members.find((member) => member.id === responsableId);
+    const member = members.find((item) => item.id === responsableId);
     return member ? member.name : "Responsable no asignado";
   };
 
@@ -100,18 +108,16 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/tasks/${taskId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
-        setTasks(tasks.filter((task) => task.id !== taskId));
+        setTasks((prev) => prev.filter((taskItem) => taskItem.id !== taskId));
+        toast.success("Tarea eliminada exitosamente");
       } else {
         const errorData = await response.json();
         console.error(
@@ -122,7 +128,6 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
     } catch (error) {
       console.error("Error al conectar con la API:", error);
     }
-    toast.success("Tarea eliminada exitosamente");
   };
 
   const handleConfirmDelete = () => {
@@ -144,123 +149,209 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="border p-4 rounded-xl shadow-md bg-white">
-      <h3 className="text-2xl font-bold text-cyan-900">
-        Proyecto: {project.name}
-      </h3>
-      {showInfo && (
-        <>
-          <h3 className="text-xl font-semibold mt-4 mb-4 text-gray-700">
-            Detalles del Proyecto
+    <div className="glass-panel rounded-3xl border border-white/10 p-8 text-slate-100 shadow-2xl">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-cyan-200">
+            Proyecto
+          </p>
+          <h3 className="mt-2 text-2xl font-semibold text-white">
+            {project.name}
           </h3>
-          <div className="grid md:grid-cols-2">
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Nombre del Proyecto:
-              </label>
-              <p className="text-gray-700">{project.name}</p>
+          <p className="mt-2 max-w-xl text-sm text-slate-200/80">
+            {project.description ||
+              "Aun no se ha definido una descripcion para este proyecto."}
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-end gap-3">
+          <ButtonExportProject project={project} />
+          <button
+            onClick={toggleInfo}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300 hover:bg-cyan-400/20"
+          >
+            <Eye size={18} />
+            {showInfo ? "Ocultar detalles" : "Ver detalles"}
+          </button>
+          <button
+            onClick={() => handleOpenModal()}
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-400/20 px-4 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-emerald-400/30"
+          >
+            <CirclePlus size={18} />
+            Nueva tarea
+          </button>
+          <button
+            onClick={onEdit}
+            disabled={userRole === "user"}
+            className={`inline-flex items-center gap-2 rounded-full border border-indigo-300/40 px-4 py-2 text-sm font-semibold transition ${
+              userRole === "user"
+                ? "cursor-not-allowed bg-indigo-500/20 text-indigo-200/60 opacity-60"
+                : "bg-indigo-500/20 text-indigo-100 hover:bg-indigo-500/30"
+            }`}
+          >
+            <Pencil size={18} />
+            Editar
+          </button>
+          <button
+            onClick={onDelete}
+            disabled={userRole === "user"}
+            className={`inline-flex items-center gap-2 rounded-full border border-rose-300/40 px-4 py-2 text-sm font-semibold transition ${
+              userRole === "user"
+                ? "cursor-not-allowed bg-rose-500/20 text-rose-200/60 opacity-60"
+                : "bg-rose-500/20 text-rose-100 hover:bg-rose-500/30"
+            }`}
+          >
+            <Trash size={18} />
+            Eliminar
+          </button>
+        </div>
+      </div>
+
+      {showInfo && (
+        <div className="mt-8 space-y-8 text-sm text-slate-200/85">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <p className="text-xs uppercase tracking-wide text-slate-300/80">
+                Inicio
+              </p>
+              <p className="mt-2 text-lg font-semibold text-white">
+                {formatDate(project.start_date || project.startDate)}
+              </p>
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Descripción:
-              </label>
-              <p className="text-gray-700">{project.description}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Fecha de Inicio:
-              </label>
-              <p className="text-gray-700">{formatDate(project.start_date)}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Fecha de Fin:
-              </label>
-              <p className="text-gray-700">{formatDate(project.end_date)}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Miembros:
-              </label>
-              {Array.isArray(members) && members.length > 0 ? (
-                <ul className="text-gray-700 list-disc pl-5">
-                  {members.map((member, index) => (
-                    <li key={index}>{member.name}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-700">No hay miembros asignados.</p>
-              )}
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Estado:
-              </label>
-              <p className="text-gray-700">{project.status}</p>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <p className="text-xs uppercase tracking-wide text-slate-300/80">
+                Fin estimado
+              </p>
+              <p className="mt-2 text-lg font-semibold text-white">
+                {formatDate(project.end_date || project.endDate)}
+              </p>
             </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-xl font-semibold mb-2">
-              Tareas asignadas al proyecto:
-            </label>
-            <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <p className="text-xs uppercase tracking-wide text-slate-300/80">
+              Estado actual
+            </p>
+            <span
+              className={`mt-3 inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold ${statusStyle(
+                project.status
+              )}`}
+            >
+              {project.status || "Sin estado"}
+            </span>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <p className="text-xs uppercase tracking-wide text-slate-300/80">
+              Miembros asignados
+            </p>
+            {Array.isArray(members) && members.length > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {members.map((member) => (
+                  <li
+                    key={member.id}
+                    className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-semibold text-slate-100"
+                  >
+                    {member.name}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-xs text-slate-200/70">
+                No hay miembros asignados actualmente.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-wide text-slate-300/80">
+                Tareas vinculadas
+              </p>
+              <span className="text-xs font-semibold text-slate-200/70">
+                {tasks.length} tareas
+              </span>
+            </div>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
               {Array.isArray(tasks) && tasks.length > 0 ? (
                 tasks.map((task) => (
                   <div
                     key={task.id}
-                    className={`hover:scale-105 cursor-pointer text-gray-700 border rounded-lg p-3 shadow-2xl ${priorityColor(
+                    className={`relative overflow-hidden rounded-2xl border px-4 py-5 transition hover:-translate-y-1 hover:shadow-2xl ${priorityColor(
                       task.priority
                     )}`}
                   >
-                    <div>
-                      <div className="grid grid-cols-2 mb-4">
-                        <p className="font-bold text-xl">{task.priority}</p>
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => handleOpenModal(task)}>
-                            <Pencil size={24} className="inline-block" />
-                          </button>
-                          <button
-                            onClick={() => handleOpenConfirmDialog(task.id)}
-                          >
-                            <SquareX size={24} className="inline-block" />
-                          </button>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-white/70">
+                          Prioridad
+                        </p>
+                        <p className="text-lg font-semibold">
+                          {task.priority || "Sin prioridad"}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleOpenModal(task)}
+                          className="rounded-full bg-white/10 p-2 transition hover:bg-white/20"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleOpenConfirmDialog(task.id)}
+                          className="rounded-full bg-white/10 p-2 transition hover:bg-white/20"
+                        >
+                          <SquareX size={16} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mt-4 space-y-2 text-xs text-white/85">
+                      <div>
+                        <p className="font-semibold uppercase tracking-wide">
+                          Tarea
+                        </p>
+                        <p className="text-sm capitalize text-white">
+                          {task.name}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-semibold uppercase tracking-wide">
+                          Descripcion
+                        </p>
+                        <p className="text-sm text-white/80">
+                          {task.description || "Sin descripcion"}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="font-semibold uppercase tracking-wide">
+                            Inicio
+                          </p>
+                          <p className="text-sm">
+                            {formatDate(task.start_date)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-semibold uppercase tracking-wide">
+                            Fin
+                          </p>
+                          <p className="text-sm">
+                            {formatDate(task.end_date)}
+                          </p>
                         </div>
                       </div>
                       <div>
-                        <label className="font-bold" htmlFor="name">
-                          Nombre de la tarea:
-                        </label>
-                        <p>{task.name}</p>
+                        <p className="font-semibold uppercase tracking-wide">
+                          Responsable
+                        </p>
+                        <p className="text-sm">
+                          {getResponsableName(task.responsable_id)}
+                        </p>
                       </div>
                       <div>
-                        <label className="font-bold" htmlFor="description">
-                          Descripción:
-                        </label>
-                        <p>{task.description}</p>
-                      </div>
-                      <div>
-                        <label className="font-bold" htmlFor="startdate">
-                          Fecha de inicio:
-                        </label>
-                        <p>{formatDate(task.start_date)}</p>
-                      </div>
-                      <div>
-                        <label className="font-bold" htmlFor="enddate">
-                          Fecha de fin:
-                        </label>
-                        <p>{formatDate(task.end_date)}</p>
-                      </div>
-                      <div>
-                        <label className="font-bold" htmlFor="responsable">
-                          Responsable:
-                        </label>
-                        <p>{getResponsableName(task.responsable_id)}</p>
-                      </div>
-                      <div>
-                        <label className="font-bold" htmlFor="status">
-                          Estado:
-                        </label>
-                        <p>
+                        <p className="font-semibold uppercase tracking-wide">
+                          Estado
+                        </p>
+                        <p className="text-sm">
                           {task.estado
                             ? capitalizeFirstLetter(task.estado)
                             : "Estado no disponible"}
@@ -270,53 +361,15 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
                   </div>
                 ))
               ) : (
-                <p>No hay tareas asignadas.</p>
+                <div className="rounded-2xl border border-white/15 bg-white/10 p-6 text-xs text-slate-100/75">
+                  No hay tareas asignadas en este proyecto todavia.
+                </div>
               )}
             </div>
           </div>
-        </>
+        </div>
       )}
-      <div className="mt-10 flex flex-wrap justify-end gap-3">
-        <ButtonExportProject project={project} />
-        <button
-          onClick={toggleInfo}
-          className={
-            "bg-cyan-800 hover:bg-cyan-950 text-white px-2 py-1 rounded-lg"
-          }
-        >
-          <Eye size={24} className="inline-block mr-3 " />
-          {showInfo ? "Ocultar Proyecto" : "Ver Proyecto"}
-        </button>
-        <button
-          onClick={() => handleOpenModal()}
-          className={
-            "bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg"
-          }
-        >
-          <CirclePlus size={24} className="inline-block mr-3" />
-          Agregar tarea
-        </button>
-        <button
-          onClick={onEdit}
-          className={`bg-sky-700 hover:bg-sky-800 text-white px-2 py-1 rounded-lg ${
-            userRole === "user" ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={userRole === "user"}
-        >
-          <Pencil size={24} className="inline-block mr-3" />
-          Editar
-        </button>
-        <button
-          onClick={onDelete}
-          className={`bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-lg ${
-            userRole === "user" ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={userRole === "user"}
-        >
-          <Trash size={24} className="inline-block mr-3" />
-          Eliminar
-        </button>
-      </div>
+
       {isModalOpen && (
         <ProjectModal
           project={project}
@@ -326,7 +379,7 @@ const ProjectCard = ({ project, userRole, onEdit, onDelete }) => {
       )}
       {isConfirmDialogOpen && (
         <ConfirmDialog
-          message="¿Estás seguro de que deseas eliminar esta tarea?"
+          message="Estas seguro de que deseas eliminar esta tarea?"
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
         />

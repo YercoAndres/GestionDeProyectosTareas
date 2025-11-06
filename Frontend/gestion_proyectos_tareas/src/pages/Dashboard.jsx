@@ -1,5 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import ProjectTimeline from "../components/ProjectTimeline";
+
+const STATUS_LABELS = ["En Progreso", "En Pausa", "Completado"];
+
+const buildStatusSummary = (projects) =>
+  projects.reduce(
+    (summary, project) => {
+      const status = project.status || "Sin estado";
+      if (!summary[status]) {
+        summary[status] = 0;
+      }
+      summary[status] += 1;
+      return summary;
+    },
+    { "Sin estado": 0 }
+  );
+
+const buildTaskSummary = (tasks) =>
+  tasks.reduce(
+    (summary, task) => {
+      const state = task.estado?.toLowerCase() || "pendiente";
+      if (state.includes("complet")) {
+        summary.completed += 1;
+      } else if (state.includes("progreso")) {
+        summary.inProgress += 1;
+      } else {
+        summary.pending += 1;
+      }
+      return summary;
+    },
+    { pending: 0, inProgress: 0, completed: 0 }
+  );
 
 export default function Dashboard() {
   const [projects, setProjects] = useState([]);
@@ -12,18 +44,21 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const projectsResponse = await fetch(
-          `http://localhost:5000/api/projects`
-        );
-        const usersResponse = await fetch(`http://localhost:5000/api/users`);
-        const tasksResponse = await fetch(`http://localhost:5000/api/tasks`);
+        const [projectsResponse, usersResponse, tasksResponse] =
+          await Promise.all([
+            fetch("http://localhost:5000/api/projects"),
+            fetch("http://localhost:5000/api/users"),
+            fetch("http://localhost:5000/api/tasks"),
+          ]);
 
-        const projectsData = await projectsResponse.json();
-        const usersData = await usersResponse.json();
-        const tasksData = await tasksResponse.json();
+        const [projectsData, usersData, tasksData] = await Promise.all([
+          projectsResponse.json(),
+          usersResponse.json(),
+          tasksResponse.json(),
+        ]);
 
-        setProjects(projectsData);
-        setUsers(usersData);
+        setProjects(Array.isArray(projectsData) ? projectsData : []);
+        setUsers(Array.isArray(usersData) ? usersData : []);
         setTasks(Array.isArray(tasksData) ? tasksData : []);
       } catch (error) {
         console.error("Error al cargar los datos", error);
@@ -32,110 +67,483 @@ export default function Dashboard() {
     fetchDashboardData();
   }, []);
 
-  const handleSelectChange = (e) => {
-    const projectId = e.target.value;
+  const statusSummary = useMemo(
+    () => buildStatusSummary(projects),
+    [projects]
+  );
+  const taskSummary = useMemo(() => buildTaskSummary(tasks), [tasks]);
+
+  const projectTimelines = useMemo(() => {
+    const parseProjectDate = (project, key) =>
+      project[key] ||
+      project[`${key}_date`] ||
+      project[`${key}Date`] ||
+      project[`${key}_at`];
+
+    const items = projects
+      .map((project) => {
+        const startRaw = parseProjectDate(project, "start");
+        const endRaw = parseProjectDate(project, "end");
+
+        if (!startRaw && !endRaw) return null;
+
+        const start = startRaw ? new Date(startRaw) : null;
+        const end = endRaw ? new Date(endRaw) : null;
+
+        const startValid = start && !Number.isNaN(start.getTime());
+        const endValid = end && !Number.isNaN(end.getTime());
+
+        if (!startValid && !endValid) {
+          return null;
+        }
+
+        return {
+          id: project.id,
+          name: project.name,
+          status: project.status,
+          start: startValid ? start : null,
+          end: endValid ? end : null,
+        };
+      })
+      .filter(Boolean);
+
+    if (items.length === 0) {
+      return { items: [], bounds: null };
+    }
+
+    const validStarts = items
+      .map((item) => item.start?.getTime())
+      .filter((time) => Number.isFinite(time));
+    const validEnds = items
+      .map((item) => item.end?.getTime())
+      .filter((time) => Number.isFinite(time));
+
+    const minStart = validStarts.length
+      ? new Date(Math.min(...validStarts))
+      : null;
+    const maxEnd = validEnds.length ? new Date(Math.max(...validEnds)) : null;
+
+    const spanDays =
+      minStart && maxEnd
+        ? Math.max(
+            1,
+            Math.ceil((maxEnd.getTime() - minStart.getTime()) / 86400000)
+          )
+        : 1;
+
+    return {
+      items,
+      bounds:
+        minStart && maxEnd
+          ? {
+              start: minStart,
+              end: maxEnd,
+              spanDays,
+            }
+          : null,
+    };
+  }, [projects]);
+
+  const observabilityMetrics = useMemo(() => {
+    const today = new Date();
+    const floorToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const upcomingThreshold = new Date(floorToday);
+    upcomingThreshold.setDate(floorToday.getDate() + 7);
+
+    let startingSoon = 0;
+    let endingSoon = 0;
+    let overdue = 0;
+
+    projects.forEach((project) => {
+      const startRaw = project.start_date || project.startDate;
+      const endRaw = project.end_date || project.endDate;
+
+      const start = startRaw ? new Date(startRaw) : null;
+      const end = endRaw ? new Date(endRaw) : null;
+
+      if (start && !Number.isNaN(start) && start >= floorToday && start <= upcomingThreshold) {
+        startingSoon += 1;
+      }
+      if (end && !Number.isNaN(end) && end >= floorToday && end <= upcomingThreshold) {
+        endingSoon += 1;
+      }
+      if (end && !Number.isNaN(end) && end < floorToday && project.status !== "Completado") {
+        overdue += 1;
+      }
+    });
+
+    return { startingSoon, endingSoon, overdue };
+  }, [projects]);
+
+  const handleSelectChange = (event) => {
+    const projectId = event.target.value;
     setSelectedProject(projectId);
-    const project = projects.find((p) => p.id === projectId);
-    setProjectInfo(project);
+    if (!projectId) {
+      setProjectInfo(null);
+      setFilteredTasks([]);
+      return;
+    }
+
+    const project = projects.find((item) => String(item.id) === projectId);
+    setProjectInfo(project || null);
 
     const tasksData = Array.isArray(tasks) ? tasks : [];
-    const filtered = tasksData.filter((task) => {
-      return task.project_id === parseInt(projectId);
-    });
+    const filtered = tasksData.filter(
+      (task) => String(task.project_id) === projectId
+    );
     setFilteredTasks(filtered);
   };
 
+  const topProjects = useMemo(
+    () =>
+      [...projects]
+        .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
+        .slice(0, 3),
+    [projects]
+  );
+
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <Sidebar />
-      <div className="flex-1 p-6 bg-gray-100">
-        <h1 className="text-2xl md:text-3xl font-semibold mb-6 text-center lg:text-left">
-          Dashboard
-        </h1>
+    <Sidebar>
+      <div className="relative min-h-screen overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.25),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(129,140,248,0.25),transparent_55%)]" />
+        <div className="relative mx-auto max-w-6xl px-4 py-10 lg:px-8 lg:py-14">
+          <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-cyan-200">
+                Panel general
+              </p>
+              <h1 className="mt-2 text-3xl font-bold text-white md:text-4xl">
+                Bienvenido al centro de control
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm text-slate-200/80 md:text-base">
+                Visualiza el rendimiento de tus equipos, identifica cuellos de
+                botella y haz seguimiento a cada deliverable sin perderte de
+                nada.
+              </p>
+            </div>
+            <div className="glass-panel rounded-2xl px-5 py-4 text-sm text-slate-200/85">
+              <p className="uppercase tracking-wide text-xs text-cyan-200/80">
+                Estado actual
+              </p>
+              <p>
+                {projects.length} proyectos, {tasks.length} tareas activas y{" "}
+                {users.length} miembros colaborando.
+              </p>
+            </div>
+          </header>
 
-        {/* Tarjetas Responsivas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-5xl text-gray-500">
-          {/* Total de proyectos */}
-          <div className="bg-gradient-to-t from-blue-400 via-blue-500 to-blue-600 p-6 rounded-3xl shadow-md grid justify-center">
-            <p className="font-bold text-center text-white">
-              {projects.length}
+          <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <div className="glass-panel rounded-3xl p-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-200">
+                Proyectos activos
+              </p>
+              <p className="mt-3 text-4xl font-bold text-white">
+                {projects.length}
+              </p>
+              <div className="mt-4 space-y-1 text-sm text-slate-200/85">
+                {STATUS_LABELS.map((label) => (
+                  <div key={label} className="flex justify-between">
+                    <span>{label}</span>
+                    <span>{statusSummary[label] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-3xl p-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                Tareas
+              </p>
+              <p className="mt-3 text-4xl font-bold text-white">
+                {tasks.length}
+              </p>
+              <div className="mt-4 grid gap-3">
+                <div className="flex justify-between rounded-2xl bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+                  <span>Completadas</span>
+                  <span>{taskSummary.completed}</span>
+                </div>
+                <div className="flex justify-between rounded-2xl bg-indigo-400/10 px-4 py-3 text-sm text-indigo-100">
+                  <span>En progreso</span>
+                  <span>{taskSummary.inProgress}</span>
+                </div>
+                <div className="flex justify-between rounded-2xl bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">
+                  <span>Pendientes</span>
+                  <span>{taskSummary.pending}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-3xl p-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-purple-200">
+                Colaboradores
+              </p>
+              <p className="mt-3 text-4xl font-bold text-white">
+                {users.length}
+              </p>
+              <p className="mt-4 text-sm text-slate-200/80">
+                Asegurate de asignar roles claros y mantener una cadencia de
+                comunicacion saludable.
+              </p>
+            </div>
+
+            <div className="glass-panel rounded-3xl p-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
+                Proximos hitos
+              </p>
+              <div className="mt-3 space-y-3">
+                {topProjects.length === 0 && (
+                  <p className="text-sm text-slate-200/75">
+                    Aun no se registran proyectos con fechas proximas.
+                  </p>
+                )}
+                {topProjects.map((project) => (
+                  <div
+                    key={project.id}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200"
+                  >
+                    <p className="font-semibold text-white">{project.name}</p>
+                    <p className="text-xs uppercase tracking-wide text-slate-300/80">
+                      Inicio:{" "}
+                      {project.start_date
+                        ? new Date(project.start_date).toLocaleDateString(
+                            "es-ES"
+                          )
+                        : "Sin fecha"}
+                    </p>
+                    <p className="text-xs uppercase tracking-wide text-slate-300/80">
+                      Fin:{" "}
+                      {project.end_date
+                        ? new Date(project.end_date).toLocaleDateString(
+                            "es-ES"
+                          )
+                        : "Sin fecha"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+        </div>
+      </section>
+
+      <section className="mt-12 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
+        <div className="glass-panel rounded-3xl p-8">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold text-white">
+                Carta Gantt simplificada
+              </h2>
+              <p className="text-sm text-slate-200/80">
+                Visualiza la duracion relativa de cada proyecto y detecta
+                solapamientos o cuellos de botella.
+              </p>
+            </div>
+            <p className="text-xs uppercase tracking-wide text-slate-300/70">
+              {projectTimelines.bounds
+                ? `${projectTimelines.items.length} proyectos - ${projectTimelines.bounds.spanDays} dias`
+                : "Datos insuficientes"}
             </p>
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">
-              Proyectos
-            </h2>
-            <img
-              src="../assets/projecticon.png"
-              loading="lazy"
-              alt="iconProject"
-              className="max-w-15 max-h-10 mx-auto block"
-            />
           </div>
-          {/* Total de tareas */}
-          <div className="bg-gradient-to-t from-green-500 via-green-500 to-green-600 p-6 rounded-3xl shadow-md grid justify-center items-center">
-            <p className="font-bold text-center text-white">{tasks.length}</p>
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">
-              Tareas
-            </h2>
-            <img
-              src="../assets/taskicon.png"
-              loading="lazy"
-              alt="iconTask"
-              className="max-w-15 max-h-10 mx-auto block"
-            />
-          </div>
-
-          {/* Total de usuarios */}
-          <div className="bg-gradient-to-t from-amber-400 via-amber-500 to-amber-600 p-6 rounded-3xl shadow-md grid justify-center items-center">
-            <p className="font-bold text-center text-white">{users.length}</p>
-            <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">
-              Miembros Registrados
-            </h2>
-            <img
-              src="../assets/membersicon.png"
-              loading="lazy"
-              alt="iconMembers"
-              className="max-w-15 max-h-10 mx-auto block"
+          <div className="mt-6">
+            <ProjectTimeline
+              items={projectTimelines.items}
+              bounds={projectTimelines.bounds}
             />
           </div>
         </div>
 
-        {/* Selector Responsivo */}
-        <div className="bg-white p-8 rounded-3xl shadow-md mt-6 max-w-full mx-auto grid justify-center text-gray-800">
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-center ">
-            Elige el proyecto para visualizar el estado:
-          </h2>
-          <select
-            value={selectedProject}
-            onChange={handleSelectChange}
-            className="max-w-full p-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white text-gray-800"
-          >
-            <option value="">Selecciona un proyecto</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
+        <div className="glass-panel flex flex-col gap-6 rounded-3xl p-8">
+          <div>
+            <h2 className="text-2xl font-semibold text-white">
+              Observabilidad rapida
+            </h2>
+            <p className="text-sm text-slate-200/80">
+              Indicadores que te permiten actuar antes de que un proyecto se
+              desvie.
+            </p>
+          </div>
+          <ul className="space-y-4 text-sm text-slate-200/85">
+            <li className="rounded-2xl border border-emerald-300/40 bg-emerald-400/10 px-5 py-4">
+              <p className="text-xs uppercase tracking-wide text-emerald-200/90">
+                Inician en 7 dias
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-white">
+                {observabilityMetrics.startingSoon}
+              </p>
+              <p className="mt-1 text-xs text-emerald-100/80">
+                Confirma que el equipo y los recursos esten listos.
+              </p>
+            </li>
+            <li className="rounded-2xl border border-amber-300/40 bg-amber-400/10 px-5 py-4">
+              <p className="text-xs uppercase tracking-wide text-amber-200/90">
+                Finalizan en 7 dias
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-white">
+                {observabilityMetrics.endingSoon}
+              </p>
+              <p className="mt-1 text-xs text-amber-100/80">
+                Prioriza revisiones y entregables finales.
+              </p>
+            </li>
+            <li className="rounded-2xl border border-rose-300/40 bg-rose-400/10 px-5 py-4">
+              <p className="text-xs uppercase tracking-wide text-rose-200/90">
+                Vencidos pendientes
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-white">
+                {observabilityMetrics.overdue}
+              </p>
+              <p className="mt-1 text-xs text-rose-100/80">
+                Revisa bloqueos y redefine fechas criticas.
+              </p>
+            </li>
+          </ul>
         </div>
+      </section>
 
-        {/* Total de tareas del proyecto seleccionado */}
-        <div className="bg-cyan-800 p-6 rounded-3xl shadow-md grid justify-center items-center mt-4">
-          <p className="font-bold text-center text-white text-5xl">
-            {filteredTasks.length}
-          </p>
+      <section className="mt-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="glass-panel rounded-3xl p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">
+                    Estado por proyecto
+                  </h2>
+                  <p className="text-sm text-slate-200/80">
+                    Selecciona un proyecto para ver tareas, fechas y responsables.
+                  </p>
+                </div>
+                <select
+                  value={selectedProject}
+                  onChange={handleSelectChange}
+                  className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-300 focus:bg-white/15 md:w-80"
+                >
+                  <option value="">Selecciona un proyecto</option>
+                  {projects.map((project) => (
+                    <option
+                      key={project.id}
+                      value={project.id}
+                      className="bg-slate-900 text-white"
+                    >
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-center text-white">
-            Tareas del proyecto seleccionado:
-          </h2>
-          <img
-            src="../assets/taskicon.png"
-            loading="lazy"
-            alt="iconTask"
-            className="max-w-15 max-h-10 mx-auto block"
-          />
+              {projectInfo ? (
+                <>
+                  <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-200/85">
+                      <p className="text-xs uppercase tracking-wide text-cyan-200">
+                        Fecha de inicio
+                      </p>
+                      <p className="mt-2 text-lg font-semibold text-white">
+                        {projectInfo.start_date
+                          ? new Date(projectInfo.start_date).toLocaleDateString(
+                              "es-ES"
+                            )
+                          : "Sin fecha"}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-200/85">
+                      <p className="text-xs uppercase tracking-wide text-emerald-200">
+                        Fecha de fin
+                      </p>
+                      <p className="mt-2 text-lg font-semibold text-white">
+                        {projectInfo.end_date
+                          ? new Date(projectInfo.end_date).toLocaleDateString(
+                              "es-ES"
+                            )
+                          : "Sin fecha"}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-200/85">
+                      <p className="text-xs uppercase tracking-wide text-indigo-200">
+                        Estado
+                      </p>
+                      <p className="mt-2 text-lg font-semibold text-white">
+                        {projectInfo.status || "Sin estado"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-200">
+                      Tareas vinculadas
+                    </h3>
+                    {filteredTasks.length === 0 ? (
+                      <p className="mt-4 text-sm text-slate-200/75">
+                        Este proyecto aun no cuenta con tareas asignadas.
+                      </p>
+                    ) : (
+                      <ul className="mt-4 space-y-3">
+                        {filteredTasks.map((task) => (
+                          <li
+                            key={task.id}
+                            className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200/85"
+                          >
+                            <div>
+                              <p className="font-semibold text-white">
+                                {task.name}
+                              </p>
+                              <p className="text-xs uppercase tracking-wide text-slate-300/80">
+                                {task.estado || "Sin estado"}
+                              </p>
+                            </div>
+                            <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                              {task.priority || "Sin prioridad"}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="mt-8 rounded-3xl border border-dashed border-white/20 bg-white/5 p-10 text-center text-sm text-slate-200/75">
+                  Selecciona un proyecto para ver su progreso y tareas asociadas.
+                </div>
+              )}
+            </div>
+
+            <div className="glass-panel rounded-3xl p-8">
+              <h2 className="text-2xl font-semibold text-white">
+                Actividad reciente
+              </h2>
+              <p className="mt-2 text-sm text-slate-200/80">
+                Monitorea cambios importantes en los proyectos y manten a tu
+                equipo informado.
+              </p>
+              <div className="mt-6 space-y-4 text-sm text-slate-200/85">
+                {projects.length === 0 ? (
+                  <p>No se registran actividades recientes.</p>
+                ) : (
+                  projects.slice(0, 6).map((project) => (
+                    <div
+                      key={project.id}
+                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                    >
+                      <p className="font-semibold text-white">
+                        {project.name}
+                      </p>
+                      <p className="text-xs uppercase tracking-wide text-slate-300/80">
+                        Estado: {project.status || "Sin estado"}
+                      </p>
+                      <p className="text-xs text-slate-300/80">
+                        Actualizado el{" "}
+                        {project.updated_at
+                          ? new Date(project.updated_at).toLocaleString("es-ES")
+                          : "Sin informacion"}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
+    </Sidebar>
   );
 }

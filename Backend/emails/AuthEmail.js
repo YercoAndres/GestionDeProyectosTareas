@@ -1,7 +1,17 @@
-const { transporter } = require("../config/nodemailer");
+const { transporter, EMAIL_ENABLED } = require("../config/nodemailer");
 
 const AuthEmail = async (user) => {
   try {
+    if (!EMAIL_ENABLED) {
+      console.log(
+        `Email disabled: se omite el envío de confirmación para ${user.email}`
+      );
+      return {
+        success: true,
+        message: "Envío de correo deshabilitado en este entorno",
+      };
+    }
+
     const confirmationUrl = `${process.env.FRONTEND_URL}/confirm/${user.token}`;
 
     const mailOptions = {
