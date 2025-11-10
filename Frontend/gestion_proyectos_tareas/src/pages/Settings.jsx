@@ -5,18 +5,54 @@ import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+const AVAILABILITY_LABELS = {
+  available: "Disponible",
+  limited: "Disponibilidad limitada",
+  unavailable: "No disponible",
+};
+
 const INFO_TILES = [
   {
     label: "Rol asignado",
     key: "role",
     helper:
       "Tu rol determina el nivel de acceso y las acciones que puedes realizar dentro de ProjectTask.",
+    transform: (value) =>
+      value === "manager"
+        ? "Project manager"
+        : value === "user"
+          ? "Miembro de equipo"
+          : value || "Sin asignar",
   },
   {
     label: "Correo de contacto",
     key: "email",
     helper:
       "Asegurate de mantener un correo activo para recibir notificaciones y recordatorios clave.",
+  },
+  {
+    label: "Capacidad semanal",
+    key: "weekly_capacity_hours",
+    helper:
+      "Define cuántas horas puedes dedicar semanalmente para mejorar la planificación del equipo.",
+    transform: (value) =>
+      value !== undefined && value !== null
+        ? `${Number(value).toFixed(1).replace(/\.0$/, "")} h`
+        : "Sin asignar",
+  },
+  {
+    label: "Disponibilidad actual",
+    key: "availability_status",
+    helper:
+      "Comunica al equipo si estás disponible, con disponibilidad limitada o no disponible.",
+    transform: (value) => AVAILABILITY_LABELS[value] || "Sin asignar",
+  },
+  {
+    label: "Notas de disponibilidad",
+    key: "availability_notes",
+    helper:
+      "Comparte información relevante como vacaciones, recordatorios o horarios especiales.",
+    transform: (value) => value || "Sin notas registradas",
   },
 ];
 
@@ -26,11 +62,21 @@ export default function Settings() {
     name: "",
     email: "",
     role: "user",
+    weekly_capacity_hours: 40,
+    availability_status: "available",
+    availability_notes: "",
   });
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [capacityForm, setCapacityForm] = useState({
+    weeklyCapacityHours: "40",
+    availabilityStatus: "available",
+    availabilityNotes: "",
+  });
+  const [capacitySaving, setCapacitySaving] = useState(false);
+  const [capacityFeedback, setCapacityFeedback] = useState(null);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -49,6 +95,15 @@ export default function Settings() {
         }
         const userData = await response.json();
         setUser(userData);
+        setCapacityForm({
+          weeklyCapacityHours:
+            userData.weekly_capacity_hours !== undefined &&
+            userData.weekly_capacity_hours !== null
+              ? String(userData.weekly_capacity_hours)
+              : "40",
+          availabilityStatus: userData.availability_status || "available",
+          availabilityNotes: userData.availability_notes || "",
+        });
         setFetchError(null);
       } catch (error) {
         console.error("Error:", error);
@@ -60,6 +115,109 @@ export default function Settings() {
 
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    setCapacityForm({
+      weeklyCapacityHours:
+        user.weekly_capacity_hours !== undefined &&
+        user.weekly_capacity_hours !== null
+          ? String(user.weekly_capacity_hours)
+          : "40",
+      availabilityStatus: user.availability_status || "available",
+      availabilityNotes: user.availability_notes || "",
+    });
+  }, [
+    user.weekly_capacity_hours,
+    user.availability_status,
+    user.availability_notes,
+  ]);
+
+  const handleCapacityInputChange = (event) => {
+    const { name, value } = event.target;
+    setCapacityForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (capacityFeedback) {
+      setCapacityFeedback(null);
+    }
+  };
+
+  const handleCapacitySubmit = async (event) => {
+    event.preventDefault();
+    if (!user.id) {
+      setCapacityFeedback({
+        type: "error",
+        message: "No se encontró el usuario actual.",
+      });
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setCapacityFeedback({
+        type: "error",
+        message: "No se encontró token de autenticación.",
+      });
+      return;
+    }
+
+    const numericCapacity = Number(capacityForm.weeklyCapacityHours);
+    if (Number.isNaN(numericCapacity) || numericCapacity < 0) {
+      setCapacityFeedback({
+        type: "error",
+        message: "Ingresa una capacidad semanal válida.",
+      });
+      return;
+    }
+
+    try {
+      setCapacitySaving(true);
+      setCapacityFeedback(null);
+      const response = await fetch(
+        `${API_BASE}/api/users/${user.id}/capacity`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            weeklyCapacityHours: numericCapacity,
+            availabilityStatus: capacityForm.availabilityStatus,
+            availabilityNotes: capacityForm.availabilityNotes,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("No fue posible actualizar la capacidad.");
+      }
+
+      setCapacityFeedback({
+        type: "success",
+        message: "Capacidad actualizada correctamente.",
+      });
+      setUser((prev) => ({
+        ...prev,
+        weekly_capacity_hours: numericCapacity,
+        availability_status: capacityForm.availabilityStatus,
+        availability_notes: capacityForm.availabilityNotes,
+      }));
+
+      setTimeout(() => {
+        setCapacityFeedback(null);
+      }, 4000);
+    } catch (error) {
+      console.error("Error actualizando capacidad:", error);
+      setCapacityFeedback({
+        type: "error",
+        message: error.message || "Error al actualizar la capacidad.",
+      });
+    } finally {
+      setCapacitySaving(false);
+    }
+  };
 
   const quickMeta = useMemo(
     () => [
@@ -77,11 +235,25 @@ export default function Settings() {
           user.role === "manager"
             ? "Project manager"
             : user.role === "user"
-            ? "Miembro de equipo"
-            : user.role || "Sin asignar",
+              ? "Miembro de equipo"
+              : user.role || "Sin asignar",
+      },
+      {
+        label: "Capacidad semanal",
+        value:
+          user.weekly_capacity_hours !== undefined &&
+          user.weekly_capacity_hours !== null
+            ? `${Number(user.weekly_capacity_hours)
+                .toFixed(1)
+                .replace(/\.0$/, "")} h`
+            : "Sin asignar",
+      },
+      {
+        label: "Disponibilidad",
+        value: AVAILABILITY_LABELS[user.availability_status] || "Sin asignar",
       },
     ],
-    [user]
+    [user],
   );
 
   return (
@@ -122,9 +294,9 @@ export default function Settings() {
               </p>
               {loading ? (
                 <div className="mt-6 space-y-3">
-                  <div className="h-12 rounded-2xl bg-white/10" />
-                  <div className="h-12 rounded-2xl bg-white/10" />
-                  <div className="h-12 rounded-2xl bg-white/10" />
+                  <div className="skeleton-block h-12 w-full" />
+                  <div className="skeleton-block h-12 w-full" />
+                  <div className="skeleton-block h-12 w-full" />
                 </div>
               ) : fetchError ? (
                 <div className="mt-6 rounded-2xl border border-rose-300/40 bg-rose-500/10 px-4 py-4 text-sm text-rose-100">
@@ -135,12 +307,18 @@ export default function Settings() {
                   {quickMeta.map((item) => (
                     <div
                       key={item.label}
-                      className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-slate-200/85"
+                      className="card-strong rounded-2xl px-5 py-4 text-sm"
                     >
-                      <p className="text-xs uppercase tracking-wide text-slate-300/70">
+                      <p
+                        className="text-xs uppercase tracking-wide"
+                        style={{ color: "var(--muted-text)" }}
+                      >
                         {item.label}
                       </p>
-                      <p className="mt-1 text-lg font-semibold text-white">
+                      <p
+                        className="mt-1 text-lg font-semibold"
+                        style={{ color: "var(--heading-text)" }}
+                      >
                         {item.value}
                       </p>
                     </div>
@@ -167,15 +345,105 @@ export default function Settings() {
                 >
                   Cambiar contrasena
                 </button>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                  <p className="text-xs uppercase tracking-wide text-slate-300/70">
+                <div className="card-muted rounded-2xl px-5 py-4">
+                  <p
+                    className="text-xs uppercase tracking-wide"
+                    style={{ color: "var(--muted-text)" }}
+                  >
                     Accesos relevantes
                   </p>
-                  <p className="mt-2 text-slate-200/85">
+                  <p className="mt-2" style={{ color: "var(--body-text)" }}>
                     Asegurate de cerrar sesion en dispositivos compartidos y
                     mantener tu correo verificado para recuperar acceso de forma
                     segura.
                   </p>
+                </div>
+                <div className="card-muted rounded-2xl px-5 py-4">
+                  <p
+                    className="text-xs uppercase tracking-wide"
+                    style={{ color: "var(--muted-text)" }}
+                  >
+                    Capacidad y disponibilidad
+                  </p>
+                  <p
+                    className="mt-2 text-xs"
+                    style={{ color: "var(--body-text)" }}
+                  >
+                    Actualiza tus horas disponibles y estado para que las
+                    sugerencias de asignación reflejen tu carga real.
+                  </p>
+                  <form
+                    onSubmit={handleCapacitySubmit}
+                    className="mt-4 space-y-3 text-xs text-slate-200/85"
+                  >
+                    <div>
+                      <label className="block font-semibold text-slate-200/80">
+                        Horas disponibles por semana
+                      </label>
+                      <input
+                        type="number"
+                        name="weeklyCapacityHours"
+                        min="0"
+                        step="0.5"
+                        value={capacityForm.weeklyCapacityHours}
+                        onChange={handleCapacityInputChange}
+                        className="mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-300/50"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-slate-200/80">
+                        Estado de disponibilidad
+                      </label>
+                      <select
+                        name="availabilityStatus"
+                        value={capacityForm.availabilityStatus}
+                        onChange={handleCapacityInputChange}
+                        className="mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-300/50"
+                      >
+                        {Object.entries(AVAILABILITY_LABELS).map(
+                          ([value, label]) => (
+                            <option key={value} value={value}>
+                              {label}
+                            </option>
+                          ),
+                        )}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-slate-200/80">
+                        Notas (opcional)
+                      </label>
+                      <textarea
+                        name="availabilityNotes"
+                        rows={3}
+                        value={capacityForm.availabilityNotes}
+                        onChange={handleCapacityInputChange}
+                        placeholder="Ej. Disponibilidad reducida durante examenes."
+                        className="mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-300/50"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full rounded-lg bg-emerald-500 py-2 text-sm font-semibold text-emerald-900 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-70"
+                      disabled={capacitySaving}
+                    >
+                      {capacitySaving
+                        ? "Guardando..."
+                        : "Guardar disponibilidad"}
+                    </button>
+                    {capacityFeedback && (
+                      <p
+                        className={`text-xs ${
+                          capacityFeedback.type === "error"
+                            ? "text-rose-200"
+                            : "text-emerald-200"
+                        }`}
+                      >
+                        {capacityFeedback.message}
+                      </p>
+                    )}
+                  </form>
                 </div>
               </div>
             </article>
@@ -198,7 +466,9 @@ export default function Settings() {
                     {info.label}
                   </p>
                   <p className="mt-1 text-lg font-semibold text-white">
-                    {user[info.key] || "Sin asignar"}
+                    {(info.transform
+                      ? info.transform(user[info.key], user)
+                      : user[info.key]) || "Sin asignar"}
                   </p>
                   <p className="mt-2 text-xs text-slate-300/75">
                     {info.helper}

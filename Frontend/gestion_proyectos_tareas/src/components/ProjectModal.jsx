@@ -1,43 +1,118 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "react-toastify";
 
-export default function ProjectModal({ project, task: initialTask, onClose }) {
+function ProjectModalContent({
+  project,
+  task: initialTask,
+  onClose,
+  canViewSuggestions = false,
+}) {
   const [task, setTask] = useState({
     name: "",
     description: "",
     start_date: "",
     end_date: "",
+    estimated_hours: "",
+    story_points: "",
     priority: "",
     estado: "en progreso",
     responsable_id: "",
   });
   const [members, setMembers] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
     if (initialTask) {
-      setTask(initialTask);
+      setTask({
+        ...initialTask,
+        estimated_hours:
+          initialTask.estimated_hours !== null &&
+          initialTask.estimated_hours !== undefined
+            ? String(initialTask.estimated_hours)
+            : "",
+        story_points:
+          initialTask.story_points !== null &&
+          initialTask.story_points !== undefined
+            ? String(initialTask.story_points)
+            : "",
+      });
     }
   }, [initialTask]);
 
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchMembersAndSuggestions = async () => {
       try {
+        const token = localStorage.getItem("token");
+        const requestOptions = token
+          ? {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          : undefined;
+
         const response = await fetch(
-          `http://localhost:5000/api/projects/${project.id}/members`
+          `http://localhost:5000/api/projects/${project.id}/members`,
+          requestOptions
         );
         if (response.ok) {
           const data = await response.json();
-          setMembers(data);
+          setMembers(
+            Array.isArray(data)
+              ? data.map((member) => ({
+                  ...member,
+                  id: Number(member.id),
+                  weeklyCapacityHours:
+                    member.weeklyCapacityHours !== undefined &&
+                    member.weeklyCapacityHours !== null
+                      ? Number(member.weeklyCapacityHours)
+                      : 0,
+                }))
+              : []
+          );
         } else {
           console.error("Error al obtener los miembros:", response.statusText);
+        }
+
+        if (token && canViewSuggestions) {
+          const suggestionsResponse = await fetch(
+            `http://localhost:5000/api/projects/${project.id}/assignment-suggestions`,
+            requestOptions
+          );
+          if (suggestionsResponse.ok) {
+            const suggestionsData = await suggestionsResponse.json();
+            setSuggestions(
+              Array.isArray(suggestionsData)
+                ? suggestionsData.map((item) => ({
+                    ...item,
+                    userId: Number(item.userId),
+                    availableHours:
+                      item.availableHours !== undefined &&
+                      item.availableHours !== null
+                        ? Number(item.availableHours)
+                        : 0,
+                    activeTasks:
+                      item.activeTasks !== undefined &&
+                      item.activeTasks !== null
+                        ? Number(item.activeTasks)
+                        : 0,
+                  }))
+                : []
+            );
+          } else {
+            setSuggestions([]);
+          }
+        } else {
+          setSuggestions([]);
         }
       } catch (error) {
         console.error("Error al conectar con la API:", error);
       }
     };
 
-    fetchMembers();
-  }, [project.id]);
+    fetchMembersAndSuggestions();
+  }, [project.id, canViewSuggestions]);
 
   const handleTaskChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +121,25 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
 
   const handleSaveTask = async (e) => {
     e.preventDefault();
-    const taskWithProjectId = { ...task, projectId: project.id };
+    const taskWithProjectId = {
+      ...task,
+      projectId: project.id,
+      estimated_hours:
+        task.estimated_hours !== ""
+          ? Number.parseFloat(task.estimated_hours)
+          : null,
+      story_points:
+        task.story_points !== ""
+          ? Number.parseInt(task.story_points, 10)
+          : null,
+    };
+
+    if (Number.isNaN(taskWithProjectId.estimated_hours)) {
+      taskWithProjectId.estimated_hours = null;
+    }
+    if (Number.isNaN(taskWithProjectId.story_points)) {
+      taskWithProjectId.story_points = null;
+    }
 
     try {
       const response = await fetch(
@@ -77,8 +170,8 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-8 rounded shadow-lg max-w-lg w-full">
+    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-slate-900/70 px-4 py-6 backdrop-blur">
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
         <h3 className="text-xl font-semibold mb-4">
           {initialTask ? "Editar Tarea" : "Agregar Tarea"}
         </h3>
@@ -117,6 +210,46 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
+          </div>
+          <div className="mb-4 grid gap-4 md:grid-cols-2">
+            <div>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="estimated_hours"
+              >
+                Horas estimadas
+              </label>
+              <input
+                type="number"
+                id="estimated_hours"
+                name="estimated_hours"
+                min="0"
+                step="0.25"
+                value={task.estimated_hours}
+                onChange={handleTaskChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Ej: 2.5"
+              />
+            </div>
+            <div>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="story_points"
+              >
+                Story points
+              </label>
+              <input
+                type="number"
+                id="story_points"
+                name="story_points"
+                min="0"
+                step="1"
+                value={task.story_points}
+                onChange={handleTaskChange}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Ej: 3"
+              />
+            </div>
           </div>
           <div className="mb-4">
             <label
@@ -210,10 +343,31 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
               <option value="">Selecciona un responsable</option>
               {members.map((member) => (
                 <option key={member.id} value={member.id}>
-                  {member.name}
+                  {member.name} · {member.weeklyCapacityHours ?? 0} h disp.
                 </option>
               ))}
             </select>
+            {suggestions.length > 0 && (
+              <div className="mt-2 rounded border border-slate-200/60 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                <p className="font-semibold uppercase tracking-wide text-slate-500">
+                  Recomendados
+                </p>
+                <ul className="mt-1 space-y-1">
+                  {suggestions.slice(0, 3).map((item) => (
+                    <li key={item.userId} className="flex justify-between">
+                      <span>{item.name}</span>
+                      <span>
+                        {Math.max(
+                          Number(item.availableHours || 0),
+                          0
+                        ).toFixed(1)}{" "}
+                        h libres
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <button
@@ -233,4 +387,11 @@ export default function ProjectModal({ project, task: initialTask, onClose }) {
       </div>
     </div>
   );
+}
+
+export default function ProjectModal(props) {
+  if (typeof document === "undefined") {
+    return null;
+  }
+  return createPortal(<ProjectModalContent {...props} />, document.body);
 }

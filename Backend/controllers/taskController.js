@@ -10,6 +10,8 @@ const createTask = (req, res) => {
     description: req.body.description,
     start_date: req.body.start_date,
     end_date: req.body.end_date,
+    estimated_hours: req.body.estimated_hours || null,
+    story_points: req.body.story_points || null,
     priority: req.body.priority,
     estado: req.body.estado || "en progreso",
     responsable_id: req.body.responsable_id,
@@ -63,7 +65,11 @@ const deleteTask = (req, res) => {
 // Función para actualizar una tarea
 const updateTask = (req, res) => {
   const { taskId } = req.params;
-  const updatedTask = req.body;
+  const updatedTask = {
+    ...req.body,
+    estimated_hours: req.body.estimated_hours || null,
+    story_points: req.body.story_points || null,
+  };
 
   Task.updateTask(taskId, updatedTask, (err, result) => {
     if (err) {
