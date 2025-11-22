@@ -9,10 +9,9 @@ export default function ButtonExportProject({ project }) {
       return;
     }
 
-    // Crear los datos para el archivo Excel
     const projectData = [
       { Campo: "Nombre del Proyecto", Valor: project.name },
-      { Campo: "Descripción", Valor: project.description },
+      { Campo: "Descripcion", Valor: project.description },
       { Campo: "Fecha de Inicio", Valor: project.startDate },
       { Campo: "Fecha de Fin", Valor: project.endDate },
       { Campo: "Estado", Valor: project.status },
@@ -21,7 +20,7 @@ export default function ButtonExportProject({ project }) {
     const tasksData =
       project.tasks?.map((task) => ({
         "Nombre de la Tarea": task.name,
-        Descripción: task.description,
+        Descripcion: task.description,
         "Fecha de Inicio": task.start_date,
         "Fecha de Fin": task.end_date,
         Prioridad: task.priority,
@@ -29,25 +28,23 @@ export default function ButtonExportProject({ project }) {
         Responsable: task.responsable,
       })) || [];
 
-    // Crear hojas de trabajo
     const workbook = XLSX.utils.book_new();
     const projectSheet = XLSX.utils.json_to_sheet(projectData);
     const tasksSheet = XLSX.utils.json_to_sheet(tasksData);
 
-    // Agregar hojas al libro
     XLSX.utils.book_append_sheet(workbook, projectSheet, "Proyecto");
     XLSX.utils.book_append_sheet(workbook, tasksSheet, "Tareas");
 
-    // Exportar el archivo
     XLSX.writeFile(workbook, `${project.name}_export.xlsx`);
   };
 
   return (
     <button
       onClick={handleExport}
-      className="bg-gray-700 hover:bg-gray-950 text-white px-2 py-1 rounded-lg"
+      className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300 hover:bg-cyan-400/20"
     >
-      <Download size={24} className="inline-block" /> Exportar Proyecto
+      <Download size={18} className="inline-block" />
+      Exportar
     </button>
   );
 }

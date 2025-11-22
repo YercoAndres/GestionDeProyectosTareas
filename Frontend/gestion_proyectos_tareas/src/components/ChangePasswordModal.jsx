@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import Modal from "./Modal";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const MIN_PASSWORD_LENGTH = 6;
 
 export default function ChangePasswordModal({ userId, onClose }) {
   const [passwords, setPasswords] = useState({
@@ -7,9 +12,10 @@ export default function ChangePasswordModal({ userId, onClose }) {
     newPassword: "",
     confirmPassword: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
     setPasswords((prev) => ({
       ...prev,
       [name]: value,
@@ -17,31 +23,32 @@ export default function ChangePasswordModal({ userId, onClose }) {
   };
 
   const validatePasswords = () => {
-    if (passwords.newPassword.length < 6) {
-      toast.error("La nueva contraseña debe tener al menos 6 caracteres");
+    if (passwords.newPassword.length < MIN_PASSWORD_LENGTH) {
+      toast.error(
+        `La nueva contrasena debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`
+      );
       return false;
     }
     if (passwords.newPassword !== passwords.confirmPassword) {
-      toast.error("Las contraseñas no coinciden");
+      toast.error("Las contrasenas no coinciden.");
       return false;
     }
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     if (!validatePasswords()) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("No hay sesión activa");
-        return;
-      }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("No hay sesion activa.");
+      return;
+    }
 
+    setSubmitting(true);
+    try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/users/${userId}/change-password`,
+        `${API_BASE}/api/users/${userId}/change-password`,
         {
           method: "POST",
           headers: {
@@ -58,79 +65,61 @@ export default function ChangePasswordModal({ userId, onClose }) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Error al cambiar la contraseña");
+        throw new Error(data.message || "No se pudo cambiar la contrasena.");
       }
 
-      toast.success(data.message);
+      toast.success(data.message || "Contrasena cambiada correctamente.");
       onClose();
     } catch (error) {
-      console.error("Error al cambiar la contraseña:", error);
-      toast.error(error.message);
+      console.error("Error al cambiar la contrasena:", error);
+      toast.error(error.message || "No se pudo cambiar la contrasena.");
+    } finally {
+      setSubmitting(false);
     }
-    toast.success("Contraseña cambiada exitosamente");
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4">Cambiar Contraseña</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Contraseña Actual
-            </label>
-            <input
-              type="password"
-              name="currentPassword"
-              value={passwords.currentPassword}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Nueva Contraseña
-            </label>
-            <input
-              type="password"
-              name="newPassword"
-              value={passwords.newPassword}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Confirmar Nueva Contraseña
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={passwords.confirmPassword}
-              onChange={handleInputChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Cambiar Contraseña
-            </button>
-          </div>
-        </form>
+    <Modal
+      title="Cambiar contrasena"
+      buttonText={submitting ? "Guardando..." : "Guardar cambios"}
+      onClose={onClose}
+      onSubmit={submitting ? undefined : handleSubmit}
+    >
+      <div className="space-y-4">
+        <label className="space-y-2 text-sm font-semibold text-slate-700">
+          Contrasena actual
+          <input
+            type="password"
+            name="currentPassword"
+            value={passwords.currentPassword}
+            onChange={handleInputChange}
+            className="w-full rounded-2xl border border-slate-300/60 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200/70"
+            autoComplete="current-password"
+          />
+        </label>
+        <label className="space-y-2 text-sm font-semibold text-slate-700">
+          Nueva contrasena
+          <input
+            type="password"
+            name="newPassword"
+            value={passwords.newPassword}
+            onChange={handleInputChange}
+            className="w-full rounded-2xl border border-slate-300/60 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200/70"
+            autoComplete="new-password"
+          />
+        </label>
+        <label className="space-y-2 text-sm font-semibold text-slate-700">
+          Confirmar nueva contrasena
+          <input
+            type="password"
+            name="confirmPassword"
+            value={passwords.confirmPassword}
+            onChange={handleInputChange}
+            className="w-full rounded-2xl border border-slate-300/60 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200/70"
+            autoComplete="new-password"
+          />
+        </label>
       </div>
-    </div>
+    </Modal>
   );
 }

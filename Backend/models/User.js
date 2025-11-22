@@ -39,6 +39,18 @@ const User = {
     const query = "UPDATE users SET verify = ? WHERE id = ?";
     db.query(query, [isVerified, userId], callback);
   },
+  updateCapacity: (userId, { weeklyCapacityHours, availabilityStatus, availabilityNotes }, callback) => {
+    const query = `
+      UPDATE users
+      SET weekly_capacity_hours = ?, availability_status = ?, availability_notes = ?
+      WHERE id = ?
+    `;
+    db.query(
+      query,
+      [weeklyCapacityHours, availabilityStatus, availabilityNotes, userId],
+      callback
+    );
+  },
 };
 
 module.exports = User;

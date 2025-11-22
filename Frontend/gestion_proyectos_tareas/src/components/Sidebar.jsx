@@ -1,129 +1,171 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Home, Folder, User, LogOut } from "lucide-react";
+import {
+  Home,
+  Folder,
+  User,
+  LogOut,
+  Menu,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { useLoading } from "../contexts/LoadingContext";
+import { useTheme } from "../contexts/ThemeContext";
+
+const navLinks = [
+  { to: "/dashboard", label: "Dashboard", icon: Home },
+  { to: "/dashboard/projects", label: "Proyectos", icon: Folder },
+];
 
 const Sidebar = ({ children }) => {
   const { set: setLoading } = useLoading();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
   };
 
   const handleLogout = () => {
     setLoading(true);
     localStorage.removeItem("token");
-    toast.success("Sesión cerrada correctamente");
+    toast.success("Sesion cerrada correctamente");
     navigate("/");
     setLoading(false);
   };
 
-  return (
-    <div className="flex">
-      <div className="  bg-cyan-950">
-        <button
-          onClick={toggleMenu}
-          type="button"
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:focus:ring-gray-600"
-          aria-controls="sidebar"
-          aria-expanded={isOpen}
-        >
-          <span className="sr-only">Open menu</span>
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 17 14"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M1 1h15M1 7h15M1 13h15"
-            />
-          </svg>
-        </button>
-      </div>
+  const isLight = theme === "light";
 
-      <div
-        id="sidebar"
-        className={`fixed inset-y-0 left-0 transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } 4xl:translate-x-0 transition-transform duration-300 ease-in-out bg-cyan-950 text-white w-72 flex flex-col`}
+  const renderLinks = () => (
+    <>
+      {navLinks.map(({ to, label }) => (
+        <Link
+          key={to}
+          to={to}
+          onClick={() => setIsOpen(false)}
+          className={`nav-link rounded-full px-4 py-2 text-sm font-semibold ${
+            location.pathname === to ? "nav-link-active" : ""
+          }`}
+        >
+          <span className="font-medium">{label}</span>
+        </Link>
+      ))}
+      <Link
+        to="/dashboard/settings"
+        onClick={() => setIsOpen(false)}
+        className="nav-link rounded-full px-4 py-2 text-sm font-semibold"
       >
-        <div className="flex items-center justify-end">
-          <h2 className="p-4 text-2xl font-bold border-b border-gray-700">
-            ProjectTask
-          </h2>
+        Perfil
+      </Link>
+    </>
+  );
+
+  return (
+    <div className="min-h-screen transition-colors duration-300">
+      <header className="nav-shell fixed inset-x-0 top-0 z-40 border-b backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 lg:px-8">
+          <Link to="/dashboard" className="flex items-center gap-3">
+            <img
+              src="../assets/icon.png"
+              alt="ProjectTask icon"
+              className="h-10 w-10 rounded-2xl border p-2 shadow-lg"
+              style={{
+                borderColor: "var(--surface-border)",
+                background: "var(--surface-muted)",
+              }}
+            />
+            <div>
+              <p
+                className="text-xs uppercase tracking-[0.35em]"
+                style={{ color: "var(--nav-muted)" }}
+              >
+                ProjectTask
+              </p>
+              <p
+                className="text-sm font-semibold"
+                style={{ color: "var(--nav-text)" }}
+              >
+                Gestion colaborativa
+              </p>
+            </div>
+          </Link>
+
+          <nav className="hidden items-center gap-2 md:flex">{renderLinks()}</nav>
+
+          <div className="hidden items-center gap-3 text-sm font-semibold md:flex">
+            <button
+              onClick={toggleTheme}
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border transition"
+              style={{
+                borderColor: "var(--surface-border)",
+                background: "var(--surface-muted)",
+                color: "var(--nav-text)",
+              }}
+            >
+              {isLight ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 transition"
+              style={{
+                borderColor: "var(--surface-border)",
+                color: "var(--nav-text)",
+              }}
+            >
+              <LogOut size={16} />
+              Cerrar sesion
+            </button>
+          </div>
 
           <button
             onClick={toggleMenu}
             type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:focus:ring-gray-600"
+            className="inline-flex items-center justify-center rounded-full border p-2 md:hidden"
+            style={{
+              borderColor: "var(--surface-border)",
+              background: "var(--surface-muted)",
+              color: "var(--nav-text)",
+            }}
           >
-            <span className="sr-only">Close menu</span>
-            <svg
-              className="w-5 h-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 17 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 1h15M1 7h15M1 13h15"
-              />
-            </svg>
+            <Menu size={20} />
+            <span className="sr-only">Abrir menu</span>
           </button>
         </div>
-        <nav className="flex-1 p-4 space-y-4">
-          <Link
-            to="/dashboard"
-            className="block p-2 rounded hover:bg-cyan-700 "
-          >
-            <Home size={24} className="inline-block mr-3 " />
-            Dashboard
-          </Link>
-          <Link
-            to="/dashboard/projects"
-            className="block p-2 rounded hover:bg-cyan-700 "
-          >
-            <Folder size={24} className="inline-block mr-3 " />
-            Proyectos
-          </Link>
-          {/* <Link
-            to="/dashboard/tasks"
-            className="block p-2 rounded hover:bg-cyan-700"
-          >
-            Tareas
-          </Link> */}
-        </nav>
 
-        <Link
-          to="/dashboard/settings"
-          className="p-4 mt-auto block rounded  border-t border-gray-700 hover:bg-cyan-700 "
-        >
-          <User size={24} className="inline-block mr-3 " />
-          Ver Perfil
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="p-4 mt-auto block rounded  text-start text-red-600 hover:bg-red-600 hover:text-white"
-        >
-          <LogOut size={24} className="inline-block mr-3 " />
-          Cerrar Sesión
-        </button>
-      </div>
+        {isOpen && (
+          <div className="nav-shell border-t px-4 py-4 md:hidden">
+            <div className="flex flex-col gap-3">{renderLinks()}</div>
+            <button
+              onClick={toggleTheme}
+              className="mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition"
+              style={{
+                borderColor: "var(--surface-border)",
+                color: "var(--nav-text)",
+              }}
+            >
+              {isLight ? <Moon size={16} /> : <Sun size={16} />}
+              Modo {isLight ? "oscuro" : "claro"}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="mt-3 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition"
+              style={{
+                borderColor: "var(--surface-border)",
+                color: "var(--nav-text)",
+              }}
+            >
+              <LogOut size={16} />
+              Cerrar sesion
+            </button>
+          </div>
+        )}
+      </header>
 
-      <div className="flex-1 md:ml-64">{children}</div>
+      <main className="pt-24">{children}</main>
     </div>
   );
 };

@@ -14,8 +14,109 @@ const createProject = (project, callback) => {
 };
 
 const updateProject = (id, project, callback) => {
-  const { name, description } = project;
-  connection.query('UPDATE projects SET name = ?, description = ? WHERE id = ?', [name, description, id], callback);
+  const {
+    name,
+    description = '',
+    startDate,
+    start_date,
+    endDate,
+    end_date,
+    status,
+    members,
+  } = project;
+
+  const normalizedStartDate = startDate || start_date || null;
+  const normalizedEndDate = endDate || end_date || null;
+  const normalizedStatus = status || project.status || 'En Progreso';
+  const memberAssignments = Array.isArray(members)
+    ? members
+        .map((member) => {
+          if (member && typeof member === 'object') {
+            const userId = Number(
+              member.userId ?? member.id ?? member.user_id ?? member.memberId
+            );
+            const roleId =
+              member.roleId ?? member.role_id ?? member.roleId ?? null;
+            if (!Number.isNaN(userId) && userId > 0) {
+              return {
+                userId,
+                roleId: roleId ? Number(roleId) : null,
+              };
+            }
+            return null;
+          }
+          const numericId = Number(member);
+          if (Number.isNaN(numericId) || numericId <= 0) {
+            return null;
+          }
+          return { userId: numericId, roleId: null };
+        })
+        .filter(Boolean)
+    : [];
+
+  connection.beginTransaction((err) => {
+    if (err) return callback(err);
+
+    const updateProjectQuery =
+      'UPDATE projects SET name = ?, description = ?, start_date = ?, end_date = ?, status = ? WHERE id = ?';
+
+    connection.query(
+      updateProjectQuery,
+      [name, description, normalizedStartDate, normalizedEndDate, normalizedStatus, id],
+      (updateErr) => {
+        if (updateErr) {
+          return connection.rollback(() => {
+            callback(updateErr);
+          });
+        }
+
+        const deleteMembersQuery = 'DELETE FROM project_members WHERE project_id = ?';
+        connection.query(deleteMembersQuery, [id], (deleteErr) => {
+          if (deleteErr) {
+            return connection.rollback(() => {
+              callback(deleteErr);
+            });
+          }
+
+          if (!memberAssignments.length) {
+            return connection.commit((commitErr) => {
+              if (commitErr) {
+                return connection.rollback(() => {
+                  callback(commitErr);
+                });
+              }
+              callback(null, { affectedRows: 1 });
+            });
+          }
+
+          const insertMembersQuery =
+            'INSERT INTO project_members (project_id, user_id, role_id) VALUES ?';
+          const insertValues = memberAssignments.map((member) => [
+            id,
+            member.userId,
+            member.roleId,
+          ]);
+
+          connection.query(insertMembersQuery, [insertValues], (insertErr) => {
+            if (insertErr) {
+              return connection.rollback(() => {
+                callback(insertErr);
+              });
+            }
+
+            connection.commit((commitErr) => {
+              if (commitErr) {
+                return connection.rollback(() => {
+                  callback(commitErr);
+                });
+              }
+              callback(null, { affectedRows: 1 });
+            });
+          });
+        });
+      }
+    );
+  });
 };
 
 const deleteProject = (id, callback) => {
@@ -78,10 +179,21 @@ const updateProjectStatus = (projectId, status, callback) => {
 
 const getProjectMembers = (projectId, callback) => {
   const query = `
-    SELECT u.id, u.name 
+    SELECT 
+      u.id,
+      u.name,
+      u.email,
+      u.weekly_capacity_hours,
+      u.availability_status,
+      u.availability_notes,
+      pm.role_id,
+      r.role_key,
+      r.name AS role_name
     FROM project_members pm
     JOIN users u ON pm.user_id = u.id
+    LEFT JOIN roles r ON pm.role_id = r.id
     WHERE pm.project_id = ?
+    ORDER BY u.name ASC
   `;
   connection.query(query, [projectId], (err, results) => {
     if (err) {
