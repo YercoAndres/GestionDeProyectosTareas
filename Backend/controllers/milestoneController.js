@@ -2,6 +2,9 @@ const Milestone = require('../models/MilestoneModel');
 
 const getMilestones = (req, res) => {
   const { projectId } = req.params;
+  if (!projectId || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
   Milestone.getMilestonesByProject(projectId, (err, rows) => {
     if (err) {
       console.error('Error al obtener hitos:', err);

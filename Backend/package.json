@@ -20,6 +20,7 @@
     "express-slow-down": "^3.0.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mssql": "^12.2.0",
     "mysql2": "^3.11.5",
     "nodemailer": "^6.9.16"
   }

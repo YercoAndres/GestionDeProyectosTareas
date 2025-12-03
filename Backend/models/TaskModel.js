@@ -1,7 +1,7 @@
 const connection = require('../config/db');
 
 // Función para crear una tarea
-const createTask = (task, callback) => {  
+const createTask = (task, callback) => {
   const {
     projectId,
     name,
@@ -15,20 +15,51 @@ const createTask = (task, callback) => {
     responsable_id,
   } = task;
   connection.query(
-    'INSERT INTO tasks (project_id, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-    [projectId, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id], 
+    'INSERT INTO tasks (project_id, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [projectId, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id],
     callback
   );
 };
 
 // Función para obtener las tareas de un proyecto
 const getTasksByProjectId = (projectId, callback) => {
-  connection.query('SELECT * FROM tasks WHERE project_id = ?', [projectId], callback);
+  const query = `
+    SELECT
+      id AS id,
+      project_id AS project_id,
+      name AS name,
+      description AS description,
+      start_date AS start_date,
+      end_date AS end_date,
+      estimated_hours AS estimated_hours,
+      story_points AS story_points,
+      priority AS priority,
+      estado AS estado,
+      responsable_id AS responsable_id
+    FROM tasks
+    WHERE project_id = ?
+  `;
+  connection.query(query, [projectId], callback);
 };
 
 // Función para obtener todas las tareas
 const getAllTasks = (callback) => {
-  connection.query('SELECT * FROM tasks', callback);
+  const query = `
+    SELECT
+      id AS id,
+      project_id AS project_id,
+      name AS name,
+      description AS description,
+      start_date AS start_date,
+      end_date AS end_date,
+      estimated_hours AS estimated_hours,
+      story_points AS story_points,
+      priority AS priority,
+      estado AS estado,
+      responsable_id AS responsable_id
+    FROM tasks
+  `;
+  connection.query(query, callback);
 };
 
 // Función para eliminar las tareas de un proyecto
@@ -65,5 +96,5 @@ module.exports = {
   getAllTasks,
   deleteTasksByProjectId,
   deleteTask,
-  updateTask
+  updateTask,
 };

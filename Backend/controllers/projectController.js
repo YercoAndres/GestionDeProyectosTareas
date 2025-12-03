@@ -32,12 +32,17 @@ const normalizeMemberPayload = (members = []) =>
 const getAllProjects = (req, res) => {
   const query = `
       SELECT 
-        p.*,
+        p.id AS id,
+        p.name AS name,
+        p.description AS description,
+        p.start_date AS start_date,
+        p.end_date AS end_date,
+        p.status AS status,
         pm.user_id AS member_id,
         pm.role_id AS member_role_id,
         u.name AS member_name,
-        u.weekly_capacity_hours,
-        r.role_key,
+        u.weekly_capacity_hours AS weekly_capacity_hours,
+        r.role_key AS role_key,
         r.name AS role_name
       FROM projects p
       LEFT JOIN project_members pm ON p.id = pm.project_id
@@ -156,7 +161,7 @@ const createProject = (req, res) => {
           description: description || "",
           start_date: startDate,
           end_date: endDate,
-          status: status || "En Progreso",
+          status: status || "En progreso",
         };
         const insertProjectQuery =
           "INSERT INTO projects (name, description, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)";
@@ -292,6 +297,9 @@ const deleteProject = (req, res) => {
 
 const getProjectMembers = (req, res) => {
   const { projectId } = req.params;
+  if (projectId === undefined || projectId === null || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
   Project.getProjectMembers(projectId, (err, members) => {
     if (err) {
       console.error("Error al obtener los miembros del proyecto:", err);
@@ -316,6 +324,9 @@ const getProjectMembers = (req, res) => {
 
 const getAssignmentSuggestions = (req, res) => {
   const { projectId } = req.params;
+  if (!projectId || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
   const query = `
     SELECT
       u.id,

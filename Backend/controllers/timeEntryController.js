@@ -80,6 +80,9 @@ const getTimeEntriesByTask = (req, res) => {
 
 const getTimeEntriesByProject = (req, res) => {
   const { projectId } = req.params;
+  if (!projectId || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
   TimeEntry.getEntriesByProject(projectId, (err, rows) => {
     if (err) {
       console.error('Error al obtener tiempos por proyecto:', err);
@@ -93,6 +96,9 @@ const getTimeEntriesByProject = (req, res) => {
 
 const getTimeSummaryByProject = (req, res) => {
   const { projectId } = req.params;
+  if (!projectId || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
   TimeEntry.getSummaryByProject(projectId, (err, summaryRows) => {
     if (err) {
       console.error('Error al calcular el resumen de tiempo:', err);

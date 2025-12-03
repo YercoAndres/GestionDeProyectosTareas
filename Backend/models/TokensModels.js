@@ -3,7 +3,7 @@ const db = require("../config/db");
 const Token = {
   saveToken: (userId, token, callback) => {
     db.query(
-      "INSERT INTO tokens (user_id, token, expiresAt) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))",
+      "INSERT INTO tokens (user_id, token, expiresAt) VALUES (?, ?, DATEADD(MINUTE, 10, SYSDATETIME()))",
       [userId, token],
       callback
     );

@@ -25,19 +25,43 @@ const createTimeEntry = (entry, callback) => {
 };
 
 const getEntriesByTask = (taskId, callback) => {
-  connection.query(
-    'SELECT * FROM time_entries WHERE task_id = ? ORDER BY started_at DESC',
-    [taskId],
-    callback
-  );
+  const query = `
+    SELECT
+      id AS id,
+      task_id AS task_id,
+      project_id AS project_id,
+      user_id AS user_id,
+      started_at AS started_at,
+      ended_at AS ended_at,
+      duration_minutes AS duration_minutes,
+      note AS note,
+      created_at AS created_at,
+      updated_at AS updated_at
+    FROM time_entries
+    WHERE task_id = ?
+    ORDER BY started_at DESC
+  `;
+  connection.query(query, [taskId], callback);
 };
 
 const getEntriesByProject = (projectId, callback) => {
-  connection.query(
-    'SELECT * FROM time_entries WHERE project_id = ? ORDER BY started_at DESC',
-    [projectId],
-    callback
-  );
+  const query = `
+    SELECT
+      id AS id,
+      task_id AS task_id,
+      project_id AS project_id,
+      user_id AS user_id,
+      started_at AS started_at,
+      ended_at AS ended_at,
+      duration_minutes AS duration_minutes,
+      note AS note,
+      created_at AS created_at,
+      updated_at AS updated_at
+    FROM time_entries
+    WHERE project_id = ?
+    ORDER BY started_at DESC
+  `;
+  connection.query(query, [projectId], callback);
 };
 
 const getSummaryByProject = (projectId, callback) => {

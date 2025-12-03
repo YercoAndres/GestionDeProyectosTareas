@@ -3,18 +3,21 @@ const connection = require('../config/db');
 const getMilestonesByProject = (projectId, callback) => {
   const query = `
     SELECT
-      id,
-      project_id,
-      name,
-      description,
-      start_date,
-      due_date,
-      status,
-      created_at,
-      updated_at
+      id AS id,
+      project_id AS project_id,
+      name AS name,
+      description AS description,
+      start_date AS start_date,
+      due_date AS due_date,
+      status AS status,
+      created_at AS created_at,
+      updated_at AS updated_at
     FROM milestones
     WHERE project_id = ?
-    ORDER BY due_date IS NULL, due_date ASC, id ASC
+    ORDER BY
+      CASE WHEN due_date IS NULL THEN 1 ELSE 0 END,
+      due_date ASC,
+      id ASC
   `;
   connection.query(query, [projectId], callback);
 };

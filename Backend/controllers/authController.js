@@ -56,6 +56,10 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   user.findByEmail(email, (err, results) => {
+    if (err) {
+      console.error('Error en findByEmail:', err);
+      return res.status(500).json({ message: 'Error en la base de datos' });
+    }
     if (!email || !password) {
       return res.status(400).json({ message: "Debes llenar todos los campos" });
     } else if (results.length === 0) {
@@ -63,7 +67,12 @@ const login = (req, res) => {
     }
 
     const userData = results[0];
-    const isMatch = bcrypt.compareSync(password, userData.password);
+    const hashed = userData?.password || userData?.Password;
+    if (!hashed) {
+      console.error('No se encontró hash de contraseña para el usuario');
+      return res.status(500).json({ message: 'Error interno: hash no encontrado' });
+    }
+    const isMatch = bcrypt.compareSync(password, hashed);
     if (!isMatch) {
       return res.status(400).json({ message: "Credenciales invalidas" });
     }

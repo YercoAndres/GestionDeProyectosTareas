@@ -2,6 +2,9 @@ const TaskDependency = require('../models/TaskDependencyModel');
 
 const getDependencies = (req, res) => {
   const { projectId } = req.params;
+  if (!projectId || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
   TaskDependency.getDependenciesByProject(projectId, (err, rows) => {
     if (err) {
       console.error('Error al obtener dependencias:', err);
@@ -202,6 +205,9 @@ const buildCriticalPath = (projectId, callback) => {
 
 const getCriticalPath = (req, res) => {
   const { projectId } = req.params;
+  if (!projectId || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
   buildCriticalPath(projectId, (err, result) => {
     if (err) {
       console.error('Error al calcular la ruta crítica:', err);

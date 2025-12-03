@@ -6,7 +6,7 @@ const normaliseProjectStatus = (status) => {
   const lower = status.toLowerCase();
   if (lower.includes('pausa')) return 'En Pausa';
   if (lower.includes('complet')) return 'Completado';
-  if (lower.includes('progreso')) return 'En Progreso';
+  if (lower.includes('progreso')) return 'En progreso';
   return status;
 };
 
@@ -77,10 +77,19 @@ const getOverviewMetrics = async (_req, res) => {
 
 const getProjectAnalytics = async (req, res) => {
   const { projectId } = req.params;
+  if (!projectId || projectId === 'undefined') {
+    return res.status(400).json({ message: 'projectId requerido' });
+  }
 
   const tasksPromise = new Promise((resolve, reject) => {
     const query = `
-      SELECT id, name, estado, estimated_hours, story_points, end_date
+      SELECT 
+        id AS id, 
+        name AS name, 
+        estado AS estado, 
+        estimated_hours AS estimated_hours, 
+        story_points AS story_points, 
+        end_date AS end_date
       FROM tasks
       WHERE project_id = ?
     `;

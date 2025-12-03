@@ -6,8 +6,9 @@ const getAllProjects = (callback) => {
 
 const createProject = (project, callback) => {
   const { name, description, start_Date, end_Date, members, status } = project;
+  const normalizedStatus = status || 'En progreso';
   const query = 'INSERT INTO projects (name, description, start_date, end_date, members, status) VALUES (?, ?, ?, ?, ?, ?)';
-  connection.query(query, [name, description, start_Date, end_Date, members, status], (err, results) => {
+  connection.query(query, [name, description, start_Date, end_Date, members, normalizedStatus], (err, results) => {
     if (err) return callback(err);
     callback(null, results.insertId);
   });
@@ -27,7 +28,7 @@ const updateProject = (id, project, callback) => {
 
   const normalizedStartDate = startDate || start_date || null;
   const normalizedEndDate = endDate || end_date || null;
-  const normalizedStatus = status || project.status || 'En Progreso';
+  const normalizedStatus = status || project.status || 'En progreso';
   const memberAssignments = Array.isArray(members)
     ? members
         .map((member) => {
@@ -89,15 +90,19 @@ const updateProject = (id, project, callback) => {
             });
           }
 
-          const insertMembersQuery =
-            'INSERT INTO project_members (project_id, user_id, role_id) VALUES ?';
           const insertValues = memberAssignments.map((member) => [
             id,
             member.userId,
             member.roleId,
           ]);
+          const placeholders = insertValues.map(() => '(?, ?, ?)').join(', ');
+          const flatValues = insertValues.flat();
+          const insertMembersQuery = `
+            INSERT INTO project_members (project_id, user_id, role_id)
+            VALUES ${placeholders}
+          `;
 
-          connection.query(insertMembersQuery, [insertValues], (insertErr) => {
+          connection.query(insertMembersQuery, flatValues, (insertErr) => {
             if (insertErr) {
               return connection.rollback(() => {
                 callback(insertErr);
@@ -162,7 +167,15 @@ const deleteProject = (id, callback) => {
 
 const getProjectsByUserId = (userId, callback) => {
   const query = `
-    SELECT p.* FROM projects p
+    SELECT
+      p.id AS id,
+      p.name AS name,
+      p.description AS description,
+      p.start_date AS start_date,
+      p.end_date AS end_date,
+      p.members AS members,
+      p.status AS status
+    FROM projects p
     JOIN project_members pm ON p.id = pm.project_id
     WHERE pm.user_id = ?
   `;

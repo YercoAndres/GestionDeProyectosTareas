@@ -29,6 +29,9 @@ const createTask = (req, res) => {
 // Función para obtener las tareas de un proyecto
 const getTasksByProjectId = (req, res) => {
   const { projectId } = req.params;
+  if (projectId === undefined || projectId === null || projectId === 'undefined') {
+    return res.status(400).json({ message: "projectId requerido" });
+  }
   Task.getTasksByProjectId(projectId, (err, tasks) => {
     if (err) {
       return res.status(500).json({ error: err.message });
