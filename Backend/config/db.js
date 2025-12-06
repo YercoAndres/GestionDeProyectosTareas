@@ -28,6 +28,16 @@ const sqlConfig = {
     encrypt: false,
     trustServerCertificate: true,
   },
+  pool: {
+    max: parseInt(process.env.DB_POOL_MAX || '15', 10),
+    min: parseInt(process.env.DB_POOL_MIN || '2', 10),
+    idleTimeoutMillis: 30000,
+  },
+  requestTimeout: parseInt(process.env.DB_REQUEST_TIMEOUT_MS || '15000', 10),
+  connectionTimeout: parseInt(
+    process.env.DB_CONNECTION_TIMEOUT_MS || '5000',
+    10
+  ),
 };
 
 if (useInstance) {

@@ -201,11 +201,29 @@ const getProjectMembers = (projectId, callback) => {
       u.availability_notes,
       pm.role_id,
       r.role_key,
-      r.name AS role_name
+      r.name AS role_name,
+      COALESCE(SUM(
+        CASE 
+          WHEN t.estado IS NULL OR LOWER(t.estado) <> 'completado'
+            THEN COALESCE(t.estimated_hours, 0)
+          ELSE 0
+        END
+      ), 0) AS active_assigned_hours
     FROM project_members pm
     JOIN users u ON pm.user_id = u.id
     LEFT JOIN roles r ON pm.role_id = r.id
+    LEFT JOIN tasks t ON t.responsable_id = u.id
     WHERE pm.project_id = ?
+    GROUP BY 
+      u.id,
+      u.name,
+      u.email,
+      u.weekly_capacity_hours,
+      u.availability_status,
+      u.availability_notes,
+      pm.role_id,
+      r.role_key,
+      r.name
     ORDER BY u.name ASC
   `;
   connection.query(query, [projectId], (err, results) => {

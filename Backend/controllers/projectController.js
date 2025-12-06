@@ -312,6 +312,12 @@ const getProjectMembers = (req, res) => {
       name: member.name,
       email: member.email,
       weeklyCapacityHours: Number(member.weekly_capacity_hours || 0),
+      activeAssignedHours: Number(member.active_assigned_hours || 0),
+      availableHours: Math.max(
+        0,
+        Number(member.weekly_capacity_hours || 0) -
+          Number(member.active_assigned_hours || 0)
+      ),
       availabilityStatus: member.availability_status,
       availabilityNotes: member.availability_notes,
       roleId: member.role_id ? Number(member.role_id) : null,

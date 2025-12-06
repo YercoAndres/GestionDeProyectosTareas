@@ -12,6 +12,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const timeEntryRoutes = require('./routes/timeEntryRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const roleRoutes = require('./routes/roleRoutes');
+const shardRoutes = require('./routes/shardRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const userRoutes = require('./routes/userRoutes');
 const systemRoutes = require('./routes/systemRoutes');
@@ -70,6 +71,24 @@ const createApp = () => {
     app.set('trust proxy', TRUST_PROXY);
   }
 
+  // Middleware de logging sencillo (método, ruta, status, duración)
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      const ms = Date.now() - start;
+      console.log(
+        JSON.stringify({
+          time: new Date().toISOString(),
+          method: req.method,
+          path: req.originalUrl,
+          status: res.statusCode,
+          duration_ms: ms,
+        })
+      );
+    });
+    next();
+  });
+
   app.use(helmet());
   app.use(cors());
   app.use(speedLimiter);
@@ -83,6 +102,7 @@ const createApp = () => {
   app.use('/api/time-entries', timeEntryRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/roles', roleRoutes);
+  app.use('/api/sharded', shardRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/system', systemRoutes);
   app.use(errorHandler);

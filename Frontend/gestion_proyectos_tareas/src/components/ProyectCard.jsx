@@ -166,6 +166,16 @@ const ProjectCard = ({
                   member.weeklyCapacityHours !== null
                     ? Number(member.weeklyCapacityHours)
                     : 0,
+                activeAssignedHours:
+                  member.activeAssignedHours !== undefined &&
+                  member.activeAssignedHours !== null
+                    ? Number(member.activeAssignedHours)
+                    : 0,
+                availableHours:
+                  member.availableHours !== undefined &&
+                  member.availableHours !== null
+                    ? Number(member.availableHours)
+                    : null,
               }))
             : []
         );
@@ -627,7 +637,15 @@ const ProjectCard = ({
                       {member.weeklyCapacityHours !== undefined
                         ? member.weeklyCapacityHours
                         : 0}{" "}
-                      h · Estado:{" "}
+                      h{" "}
+                      {member.availableHours !== null &&
+                      member.availableHours !== undefined
+                        ? `· Libres: ${Math.max(
+                            member.availableHours,
+                            0
+                          ).toFixed(1)} h `
+                        : ""}
+                      · Estado:{" "}
                       {member.availabilityStatus
                         ? AVAILABILITY_LABELS?.[member.availabilityStatus] ||
                           member.availabilityStatus

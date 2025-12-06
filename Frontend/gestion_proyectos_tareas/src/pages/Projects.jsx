@@ -8,6 +8,7 @@ import jwt_decode from "jwt-decode";
 import { toast } from "react-toastify";
 
 const STATUS_LABELS = ["En Progreso", "En Pausa", "Completado"];
+const STATUS_CREATE = ["En Progreso", "En Pausa"];
 
 const AVAILABILITY_LABELS = {
   available: "Disponible",
@@ -319,10 +320,15 @@ const Projects = () => {
           .filter(Boolean)
       : [];
 
+    const sanitizedStatus =
+      !newProject.id && newProject.status === "Completado"
+        ? "En Progreso"
+        : newProject.status || "En Progreso";
+
     const projectToAdd = {
       ...newProject,
       members: memberPayload,
-      status: newProject.status || "En Progreso",
+      status: sanitizedStatus,
     };
 
     toast.success(
@@ -723,11 +729,13 @@ const Projects = () => {
                   }
                 >
                   <option value="">Selecciona una opcion</option>
-                  {STATUS_LABELS.map((label) => (
-                    <option key={label} value={label}>
-                      {label}
-                    </option>
-                  ))}
+                  {(newProject.id ? STATUS_LABELS : STATUS_CREATE).map(
+                    (label) => (
+                      <option key={label} value={label}>
+                        {label}
+                      </option>
+                    )
+                  )}
                 </select>
               </label>
             </div>

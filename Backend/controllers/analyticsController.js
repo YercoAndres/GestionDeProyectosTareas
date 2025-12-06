@@ -1,5 +1,6 @@
 const connection = require('../config/db');
 const TimeEntry = require('../models/TimeEntryModel');
+const shardBalancer = require('../config/shardBalancer');
 
 const normaliseProjectStatus = (status) => {
   if (!status) return 'Sin estado';
@@ -20,6 +21,65 @@ const normaliseTaskStatus = (status) => {
 
 const getOverviewMetrics = async (_req, res) => {
   try {
+    // Sharded: sumar métricas en paralelo en todos los shards si están configurados
+    if (shardBalancer.hasShards) {
+      const projectStatusPromise = shardBalancer.queryAll(
+        'SELECT status, COUNT(*) AS total FROM projects GROUP BY status'
+      );
+      const taskTotalsPromise = shardBalancer.queryAll(
+        'SELECT COUNT(*) AS totalTasks, COALESCE(SUM(estimated_hours), 0) AS estimatedHours FROM tasks'
+      );
+      const timeTotalsPromise = shardBalancer.queryAll(
+        'SELECT COALESCE(SUM(duration_minutes), 0) AS totalMinutes FROM time_entries'
+      );
+
+      const [projectStatusShards, taskTotalsShards, timeTotalsShards] =
+        await Promise.all([
+          projectStatusPromise,
+          taskTotalsPromise,
+          timeTotalsPromise,
+        ]);
+
+      const projectStatus = projectStatusShards.reduce((acc, shardRes) => {
+        const rows = shardRes.rows || [];
+        rows.forEach((row) => {
+          const status = normaliseProjectStatus(row.status);
+          acc[status] = (acc[status] || 0) + (row.total || 0);
+        });
+        return acc;
+      }, {});
+
+      const taskTotals = taskTotalsShards.reduce(
+        (acc, shardRes) => {
+          const row = (shardRes.rows && shardRes.rows[0]) || {};
+          acc.totalTasks += Number(row.totalTasks || 0);
+          acc.estimatedHours += Number(row.estimatedHours || 0);
+          return acc;
+        },
+        { totalTasks: 0, estimatedHours: 0 }
+      );
+
+      const timeTotals = timeTotalsShards.reduce(
+        (acc, shardRes) => {
+          const row = (shardRes.rows && shardRes.rows[0]) || {};
+          acc.totalMinutes += Number(row.totalMinutes || 0);
+          return acc;
+        },
+        { totalMinutes: 0 }
+      );
+
+      return res.json({
+        projectsByStatus: projectStatus,
+        totalTasks: Number(taskTotals.totalTasks) || 0,
+        totalEstimatedHours: Number(taskTotals.estimatedHours) || 0,
+        totalLoggedHours: Number((timeTotals.totalMinutes || 0) / 60).toFixed(
+          2
+        ),
+        sharded: true,
+      });
+    }
+
+    // Fallback: una sola base de datos
     const projectStatusPromise = new Promise((resolve, reject) => {
       connection.query(
         'SELECT status, COUNT(*) AS total FROM projects GROUP BY status',
@@ -66,6 +126,7 @@ const getOverviewMetrics = async (_req, res) => {
       totalTasks: Number(taskTotals.totalTasks) || 0,
       totalEstimatedHours: Number(taskTotals.estimatedHours) || 0,
       totalLoggedHours: Number((timeTotals.totalMinutes || 0) / 60).toFixed(2),
+      sharded: false,
     });
   } catch (error) {
     console.error('Error al obtener métricas generales:', error);
@@ -178,4 +239,3 @@ module.exports = {
   getOverviewMetrics,
   getProjectAnalytics,
 };
-
