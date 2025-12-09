@@ -331,12 +331,6 @@ const Projects = () => {
       status: sanitizedStatus,
     };
 
-    toast.success(
-      newProject.id
-        ? "Proyecto actualizado correctamente"
-        : "Proyecto creado correctamente"
-    );
-
     if (newProject.id) {
       fetch(`http://localhost:5000/api/projects/${newProject.id}`, {
         method: "PUT",
@@ -353,6 +347,7 @@ const Projects = () => {
           return response.json();
         })
         .then(() => {
+          toast.success("Proyecto actualizado correctamente");
           setProjects((prevProjects) =>
             prevProjects.map((project) =>
               project.id === newProject.id
@@ -393,6 +388,7 @@ const Projects = () => {
           return response.json();
         })
         .then((data) => {
+          toast.success("Proyecto creado correctamente");
           setProjects((prevProjects) => [
             ...prevProjects,
             buildProjectState(data.projectId, projectToAdd),

@@ -6,7 +6,7 @@ const authorizeRole = (roles) => {
     const [scheme, token] = authHeader.split(' ');
 
     if (!scheme || scheme.toLowerCase() !== 'bearer' || !token) {
-      return res.status(403).json({ message: 'Token ausente o formato invalido' });
+      return res.status(401).json({ message: 'Token ausente o formato invalido' });
     }
 
     const allowedAlgs = ['HS256'];
@@ -17,11 +17,11 @@ const authorizeRole = (roles) => {
       { algorithms: allowedAlgs },
       (err, decoded) => {
         if (err) {
-          return res.status(403).json({ message: 'Token invalido o expirado' });
+          return res.status(401).json({ message: 'Token invalido o expirado' });
         }
 
         if (!decoded || !decoded.role) {
-          return res.status(403).json({ message: 'Token sin rol' });
+          return res.status(401).json({ message: 'Token sin rol' });
         }
 
         if (!roles.includes(decoded.role)) {

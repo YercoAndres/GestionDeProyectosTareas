@@ -4,15 +4,16 @@ const projectController = require('../controllers/projectController');
 const milestoneController = require('../controllers/milestoneController');
 const dependencyController = require('../controllers/dependencyController');
 const { authorizeRole } = require('../middlewares/authMiddleware'); 
+const { validateProjectPayload } = require('../middlewares/validators');
 
 // Obtener todos los proyectos (acceso para manager y user)
 router.get('/', projectController.getAllProjects);
 
 // Crear un nuevo proyecto (solo para managers)
-router.post('/', authorizeRole(['manager']), projectController.createProject);
+router.post('/', authorizeRole(['manager']), validateProjectPayload, projectController.createProject);
 
 // Actualizar un proyecto (solo para managers)
-router.put('/:id', authorizeRole(['manager']), projectController.updateProject);
+router.put('/:id', authorizeRole(['manager']), validateProjectPayload, projectController.updateProject);
 
 // Eliminar un proyecto (solo para managers)
 router.delete('/:id', authorizeRole(['manager']), projectController.deleteProject);
