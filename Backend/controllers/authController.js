@@ -67,7 +67,10 @@ const login = (req, res) => {
     }
 
     const userData = results[0];
-    const hashed = userData?.password || userData?.Password;
+    if (userData && userData.passwordHash) {
+      userData.password = userData.passwordHash; // transición suave
+    }
+    const hashed = userData?.password || userData?.passwordHash;
     if (!hashed) {
       console.error('No se encontró hash de contraseña para el usuario');
       return res.status(500).json({ message: 'Error interno: hash no encontrado' });
@@ -118,7 +121,8 @@ const changePassword = async (req, res) => {
       }
 
       const userFound = results[0];
-      const isMatch = bcrypt.compareSync(currentPassword, userFound.password);
+      const hashed = userFound?.passwordHash || userFound?.password;
+      const isMatch = bcrypt.compareSync(currentPassword, hashed);
       if (!isMatch) {
         return res
           .status(400)

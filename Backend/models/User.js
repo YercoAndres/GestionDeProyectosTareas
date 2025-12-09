@@ -7,7 +7,7 @@ const User = {
   create: (userData, callback) => {
     const hashedPassword = bcrypt.hashSync(userData.password, 10);
     const query =
-      "INSERT INTO users (name, email, [password], role) VALUES (?, ?, ?, ?)";
+      "INSERT INTO users (name, email, [Password_Hash], role) VALUES (?, ?, ?, ?)";
     db.query(
       query,
       [userData.name, userData.email, hashedPassword, userData.role],
@@ -20,7 +20,7 @@ const User = {
         id AS id,
         name AS name,
         email AS email,
-        [password] AS password,
+        [Password_Hash] AS passwordHash,
         role AS role,
         verify AS verify,
         weekly_capacity_hours AS weekly_capacity_hours,
@@ -37,7 +37,7 @@ const User = {
         id AS id,
         name AS name,
         email AS email,
-        [password] AS password,
+        [Password_Hash] AS passwordHash,
         role AS role,
         verify AS verify,
         weekly_capacity_hours AS weekly_capacity_hours,
@@ -53,7 +53,7 @@ const User = {
         id AS id,
         name AS name,
         email AS email,
-        [password] AS password,
+        [Password_Hash] AS passwordHash,
         role AS role,
         verify AS verify,
         weekly_capacity_hours AS weekly_capacity_hours,
@@ -70,7 +70,7 @@ const User = {
     db.query(query, [name, email, role, id], callback);
   },
   updatePassword: (userId, hashedPassword, callback) => {
-    const query = "UPDATE users SET [password] = ? WHERE id = ?";
+    const query = "UPDATE users SET [Password_Hash] = ? WHERE id = ?";
     db.query(query, [hashedPassword, userId], callback);
   },
   updateVerificationStatus: (userId, isVerified, callback) => {

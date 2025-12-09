@@ -15,8 +15,8 @@ const createTask = (task, callback) => {
     responsable_id,
   } = task;
   connection.query(
-    'INSERT INTO tasks (project_id, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [projectId, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id],
+    'INSERT INTO tasks (project_id, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, Assigned_User_Id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+    [projectId, name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id], 
     callback
   );
 };
@@ -35,7 +35,7 @@ const getTasksByProjectId = (projectId, callback) => {
       story_points AS story_points,
       priority AS priority,
       estado AS estado,
-      responsable_id AS responsable_id
+      Assigned_User_Id AS responsable_id
     FROM tasks
     WHERE project_id = ?
   `;
@@ -56,7 +56,7 @@ const getAllTasks = (callback) => {
       story_points AS story_points,
       priority AS priority,
       estado AS estado,
-      responsable_id AS responsable_id
+      Assigned_User_Id AS responsable_id
     FROM tasks
   `;
   connection.query(query, callback);
@@ -84,7 +84,7 @@ const updateTask = (taskId, task, callback) => {
     responsable_id,
   } = task;
   connection.query(
-    'UPDATE tasks SET name = ?, description = ?, start_date = ?, end_date = ?, estimated_hours = ?, story_points = ?, priority = ?, estado = ?, responsable_id = ? WHERE id = ?',
+    'UPDATE tasks SET name = ?, description = ?, start_date = ?, end_date = ?, estimated_hours = ?, story_points = ?, priority = ?, estado = ?, Assigned_User_Id = ? WHERE id = ?',
     [name, description, start_date, end_date, estimated_hours, story_points, priority, estado, responsable_id, taskId],
     callback
   );

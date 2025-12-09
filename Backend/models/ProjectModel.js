@@ -212,7 +212,7 @@ const getProjectMembers = (projectId, callback) => {
     FROM project_members pm
     JOIN users u ON pm.user_id = u.id
     LEFT JOIN roles r ON pm.role_id = r.id
-    LEFT JOIN tasks t ON t.responsable_id = u.id
+    LEFT JOIN tasks t ON t.Assigned_User_Id = u.id
     WHERE pm.project_id = ?
     GROUP BY 
       u.id,

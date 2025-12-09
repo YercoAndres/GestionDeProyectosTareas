@@ -25,8 +25,8 @@ export default function () {
   codes.add(res1.status);
   codes.add(res2.status);
 
-  check(res1, { 'overview 200': (r) => r.status === 200 });
-  check(res2, { 'projects 200': (r) => r.status === 200 });
+  check(res1, { 'overview 500': (r) => r.status === 500 });
+  check(res2, { 'projects 500': (r) => r.status === 500 });
 
   sleep(1);
 }

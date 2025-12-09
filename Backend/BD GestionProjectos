@@ -224,55 +224,57 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Roles WHERE Role_Key = 'admin')
     
     GO
 
-USE gestion_proyectos;
-SELECT * FROM Projects;
-USE gestion_proyectos_shard1;
-SELECT * FROM Projects;
-USE gestion_proyectos_shard2;
-SELECT * FROM Projects;
-USE gestion_proyectos_shard3;
-SELECT * FROM Projects;
+--USE gestion_proyectos;
+--SELECT * FROM Projects;
+--USE gestion_proyectos_shard1;
+--SELECT * FROM Projects;
+--USE gestion_proyectos_shard2;
+--SELECT * FROM Projects;
+--USE gestion_proyectos_shard3;
+--SELECT * FROM Projects;
 
-use gestion_proyectos;
+--use gestion_proyectos;
 
-ALTER DATABASE gestion_proyectos SET RECOVERY BULK_LOGGED;
-GO
+-- ****************************SCRIPT DE INSERCION MASIVA************************************************************************
+--ALTER DATABASE gestion_proyectos SET RECOVERY BULK_LOGGED;
+--GO
 
-;WITH N1 AS (SELECT 1 n FROM (VALUES(0),(0),(0),(0),(0),(0),(0),(0),(0),(0)) v(n)), -- 10
-N2 AS (SELECT 1 n FROM N1 a CROSS JOIN N1 b),       -- 100
-N3 AS (SELECT 1 n FROM N2 a CROSS JOIN N2 b),       -- 10.000
-N4 AS (SELECT 1 n FROM N3 a CROSS JOIN N2 b),       -- 1.000.000
-N5 AS (
-  SELECT TOP (5000000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS RN
-  FROM N4 a CROSS JOIN N2 b -- 1M*100=100M, se recorta a 5M
-),
-RandomData AS (
-  SELECT
-    RN AS DummyId,
-    CONCAT('Proyecto masivo ', RN) AS Name,
-    DATEADD(DAY, RN % 365, '2024-01-01') AS Start_Date,
-    DATEADD(DAY, (RN % 365) + 30, '2024-01-01') AS End_Date,
-    N'En progreso' AS [Status]
-  FROM N5
-)
-INSERT INTO dbo.Projects (Name, [Description], Start_Date, End_Date, [Status])
-SELECT Name, N'', Start_Date, End_Date, [Status]
-FROM RandomData;
-GO
+--;WITH N1 AS (SELECT 1 n FROM (VALUES(0),(0),(0),(0),(0),(0),(0),(0),(0),(0)) v(n)), -- 10
+--N2 AS (SELECT 1 n FROM N1 a CROSS JOIN N1 b),       -- 100
+--N3 AS (SELECT 1 n FROM N2 a CROSS JOIN N2 b),       -- 10.000
+--N4 AS (SELECT 1 n FROM N3 a CROSS JOIN N2 b),       -- 1.000.000
+--N5 AS (
+--  SELECT TOP (5000000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS RN
+--  FROM N4 a CROSS JOIN N2 b -- 1M*100=100M, se recorta a 5M
+--),
+--RandomData AS (
+--  SELECT
+--    RN AS DummyId,
+--    CONCAT('Proyecto masivo ', RN) AS Name,
+--    DATEADD(DAY, RN % 365, '2024-01-01') AS Start_Date,
+--    DATEADD(DAY, (RN % 365) + 30, '2024-01-01') AS End_Date,
+--    N'En progreso' AS [Status]
+--  FROM N5
+--)
+--INSERT INTO dbo.Projects (Name, [Description], Start_Date, End_Date, [Status])
+--SELECT Name, N'', Start_Date, End_Date, [Status]
+--FROM RandomData;
+--GO
 
-USE gestion_proyectos_shard1;
-WHILE 1 = 1
-BEGIN
-    DELETE TOP (50000)
-    FROM dbo.Projects
-    WHERE Name LIKE N'Proyecto masivo %';
+--*************BORRAR DATOS DE INSERCION MASIVA*******************************
+--USE gestion_proyectos_shard1;
+--WHILE 1 = 1
+--BEGIN
+--    DELETE TOP (50000)
+--    FROM dbo.Projects
+--    WHERE Name LIKE N'Proyecto masivo %';
 
-    IF @@ROWCOUNT = 0 BREAK;
-    CHECKPOINT;
-END;
+--    IF @@ROWCOUNT = 0 BREAK;
+--    CHECKPOINT;
+--END;
 
-USE master;
-GO
+--USE master;
+--GO
 
 CREATE DATABASE gestion_proyectos_shard1;
 GO
@@ -282,3 +284,71 @@ GO
 
 CREATE DATABASE gestion_proyectos_shard3;
 GO
+
+--******MODIFICACIONES DE SEGURIDAD***********************+
+ALTER TABLE dbo.Users
+    ADD Password_Hash NVARCHAR(255) NULL;
+GO
+UPDATE dbo.Users SET Password_Hash = [Password];  -- temporal si migras
+ALTER TABLE dbo.Users DROP COLUMN [Password];
+GO
+
+CREATE UNIQUE INDEX UQ_Users_Email ON dbo.Users(Email);
+
+-- Opción A: FK a tabla Roles (si quieres rol global de usuario)
+ALTER TABLE dbo.Users ADD Role_Id INT NULL;
+ALTER TABLE dbo.Users
+  ADD CONSTRAINT FK_Users_RoleId
+  FOREIGN KEY (Role_Id) REFERENCES dbo.Roles(Id);
+-- (mantén el rol de proyecto en Project_Members.Role_Id como hoy)
+
+EXEC sp_rename 'dbo.Tasks.Responsable_Id','Assigned_User_Id','COLUMN';
+ALTER TABLE dbo.Tasks DROP CONSTRAINT FK_Tasks_Responsable;
+ALTER TABLE dbo.Tasks
+  ADD CONSTRAINT FK_Tasks_AssignedUser
+  FOREIGN KEY (Assigned_User_Id) REFERENCES dbo.Users(Id);
+
+ALTER TABLE dbo.Tasks
+  ADD CONSTRAINT CK_Tasks_Dates
+  CHECK (End_Date IS NULL OR End_Date >= Start_Date),
+      CONSTRAINT CK_Tasks_EstimatedHours
+  CHECK (Estimated_Hours IS NULL OR Estimated_Hours >= 0),
+      CONSTRAINT CK_Tasks_StoryPoints
+  CHECK (Story_Points IS NULL OR Story_Points >= 0);
+
+  ALTER TABLE dbo.Time_Entries
+  ADD CONSTRAINT CK_Time_Entries_Chrono
+  CHECK (Ended_At IS NULL OR Ended_At >= Started_At);
+
+-- (opcional) cambiar Duration_Minutes a computada
+ALTER TABLE dbo.Time_Entries DROP COLUMN Duration_Minutes;
+ALTER TABLE dbo.Time_Entries
+  ADD Duration_Minutes AS (CASE
+        WHEN Ended_At IS NULL THEN 0
+        ELSE DATEDIFF(MINUTE, Started_At, Ended_At)
+      END) PERSISTED;
+
+      ALTER TABLE dbo.Tokens ADD
+  [Type] VARCHAR(20) NOT NULL DEFAULT 'verify',
+  [Used] BIT NOT NULL DEFAULT 0;
+
+CREATE INDEX IX_Tokens_User_Type_Expires
+  ON dbo.Tokens(User_Id, [Type], ExpiresAt);
+
+
+  -- Projects por estado/fecha
+CREATE INDEX IX_Projects_Status ON dbo.Projects([Status]);
+CREATE INDEX IX_Projects_StartDate ON dbo.Projects(Start_Date);
+
+-- Tasks por proyecto/estado/responsable
+CREATE INDEX IX_Tasks_Project_Status ON dbo.Tasks(Project_Id, Estado);
+CREATE INDEX IX_Tasks_Assigned ON dbo.Tasks(Assigned_User_Id);
+
+-- Time_Entries por proyecto/fecha
+CREATE INDEX IX_Time_Entries_Project_Started
+  ON dbo.Time_Entries(Project_Id, Started_At);
+
+  use gestion_proyectos;
+
+Select * from Projects;
+select * from users;

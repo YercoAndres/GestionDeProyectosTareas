@@ -362,7 +362,7 @@ const getAssignmentSuggestions = (req, res) => {
     FROM users u
     LEFT JOIN project_members pm ON pm.user_id = u.id AND pm.project_id = ?
     LEFT JOIN roles r ON pm.role_id = r.id
-    LEFT JOIN tasks t ON t.responsable_id = u.id
+    LEFT JOIN tasks t ON t.Assigned_User_Id = u.id
     GROUP BY
       u.id,
       u.name,
